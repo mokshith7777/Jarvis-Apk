@@ -7,12 +7,12 @@ package com.mokshith.jarvis.ai.security
 object PromptInjectionGuard {
 
     private val suspiciousPatterns = listOf(
-        Regex("(?i)ignore\s+(all\s+)?(previous|prior|above)\s+instructions"),
-        Regex("(?i)disregard\s+(system|developer)\s+prompt"),
-        Regex("(?i)you\s+are\s+now\s+(in\s+)?developer\s+mode"),
-        Regex("(?i)reveal\s+(your\s+)?(api\s*key|token|secret|credentials|system\s+prompt)"),
-        Regex("(?i)override\s+(security|safety|permission)\s+(policy|rules)"),
-        Regex("(?i)execute\s+(arbitrary|shell|bash|rm\s+-rf)")
+        Regex("""(?i)ignore\s+(all\s+)?(previous|prior|above)\s+instructions"""),
+        Regex("""(?i)disregard\s+(system|developer)\s+prompt"""),
+        Regex("""(?i)you\s+are\s+now\s+(in\s+)?developer\s+mode"""),
+        Regex("""(?i)reveal\s+(your\s+)?(api\s*key|token|secret|credentials|system\s+prompt)"""),
+        Regex("""(?i)override\s+(security|safety|permission)\s+(policy|rules)"""),
+        Regex("""(?i)execute\s+(arbitrary|shell|bash|rm\s+-rf)""")
     )
 
     fun detectInjectionSignals(content: String): List<String> {
