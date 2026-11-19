@@ -1,5 +1,7 @@
 name: Import JARVIS Alpha native source
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: write
@@ -28,7 +30,6 @@ jobs:
         run: |
           set -euo pipefail
           cp -a "${RUNNER_TEMP}/extract/jarvis-alpha/." .
-          # Require release artifact upload to fail if the APK is missing.
           sed -i 's/if-no-files-found: warn/if-no-files-found: error/' .github/workflows/build-apk.yml
           rm -f .github/workflows/import-native-source.yml
           git status --short
