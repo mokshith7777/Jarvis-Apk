@@ -11,7 +11,7 @@ class MemoryAndRetrievalTest {
 
     @Test
     fun ftsQuerySanitizerStripsOperatorsAndBuildsPrefixMatch() {
-        val fts = MemoryQuerySanitizer.buildFtsQuery("Android: "Room" FTS4; query! (test)")
+        val fts = MemoryQuerySanitizer.buildFtsQuery("Android: \"Room\" FTS4; query! (test)")
         assertEquals("android* OR room* OR fts4* OR query* OR test*", fts)
     }
 
