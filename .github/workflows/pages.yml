@@ -68,8 +68,8 @@ jobs:
           if len(scripts) != 1:
               raise SystemExit(f"Expected exactly one inline script, found {len(scripts)}")
           Path("/tmp/storefront.js").write_text(scripts[0])
-          ids = set(re.findall(r'\\bid="([^"]+)"', html))
-          js_ids = set(re.findall(r"getElementById\\(['\\\"]([^'\\\"]+)['\\\"]\\)", scripts[0]))
+          ids = set(re.findall(r'\bid="([^"]+)"', html))
+          js_ids = set(re.findall(r"getElementById\('([^']+)'\)", scripts[0]))
           missing = sorted(js_ids - ids)
           if missing:
               raise SystemExit(f"JS references missing HTML IDs: {missing}")
@@ -93,18 +93,39 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           css = Path("index.html").read_text().split("<style>", 1)[1].split("</style>", 1)[0]
-          # Lightweight brace balance check after stripping comments and quoted strings.
-          import re
-          css = re.sub(r"/\\*.*?\\*/", "", css, flags=re.S)
-          css = re.sub(r'"(?:\\\\.|[^"\\\\])*"|\'(?:\\\\.|[^\'\\\\])*\'', "", css)
           depth = 0
-          for ch in css:
-              if ch == "{": depth += 1
-              elif ch == "}":
+          quote = None
+          comment = False
+          i = 0
+          while i < len(css):
+              if comment:
+                  if css.startswith("*/", i):
+                      comment = False
+                      i += 2
+                      continue
+                  i += 1
+                  continue
+              if quote:
+                  if css[i] == "\\": i += 2; continue
+                  if css[i] == quote: quote = None
+                  i += 1
+                  continue
+              if css.startswith("/*", i):
+                  comment = True
+                  i += 2
+                  continue
+              if css[i] in ('"', "'"):
+                  quote = css[i]
+                  i += 1
+                  continue
+              if css[i] == "{": depth += 1
+              elif css[i] == "}":
                   depth -= 1
                   if depth < 0: raise SystemExit("CSS has an unmatched closing brace")
-          if depth: raise SystemExit(f"CSS has {depth} unmatched opening braces")
-          print("CSS brace check passed.")
+              i += 1
+          if comment or quote or depth:
+              raise SystemExit(f"CSS balance failed: comment={comment}, quote={quote}, depth={depth}")
+          print("CSS structure check passed.")
           PY
       - name: Configure Pages
         uses: actions/configure-pages@v5
