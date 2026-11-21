@@ -58,6 +58,54 @@ jobs:
               raise SystemExit(1)
           print(f"Static audit passed: {len(ids)} IDs, {len(anchors)} anchors, {steps} setup steps.")
           PY
+      - name: Validate JavaScript and cinematic interactions
+        run: |
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+          html = Path("index.html").read_text()
+          scripts = re.findall(r"<script>(.*?)</script>", html, re.S)
+          if len(scripts) != 1:
+              raise SystemExit(f"Expected exactly one inline script, found {len(scripts)}")
+          Path("/tmp/storefront.js").write_text(scripts[0])
+          ids = set(re.findall(r'\\bid="([^"]+)"', html))
+          js_ids = set(re.findall(r"getElementById\\(['\\\"]([^'\\\"]+)['\\\"]\\)", scripts[0]))
+          missing = sorted(js_ids - ids)
+          if missing:
+              raise SystemExit(f"JS references missing HTML IDs: {missing}")
+          checks = {
+              "cinematic canvas": 'id="scene-canvas"' in html,
+              "scene label": 'id="scene-label"' in html,
+              "scene caption": 'id="scene-caption"' in html,
+              "sound control": 'id="sound-toggle"' in html,
+              "sound defaults off": 'aria-pressed="false"' in html,
+              "reduced-motion support": "prefers-reduced-motion:reduce" in html or "prefers-reduced-motion: reduce" in html,
+              "setup guide": 'id="setup"' in html,
+              "8 setup articles": len(re.findall(r'<article class="setup-step', html)) == 8,
+              "no autoplay audio": not re.search(r'<audio[^>]*autoplay', html, re.I),
+          }
+          failed = [name for name, ok in checks.items() if not ok]
+          if failed:
+              raise SystemExit("Interaction checks failed: " + ", ".join(failed))
+          print("JavaScript selectors and cinematic checks passed.")
+          PY
+          node --check /tmp/storefront.js
+          python3 - <<'PY'
+          from pathlib import Path
+          css = Path("index.html").read_text().split("<style>", 1)[1].split("</style>", 1)[0]
+          # Lightweight brace balance check after stripping comments and quoted strings.
+          import re
+          css = re.sub(r"/\\*.*?\\*/", "", css, flags=re.S)
+          css = re.sub(r'"(?:\\\\.|[^"\\\\])*"|\'(?:\\\\.|[^\'\\\\])*\'', "", css)
+          depth = 0
+          for ch in css:
+              if ch == "{": depth += 1
+              elif ch == "}":
+                  depth -= 1
+                  if depth < 0: raise SystemExit("CSS has an unmatched closing brace")
+          if depth: raise SystemExit(f"CSS has {depth} unmatched opening braces")
+          print("CSS brace check passed.")
+          PY
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload site
