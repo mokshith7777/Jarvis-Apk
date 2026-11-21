@@ -78,6 +78,8 @@ jobs:
               "procedural shader": "Procedural WebGL background plane" in scripts[0],
               "responsive hero architecture": ".hero{min-height:100svh;grid-template-columns:minmax(0,1.02fr)" in html,
               "WebGL fallback": "if(!gl)" in scripts[0],
+              "context-loss fallback": "webglcontextlost" in scripts[0],
+              "background frame throttle": "lastFrame>=33" in scripts[0],
               "shader reduced motion": "prefers-reduced-motion: reduce" in scripts[0],
               "cinematic canvas": 'id="scene-canvas"' in html,
               "scene label": 'id="scene-label"' in html,
