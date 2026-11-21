@@ -179,6 +179,37 @@ body.three-ready .storybeat{background:linear-gradient(90deg,#03060a9e,#03060a45
 @media(max-width:900px){.hero{padding-top:118px;min-height:100svh}.hero .stage{min-height:clamp(280px,48vh,430px)}.hero .corecanvas{height:clamp(280px,48vh,430px)}}
 @media(max-width:600px){.hero{padding:112px 6vw 58px;min-height:100svh;gap:0}.hero .stage{min-height:260px;margin-top:-8px}.hero .corecanvas{height:260px}.hero h1{font-size:clamp(38px,11.4vw,62px)}#world-status{left:6vw;top:90px;font-size:7px}#world-progress{right:13px;bottom:18px;font-size:7px}}
 @media(prefers-reduced-motion:reduce){#jarvis-world{opacity:.75;transition:none}body.three-ready #background-canvas{opacity:.16!important}}
+
+/* FULL-PAGE CINEMATIC BACKGROUND: one continuous animated world behind every section */
+.cinematic-techfield{position:fixed!important;inset:0!important;z-index:0!important;opacity:1!important;pointer-events:none!important;overflow:hidden!important}
+#background-canvas{position:absolute!important;inset:0!important;width:100vw!important;height:100vh!important;opacity:1!important;z-index:0!important;display:block!important}
+#jarvis-world{position:absolute!important;inset:0!important;width:100vw!important;height:100vh!important;opacity:.20!important;z-index:1!important;mix-blend-mode:screen!important}
+#scene-canvas{position:absolute!important;inset:0!important;width:100vw!important;height:100vh!important;opacity:.035!important;z-index:2!important}
+.scene-flare{opacity:.14!important}
+.techfield-orb,.web-lattice,.tech-particles{opacity:.025!important}
+body.three-ready #background-canvas{opacity:1!important}
+body.three-ready #jarvis-world{opacity:.10!important}
+body.three-ready #scene-canvas{opacity:.025!important}
+body,main{background:transparent!important}
+body:before{opacity:.025!important}
+body:after{opacity:.05!important}
+.hero,section,.storybeat,.setup-station{background:transparent!important}
+section:not(.hero){background:linear-gradient(180deg,#03060a36,#03060a20 48%,#03060a45)!important;backdrop-filter:none!important}
+.storybeat{background:linear-gradient(90deg,#03060a52,#03060a20 64%,#03060a52)!important}
+.feature,.demo,.visualbox,.pricecard,.included,.drop-lab,.setup-console,.setup-device,.setup-station{background-color:#050b12b8!important;backdrop-filter:blur(4px)}
+.hero{background:linear-gradient(90deg,#02030758,transparent 80%)!important}
+.hero .copy{max-width:720px}
+.hero h1{font-size:clamp(38px,6vw,84px)!important}
+.hero .stage{min-height:clamp(270px,54vh,520px)!important}
+.hero .corecanvas{height:clamp(270px,54vh,520px)!important}
+#world-progress{opacity:.45}
+@media(max-width:700px){
+ #background-canvas{width:100vw!important;height:100dvh!important}
+ #jarvis-world,#scene-canvas{width:100vw!important;height:100dvh!important}
+ section:not(.hero){background:linear-gradient(180deg,#02050a45,#02050a28 55%,#02050a52)!important}
+ .feature,.demo,.visualbox,.pricecard,.included,.drop-lab,.setup-console{background-color:#050b12d0!important}
+}
+@media(prefers-reduced-motion:reduce){#background-canvas{opacity:.72!important}}
 </style></head>
 <body>
 <div class="cinematic-atmosphere" aria-hidden="true"><div class="atmo-glow atmo-red"></div><div class="atmo-glow atmo-blue"></div><div class="atmo-glow atmo-violet"></div><div class="atmo-grid"></div><div class="atmo-specks"></div><div class="atmo-vignette"></div></div>
@@ -219,24 +250,45 @@ body.three-ready .storybeat{background:linear-gradient(90deg,#03060a9e,#03060a45
 /* Procedural WebGL background plane: perspective floor, signal arcs, nebula and particles. */
 (()=>{const c=document.getElementById('background-canvas');if(!c)return;let gl;try{gl=c.getContext('webgl',{alpha:false,antialias:false,powerPreference:'low-power'})||c.getContext('experimental-webgl')}catch(e){}if(!gl){c.style.background='radial-gradient(ellipse at 72% 44%,#122c54 0,#070d1a 45%,#020307 85%)';return}
 const vs='attribute vec2 aPosition;varying vec2 vUv;void main(){vUv=aPosition*.5+.5;gl_Position=vec4(aPosition,0.,1.);}';
-const fs='precision mediump float;varying vec2 vUv;uniform vec2 uResolution;uniform vec2 uMouse;uniform float uTime;uniform float uScroll;'+
-'float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}'+
-'float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hash(i),hash(i+vec2(1.,0.)),f.x),mix(hash(i+vec2(0.,1.)),hash(i+vec2(1.,1.)),f.x),f.y);}'+
-'float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<4;i++){v+=noise(p)*a;p*=2.02;a*=.5;}return v;}'+
-'void main(){vec2 uv=vUv;vec2 p=(uv-.5)*vec2(uResolution.x/uResolution.y,1.);p+=uMouse*.035;float t=uTime;vec3 col=vec3(.008,.012,.022);'+
-'float n=fbm(p*2.3+vec2(t*.035,-t*.025));float cloud= smoothstep(.22,.85,n)*exp(-length(p-vec2(.28,.02))*.8);col+=vec3(.025,.055,.12)*cloud;'+
-'float redNeb=fbm(p*2.6+vec2(-t*.025,t*.04))*exp(-length(p-vec2(-.42,.1))*.95);col+=vec3(.16,.012,.045)*redNeb;'+
-'float blueNeb=fbm(p*3.1+vec2(t*.03,t*.02))*exp(-length(p-vec2(.48,.08))*.85);col+=vec3(.035,.16,.32)*blueNeb;'+
-'float horizon=.49+uMouse.y*.025;float floorMask=smoothstep(horizon,horizon+.13,uv.y);float depth=1./max(uv.y-horizon,.025);vec2 gp=vec2(p.x*depth*1.15,depth*.42);'+
-'float gx=1.-smoothstep(.006,.027,abs(fract(gp.x)-.5));float gy=1.-smoothstep(.006,.027,abs(fract(gp.y)-.5));float grid=max(gx,gy)*floorMask;float fade=exp(-max(uv.y-horizon,0.)*2.6);'+
-'col+=vec3(.025,.10,.18)*grid*fade;float gridPulse=grid*(.25+.25*sin(t*1.1+gp.x*1.4));col+=vec3(.02,.045,.11)*gridPulse;'+
-'vec2 core=vec2(.23,.02)+uMouse*.05;float d=length((p-core)*vec2(1.0,.8));float halo=exp(-d*3.3);col+=vec3(.035,.11,.3)*halo;'+
-'float ring1=abs(d-(.28+.015*sin(t*.8)));float ring2=abs(d-(.42+.012*cos(t*.55)));col+=vec3(.08,.32,.6)*exp(-ring1*85.)*.28;col+=vec3(.22,.04,.12)*exp(-ring2*62.)*.17;'+
-'float arc=sin(atan(p.y-core.y,p.x-core.x)*9.+t*1.4);float arcGlow=exp(-abs(d-.34)*70.)*smoothstep(-.15,.75,arc);col+=vec3(.12,.32,.7)*arcGlow*.35;'+
-'float wave=sin(p.x*2.8+fbm(p*2.+t*.07)*2.4+p.y*3.5+t*.3);float energy=exp(-abs(wave-p.y*.45)*8.)*.12;col+=vec3(.025,.18,.32)*energy;'+
-'vec2 cell=floor(uv*vec2(105.,65.));float star=step(.994,hash(cell+floor(t*.12)))*(.3+.7*hash(cell+5.));col+=vec3(.5,.72,1.)*star;'+
-'float vignette=1.-smoothstep(.25,1.15,length((uv-.5)*vec2(1.2,1.)));col*=.42+.58*vignette;col+=vec3(.008,.014,.028)*uScroll;'+
-'float scan=1.-smoothstep(.0,.006,abs(fract(uv.y*180.+t*.018)-.5));col+=vec3(.01,.025,.045)*scan*.08;gl_FragColor=vec4(col,1.);}';
+const fs=String.raw`precision mediump float;
+varying vec2 vUv; uniform vec2 uResolution; uniform vec2 uMouse; uniform float uTime; uniform float uScroll;
+float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hash(i),hash(i+vec2(1.,0.)),f.x),mix(hash(i+vec2(0.,1.)),hash(i+vec2(1.,1.)),f.x),f.y);}
+float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<4;i++){v+=noise(p)*a;p*=2.03;a*=.5;}return v;}
+float lineGlow(float d,float w){return 1.-smoothstep(w,w*2.8,d);}
+float webPattern(vec2 p,vec2 center,float phase){vec2 q=p-center;float r=length(q);float a=atan(q.y,q.x);float spoke=abs(sin(a*12.));float spokes=lineGlow(spoke*r,.008+.003*sin(phase));float rings=abs(sin(r*22.+.15*sin(a*12.+phase)));float ringGlow=lineGlow(rings*r,.014);return (spokes*.62+ringGlow*.45)*exp(-r*1.65);}
+float city(vec2 uv,float t){float horizon=.31+.04*sin(t*.06);float x=uv.x*42.;float id=floor(x);float local=fract(x);float h=.13+.26*hash(vec2(id,4.2))+.10*fbm(vec2(id*.07,t*.025));float y=uv.y-horizon;float b=step(y,0.)*step(y,-h);float edge=smoothstep(.02,.06,local)*smoothstep(.98,.94,local);float body=b*edge;float winx=step(.22,local)*step(local,.82);float wy=fract((uv.y-horizon)*100.+hash(vec2(id,1.))*5.);float wx=fract(local*8.);float lit=step(.74,hash(vec2(id*3.+floor(local*8.),floor((uv.y-horizon)*100.))));float windows=step(.14,wy)*step(wy,.86)*step(.18,wx)*step(wx,.82)*lit*winx*body;vec3 facade=mix(vec3(.012,.025,.045),vec3(.025,.07,.12),hash(vec2(id,7.)));return body*(.025+edge*.025)+windows*.6;}
+void main(){vec2 uv=vUv;float t=uTime;vec2 aspect=vec2(uResolution.x/uResolution.y,1.);vec2 p=(uv-.5)*aspect; p+=uMouse*.025;
+float scroll=clamp(uScroll,0.,1.);float drift=t*.035+scroll*4.5;
+vec3 col=vec3(.003,.006,.012);
+float cloud=fbm(p*2.1+vec2(t*.018,-t*.025));float neb=exp(-length(p-vec2(.28,.05))*.8)*cloud;col+=vec3(.018,.045,.095)*neb;
+float redfog=fbm(p*2.8+vec2(-t*.04,t*.025))*exp(-length(p+vec2(.48,.1))*.85);col+=vec3(.13,.008,.038)*redfog;
+float bluefog=fbm(p*3.4+vec2(t*.03,t*.02))*exp(-length(p-vec2(.46,.12))*.8);col+=vec3(.025,.12,.29)*bluefog;
+float horizon=.29+.035*sin(t*.09)+scroll*.02;
+float cityGlow=city(uv,t+scroll*70.);col+=vec3(.025,.07,.12)*cityGlow;
+float ground=smoothstep(horizon-.02,horizon+.01,uv.y);
+vec2 floorp=vec2(p.x/max(uv.y-horizon,.025),1./max(uv.y-horizon,.025));
+float gx=lineGlow(abs(fract(floorp.x*1.7)-.5),.008);
+float gy=lineGlow(abs(fract(floorp.y*.42+drift)-.5),.009);
+float grid=(gx+gy)*ground*exp(-max(uv.y-horizon,0.)*2.5);col+=vec3(.018,.08,.15)*grid;
+float cityPhase=1.-smoothstep(.05,.32,scroll);
+float webPhase=smoothstep(.12,.38,scroll)*(1.-smoothstep(.42,.66,scroll));
+float tunnelPhase=smoothstep(.42,.65,scroll)*(1.-smoothstep(.68,.88,scroll));
+float reactorPhase=smoothstep(.72,.94,scroll);
+float web=webPattern(uv,vec2(.78,.78),t*.7+scroll*4.)*webPhase;
+col+=vec3(.13,.025,.065)*web;col+=vec3(.22,.035,.09)*web*.35;
+float tunnelDist=length(p*vec2(.75,1.1));float tunnelRing=abs(fract(tunnelDist*3.4-drift)-.5);float tunnel=lineGlow(tunnelRing,.018)*tunnelPhase;float rays=pow(max(0.,1.-abs(sin(atan(p.y,p.x)*18.))),14.)*exp(-tunnelDist*.4)*tunnelPhase;col+=vec3(.02,.11,.28)*tunnel+vec3(.025,.13,.4)*rays;
+vec2 core=vec2(.05,-.05)+uMouse*.04;float d=length((p-core)*vec2(1.,.82));float coreGlow=exp(-d*4.);float ring1=lineGlow(abs(d-(.19+.015*sin(t*1.2))),.008);float ring2=lineGlow(abs(d-(.31+.012*cos(t*.8))),.006);float ring3=lineGlow(abs(d-(.43+.018*sin(t*.55))),.005);
+float pulse=.7+.3*sin(t*2.3+scroll*6.);col+=vec3(.025,.16,.36)*coreGlow*reactorPhase;col+=vec3(.05,.35,.65)*(ring1+ring2*.65+ring3*.35)*reactorPhase;
+float arc=lineGlow(abs(d-.28)*60.,.22)*smoothstep(-.2,.8,sin(atan(p.y-core.y,p.x-core.x)*7.+t*1.7))*reactorPhase;col+=vec3(.1,.38,.8)*arc;
+float energyWave=sin(p.x*3.+fbm(p*2.+t*.05)*2.+p.y*4.+t*.35);col+=vec3(.025,.16,.32)*exp(-abs(energyWave-p.y*.5)*8.)*(.45+tunnelPhase*.5);
+float stars=step(.996,hash(floor(uv*vec2(180.,100.))+floor(t*.08)))*(.25+.75*hash(floor(uv*vec2(180.,100.))+9.));col+=vec3(.55,.78,1.)*stars;
+float rain=step(.985,hash(floor(uv*vec2(230.,90.))+vec2(floor(t*4.),0.)))*lineGlow(abs(fract(uv.y*13.+t*1.8)-.5),.04);col+=vec3(.12,.28,.5)*rain*(cityPhase+webPhase*.5);
+float beam=exp(-abs(p.x-(sin(t*.16+scroll*3.)*.55))*2.2)*1.8;col+=vec3(.025,.09,.3)*beam*(.25+scroll*.45);
+float vignette=1.-smoothstep(.3,1.2,length((uv-.5)*vec2(1.1,1.)));col*=.42+.58*vignette;
+float grain=hash(uv*vec2(900.,600.)+t)*.035;col+=grain;
+col=col/(1.+col);col=pow(col,vec3(.92));gl_FragColor=vec4(col,1.);
+`;
 function compile(type,src){let s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){console.warn('JARVIS background shader:',gl.getShaderInfoLog(s));gl.deleteShader(s);return null}return s}
 const v=compile(gl.VERTEX_SHADER,vs),f=compile(gl.FRAGMENT_SHADER,fs);if(!v||!f){c.style.background='radial-gradient(ellipse at 72% 44%,#122c54 0,#070d1a 45%,#020307 85%)';return}const program=gl.createProgram();gl.attachShader(program,v);gl.attachShader(program,f);gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS)){console.warn(gl.getProgramInfoLog(program));c.style.background='#020307';return}gl.useProgram(program);const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);const loc=gl.getAttribLocation(program,'aPosition');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);const res=gl.getUniformLocation(program,'uResolution'),mouse=gl.getUniformLocation(program,'uMouse'),time=gl.getUniformLocation(program,'uTime'),scroll=gl.getUniformLocation(program,'uScroll');let w=0,h=0,dpr=1,mx=0,my=0,sc=0,raf=0,visible=true,lastFrame=0;const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 function resize(){dpr=Math.min(devicePixelRatio||1,1.35);w=c.clientWidth;h=c.clientHeight;c.width=Math.max(1,Math.floor(w*dpr));c.height=Math.max(1,Math.floor(h*dpr));gl.viewport(0,0,c.width,c.height);gl.uniform2f(res,c.width,c.height);render(performance.now())}
