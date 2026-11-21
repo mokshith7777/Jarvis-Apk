@@ -65,16 +65,26 @@ jobs:
           from pathlib import Path
           html = Path("index.html").read_text()
           scripts = re.findall(r"<script>(.*?)</script>", html, re.S)
+          modules = re.findall(r'<script type="module">(.*?)</script>', html, re.S)
           if len(scripts) != 1:
               raise SystemExit(f"Expected exactly one inline script, found {len(scripts)}")
+          if len(modules) != 1:
+              raise SystemExit(f"Expected exactly one cinematic module, found {len(modules)}")
           Path("/tmp/storefront.js").write_text(scripts[0])
+          Path("/tmp/cinematic-world.js").write_text(modules[0])
           ids = set(re.findall(r'\bid="([^"]+)"', html))
-          js_ids = set(re.findall(r"getElementById\('([^']+)'\)", scripts[0]))
+          js_ids = set(re.findall(r"getElementById\('([^']+)'\)", scripts[0] + modules[0]))
           missing = sorted(js_ids - ids)
           if missing:
               raise SystemExit(f"JS references missing HTML IDs: {missing}")
           checks = {
-              "WebGL background canvas": 'id="background-canvas"' in html,
+              "3D cinematic world canvas": 'id="jarvis-world"' in html,
+              "Three.js module": "three.module.js" in modules[0],
+              "scroll camera timeline": "cameraPath(progress.v)" in modules[0],
+              "chapter environment geometry": "network/web chapter" in modules[0] or "network/web" in modules[0] or "const net=" in modules[0],
+              "WebGL context fallback": "webglcontextlost" in modules[0],
+              "module fallback": "catch(err)" in modules[0],
+              "background canvas": 'id="background-canvas"' in html,
               "procedural shader": "Procedural WebGL background plane" in scripts[0],
               "responsive hero architecture": ".hero{min-height:100svh;grid-template-columns:minmax(0,1.02fr)" in html,
               "WebGL fallback": "if(!gl)" in scripts[0],
@@ -97,6 +107,7 @@ jobs:
           print("JavaScript selectors and cinematic checks passed.")
           PY
           node --check /tmp/storefront.js
+          node --check /tmp/cinematic-world.js
           python3 - <<'PY'
           from pathlib import Path
           css = Path("index.html").read_text().split("<style>", 1)[1].split("</style>", 1)[0]
