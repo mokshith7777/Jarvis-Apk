@@ -47,7 +47,7 @@ jobs:
           import re
           from pathlib import Path
           html = Path("index.html").read_text()
-          ids = re.findall(r'\\bid="([^"]+)"', html)
+          ids = re.findall(r'\bid="([^"]+)"', html)
           duplicates = sorted({x for x in ids if ids.count(x) > 1})
           anchors = re.findall(r'href="#([^"]+)"', html)
           broken = sorted(set(x for x in anchors if x not in ids))
