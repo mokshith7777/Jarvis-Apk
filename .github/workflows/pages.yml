@@ -35,6 +35,29 @@ jobs:
           grep -q 'dragstart' index.html
           grep -q 'chapterrail' index.html
           grep -q 'scroll-p' index.html
+          grep -q 'id="setup"' index.html
+          grep -q 'setup-station' index.html
+          grep -q 'id="devicefamily"' index.html
+          grep -q 'id="setup-progress-bar"' index.html
+          grep -q 'class="step-done"' index.html
+          grep -q 'Do not disable Play Protect' index.html
+          grep -q 'does not recommend bypassing' index.html
+          grep -q 'support.google.com/android/answer/12623953' index.html
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+          html = Path("index.html").read_text()
+          ids = re.findall(r'\\bid="([^"]+)"', html)
+          duplicates = sorted({x for x in ids if ids.count(x) > 1})
+          anchors = re.findall(r'href="#([^"]+)"', html)
+          broken = sorted(set(x for x in anchors if x not in ids))
+          setup = html[html.index('<section id="setup"'):html.index('<section id="pricing"')]
+          steps = len(re.findall(r'<article class="setup-step', setup))
+          if duplicates or broken or steps != 8:
+              print(f"Duplicate IDs: {duplicates}; broken anchors: {broken}; setup steps: {steps}")
+              raise SystemExit(1)
+          print(f"Static audit passed: {len(ids)} IDs, {len(anchors)} anchors, {steps} setup steps.")
+          PY
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload site
