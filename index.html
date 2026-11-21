@@ -94,10 +94,70 @@ section{background:linear-gradient(180deg,transparent,#05050a20,transparent)}sec
 @media(max-width:900px){.scene-label{top:88px;left:5vw}.scene-caption{left:5vw;bottom:16px}.nav-actions{gap:7px}.sound-toggle{padding:8px 9px}.navbuy{font-size:8px}}
 @media(max-width:600px){.scene-label{font-size:7px;letter-spacing:.14em}.scene-caption{font-size:7px;max-width:80vw}.cinematic-techfield{background:radial-gradient(ellipse at 72% 32%,#102039 0,#050910 48%,#03060a 80%)}.scene-flare{background:radial-gradient(ellipse at 68% 38%,transparent 8%,#03060a55 58%,#03060ae8 100%)}.nav-actions{gap:6px}.sound-toggle{font-size:7px;padding:7px 8px}.navbuy{padding:8px 9px}.hero .copy{max-width:100%}}
 @media(prefers-reduced-motion:reduce){#scene-canvas{opacity:.65}}
+
+/* JARVIS spatial hero rebuild: readable editorial foreground + full-screen shader plane */
+.cinematic-techfield{opacity:1!important;background:radial-gradient(ellipse at 70% 44%,#0a1830 0,#050912 43%,#020307 82%)}
+#background-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0;pointer-events:none}
+#scene-canvas{z-index:1;opacity:.84}
+.scene-flare{z-index:2;background:radial-gradient(ellipse at 68% 45%,transparent 12%,#02030722 48%,#020307b8 92%),linear-gradient(90deg,#02030765 0%,transparent 42%,#02030715 72%,#02030766 100%)}
+.scene-label,.scene-caption{z-index:4}
+.techfield-orb{z-index:3;opacity:.12!important}
+.web-lattice{z-index:3;opacity:.1!important}
+.tech-particles{z-index:3;opacity:.18!important}
+.tech-vignette{z-index:3}
+.hero{min-height:100svh;grid-template-columns:minmax(0,1.02fr) minmax(0,.98fr);gap:clamp(10px,3vw,48px);padding:clamp(116px,15vh,160px) 7vw clamp(70px,10vh,110px);isolation:isolate;background:linear-gradient(90deg,#020307b8 0%,#02030755 48%,transparent 100%)}
+.hero:after{z-index:0;right:-10%;top:10%;width:62vw;height:62vw;background:radial-gradient(circle at 58% 45%,#347dff1c 0,#ff174c0d 28%,transparent 67%);filter:blur(18px)}
+.hero .copy{z-index:5;max-width:650px;padding:clamp(10px,2vw,30px) 0}
+.hero .eyebrow{display:inline-flex;padding:11px 13px;border:1px solid #4ba8ff42;background:#06101bd9;backdrop-filter:blur(12px);font-size:clamp(8px,1vw,10px);letter-spacing:.17em}
+.hero h1{font-size:clamp(43px,6.3vw,88px);line-height:.98;letter-spacing:-.075em;margin:clamp(18px,3vh,28px) 0}
+.hero h1 span{background:linear-gradient(100deg,#ff355a 0%,#ff7890 28%,#76c9ff 74%,#c9f8ff);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none}
+.hero .lead{font-size:clamp(14px,1.25vw,17px);line-height:1.72;max-width:510px;color:#d0d9e7}
+.hero .actions{margin:clamp(20px,3vh,32px) 0;gap:10px}
+.hero .btn{min-height:48px;padding:14px 18px}
+.hero .fine{max-width:440px;color:#879db3}
+.hero .stage{min-height:clamp(400px,66vh,650px);z-index:4;overflow:visible}
+.hero .corecanvas{height:clamp(400px,66vh,650px);filter:drop-shadow(0 0 30px #347dff16)}
+.stagehud{font-size:9px;color:#9cc6e2;text-shadow:0 0 18px #000,0 0 8px #000}
+.hudtop{top:10%;left:5%}.hudright{right:0;top:22%}.hudbottom{bottom:8%;left:5%}
+.hudtag{bottom:7%;right:5%;border-color:#4ba8ff55;background:#06101bdc;color:#a9dcff}
+.scrollhint{left:7vw;z-index:5;color:#9cb4c9}
+body:before{opacity:.12;mask-image:linear-gradient(#000,transparent 70%)}
+.cinematic-atmosphere{opacity:.55}
+.atmo-grid{opacity:.06!important}
+.atmo-specks{opacity:.12!important}
+.storybeat,section:not(.hero){background:linear-gradient(180deg,#020307bb,#0203078c 55%,#020307b5);backdrop-filter:blur(1px)}
+.storybeat{background:linear-gradient(90deg,#020307e8,#020307a8 62%,#020307e8)}
+@media(max-width:900px){
+ .hero{grid-template-columns:1fr;gap:0;padding:120px 6vw 78px;min-height:auto;background:linear-gradient(180deg,#020307a8,#02030720 58%,#020307a0)}
+ .hero .copy{max-width:760px;margin:0 auto;width:100%}
+ .hero .stage{min-height:clamp(340px,62vw,470px);width:min(100%,760px);margin:-8px auto 0}
+ .hero .corecanvas{height:clamp(340px,62vw,470px)}
+ .hero:after{width:100vw;height:100vw;right:-20vw;top:25%}
+ .scrollhint{left:6vw}
+}
+@media(max-width:600px){
+ .hero{padding:110px 6vw 70px}
+ .hero h1{font-size:clamp(42px,12vw,64px);line-height:1.01}
+ .hero .eyebrow{letter-spacing:.12em;max-width:100%;font-size:8px}
+ .hero .lead{font-size:14px;line-height:1.7}
+ .hero .actions{display:grid;grid-template-columns:1fr;max-width:330px}
+ .hero .btn{width:100%;text-align:center}
+ .hero .stage{min-height:310px;margin-top:0}
+ .hero .corecanvas{height:310px}
+ .hudright{right:1%;top:20%;font-size:7px}
+ .hudtop,.hudbottom{font-size:7px}
+ .hudtag{font-size:7px;right:2%;bottom:5%}
+ .scene-label{top:82px;font-size:7px}
+ .scene-caption{bottom:14px;font-size:7px}
+}
+@media(prefers-reduced-motion:reduce){
+ #background-canvas{opacity:.8}
+ .hero .copy,.hero .stage{transform:none!important}
+}
 </style></head>
 <body>
 <div class="cinematic-atmosphere" aria-hidden="true"><div class="atmo-glow atmo-red"></div><div class="atmo-glow atmo-blue"></div><div class="atmo-glow atmo-violet"></div><div class="atmo-grid"></div><div class="atmo-specks"></div><div class="atmo-vignette"></div></div>
-<div class="cinematic-techfield" aria-hidden="true"><canvas id="scene-canvas"></canvas><div class="scene-flare"></div><div class="scene-label" id="scene-label">01 / CORE IGNITION</div><div class="scene-caption" id="scene-caption">ENERGY SYSTEM · INITIALIZING</div><div class="techfield-orb"><div class="tech-ring ring-a"></div><div class="tech-ring ring-b"></div><div class="tech-ring ring-c"></div><div class="tech-core"></div><div class="tech-cross"></div></div><div class="web-lattice"><svg viewBox="0 0 1000 700" preserveAspectRatio="none"><g fill="none" stroke="currentColor" stroke-width="1"><path d="M0 0L500 350L1000 0M0 700L500 350L1000 700M0 350H1000M500 0V700M0 0L1000 700M1000 0L0 700"/><circle cx="500" cy="350" r="90"/><circle cx="500" cy="350" r="180"/><circle cx="500" cy="350" r="270"/></g></svg></div><div class="tech-particles"></div><div class="tech-vignette"></div></div><div class="progressline" aria-hidden="true"></div><nav class="chapterrail" aria-label="Page chapters"><a href="#top" class="active"><span>01 · ENTRY</span></a><a href="#story"><span>02 · REVEAL</span></a><a href="#features"><span>03 · CAPABILITIES</span></a><a href="#experience"><span>04 · LAB</span></a><a href="#integrations"><span>05 · ECOSYSTEM</span></a><a href="#pricing"><span>06 · OFFER</span></a></nav><div class="floatingnote" id="floatingnote"><small>JARVIS / FIELD NOTE</small><span id="floattext">An interface designed around your setup.</span></div><nav class="nav"><a href="#top" class="brand"><span class="logo">J</span> JARVIS <span style="color:#6d8494">/ PRO</span></a><div class="links"><a href="#features">FEATURES</a><a href="#experience">INTERACTIVE</a><a href="#integrations">ECOSYSTEM</a><a href="#pricing">OFFER</a></div><div class="nav-actions"><button class="sound-toggle" id="sound-toggle" aria-pressed="false" title="Sound effects are off">SFX <span>OFF</span></button><a class="navbuy" href="#pricing">EXPLORE / BUY ↓</a></div></nav>
+<div class="cinematic-techfield" aria-hidden="true"><canvas id="background-canvas"></canvas><canvas id="scene-canvas"></canvas></canvas><div class="scene-flare"></div><div class="scene-label" id="scene-label">01 / CORE IGNITION</div><div class="scene-caption" id="scene-caption">ENERGY SYSTEM · INITIALIZING</div><div class="techfield-orb"><div class="tech-ring ring-a"></div><div class="tech-ring ring-b"></div><div class="tech-ring ring-c"></div><div class="tech-core"></div><div class="tech-cross"></div></div><div class="web-lattice"><svg viewBox="0 0 1000 700" preserveAspectRatio="none"><g fill="none" stroke="currentColor" stroke-width="1"><path d="M0 0L500 350L1000 0M0 700L500 350L1000 700M0 350H1000M500 0V700M0 0L1000 700M1000 0L0 700"/><circle cx="500" cy="350" r="90"/><circle cx="500" cy="350" r="180"/><circle cx="500" cy="350" r="270"/></g></svg></div><div class="tech-particles"></div><div class="tech-vignette"></div></div><div class="progressline" aria-hidden="true"></div><nav class="chapterrail" aria-label="Page chapters"><a href="#top" class="active"><span>01 · ENTRY</span></a><a href="#story"><span>02 · REVEAL</span></a><a href="#features"><span>03 · CAPABILITIES</span></a><a href="#experience"><span>04 · LAB</span></a><a href="#integrations"><span>05 · ECOSYSTEM</span></a><a href="#pricing"><span>06 · OFFER</span></a></nav><div class="floatingnote" id="floatingnote"><small>JARVIS / FIELD NOTE</small><span id="floattext">An interface designed around your setup.</span></div><nav class="nav"><a href="#top" class="brand"><span class="logo">J</span> JARVIS <span style="color:#6d8494">/ PRO</span></a><div class="links"><a href="#features">FEATURES</a><a href="#experience">INTERACTIVE</a><a href="#integrations">ECOSYSTEM</a><a href="#pricing">OFFER</a></div><div class="nav-actions"><button class="sound-toggle" id="sound-toggle" aria-pressed="false" title="Sound effects are off">SFX <span>OFF</span></button><a class="navbuy" href="#pricing">EXPLORE / BUY ↓</a></div></nav>
 <main id="top">
 <header class="hero"><div class="copy reveal"><div class="eyebrow">ANDROID AI COMPANION / EXPERIMENTAL</div><h1>MEET YOUR<br><span>AI CORE.</span></h1><p class="lead">A configurable AI companion for Android. Talk, explore connected AI providers, and experiment with user-directed tools and workflows from one interface.</p><div class="actions"><a class="btn" href="#pricing">JARVIS PRO · ₹19 ↗</a><a class="btn ghost" href="#experience">INTERACT WITH THE CORE</a></div><p class="fine">Experimental software. Capabilities vary by Android version, permissions, services and setup.</p></div>
 <div class="stage reveal"><canvas id="core" class="corecanvas" aria-label="Interactive 3D JARVIS core. Drag to rotate and tap to change energy mode."></canvas><span class="stagehud hudtop">CORE / 01</span><span class="stagehud hudright">DRAG TO ROTATE<br>TOUCH / CLICK TO PULSE</span><span class="stagehud hudbottom">NEURAL INTERFACE // ONLINE</span><span class="hudtag" id="coremode">MODE: EXPLORATION</span></div><div class="scrollhint"><i></i> SCROLL TO EXPLORE</div></header><section id="story" class="storybeat reveal"><div class="storyindex">02</div><div class="storycopy"><div class="chapter">THE REVEAL / 02</div><div class="micro">NOT A MAGIC BUTTON. A SYSTEM YOU CONFIGURE.</div><h2>Bring the pieces together.<br><span>Make it yours.</span></h2><p>JARVIS is an interface for experimenting with AI services, voice, and optional Android-connected tools. The experience is built around your choices: select your provider, configure your environment, and decide which integrations belong in your workflow.</p></div></section>
@@ -131,6 +191,34 @@ section{background:linear-gradient(180deg,transparent,#05050a20,transparent)}sec
 </div></section>
 </main><footer class="footer"><span>JARVIS PRO / ANDROID AI COMPANION</span><span>EXPERIMENTAL SOFTWARE · CAPABILITIES SUBJECT TO CONFIGURATION</span><a href="#top">BACK TO TOP ↑</a></footer>
 <script>
+/* Procedural WebGL background plane: perspective floor, signal arcs, nebula and particles. */
+(()=>{const c=document.getElementById('background-canvas');if(!c)return;let gl;try{gl=c.getContext('webgl',{alpha:false,antialias:false,powerPreference:'low-power'})||c.getContext('experimental-webgl')}catch(e){}if(!gl){c.style.background='radial-gradient(ellipse at 72% 44%,#122c54 0,#070d1a 45%,#020307 85%)';return}
+const vs='attribute vec2 aPosition;varying vec2 vUv;void main(){vUv=aPosition*.5+.5;gl_Position=vec4(aPosition,0.,1.);}';
+const fs='precision mediump float;varying vec2 vUv;uniform vec2 uResolution;uniform vec2 uMouse;uniform float uTime;uniform float uScroll;'+
+'float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}'+
+'float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hash(i),hash(i+vec2(1.,0.)),f.x),mix(hash(i+vec2(0.,1.)),hash(i+vec2(1.,1.)),f.x),f.y);}'+
+'float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<4;i++){v+=noise(p)*a;p*=2.02;a*=.5;}return v;}'+
+'void main(){vec2 uv=vUv;vec2 p=(uv-.5)*vec2(uResolution.x/uResolution.y,1.);p+=uMouse*.035;float t=uTime;vec3 col=vec3(.008,.012,.022);'+
+'float n=fbm(p*2.3+vec2(t*.035,-t*.025));float cloud= smoothstep(.22,.85,n)*exp(-length(p-vec2(.28,.02))*.8);col+=vec3(.025,.055,.12)*cloud;'+
+'float redNeb=fbm(p*2.6+vec2(-t*.025,t*.04))*exp(-length(p-vec2(-.42,.1))*.95);col+=vec3(.16,.012,.045)*redNeb;'+
+'float blueNeb=fbm(p*3.1+vec2(t*.03,t*.02))*exp(-length(p-vec2(.48,.08))*.85);col+=vec3(.035,.16,.32)*blueNeb;'+
+'float horizon=.49+uMouse.y*.025;float floorMask=smoothstep(horizon,horizon+.13,uv.y);float depth=1./max(uv.y-horizon,.025);vec2 gp=vec2(p.x*depth*1.15,depth*.42);'+
+'float gx=1.-smoothstep(.006,.027,abs(fract(gp.x)-.5));float gy=1.-smoothstep(.006,.027,abs(fract(gp.y)-.5));float grid=max(gx,gy)*floorMask;float fade=exp(-max(uv.y-horizon,0.)*2.6);'+
+'col+=vec3(.025,.10,.18)*grid*fade;float gridPulse=grid*(.25+.25*sin(t*1.1+gp.x*1.4));col+=vec3(.02,.045,.11)*gridPulse;'+
+'vec2 core=vec2(.23,.02)+uMouse*.05;float d=length((p-core)*vec2(1.0,.8));float halo=exp(-d*3.3);col+=vec3(.035,.11,.3)*halo;'+
+'float ring1=abs(d-(.28+.015*sin(t*.8)));float ring2=abs(d-(.42+.012*cos(t*.55)));col+=vec3(.08,.32,.6)*exp(-ring1*85.)*.28;col+=vec3(.22,.04,.12)*exp(-ring2*62.)*.17;'+
+'float arc=sin(atan(p.y-core.y,p.x-core.x)*9.+t*1.4);float arcGlow=exp(-abs(d-.34)*70.)*smoothstep(-.15,.75,arc);col+=vec3(.12,.32,.7)*arcGlow*.35;'+
+'float wave=sin(p.x*2.8+fbm(p*2.+t*.07)*2.4+p.y*3.5+t*.3);float energy=exp(-abs(wave-p.y*.45)*8.)*.12;col+=vec3(.025,.18,.32)*energy;'+
+'vec2 cell=floor(uv*vec2(105.,65.));float star=step(.994,hash(cell+floor(t*.12)))*(.3+.7*hash(cell+5.));col+=vec3(.5,.72,1.)*star;'+
+'float vignette=smoothstep(1.15,.25,length((uv-.5)*vec2(1.2,1.)));col*=.42+.58*vignette;col+=vec3(.008,.014,.028)*uScroll;'+
+'float scan=1.-smoothstep(.0,.006,abs(fract(uv.y*180.+t*.018)-.5));col+=vec3(.01,.025,.045)*scan*.08;gl_FragColor=vec4(col,1.);}';
+function compile(type,src){let s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){console.warn('JARVIS background shader:',gl.getShaderInfoLog(s));gl.deleteShader(s);return null}return s}
+const v=compile(gl.VERTEX_SHADER,vs),f=compile(gl.FRAGMENT_SHADER,fs);if(!v||!f){c.style.background='radial-gradient(ellipse at 72% 44%,#122c54 0,#070d1a 45%,#020307 85%)';return}const program=gl.createProgram();gl.attachShader(program,v);gl.attachShader(program,f);gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS)){console.warn(gl.getProgramInfoLog(program));c.style.background='#020307';return}gl.useProgram(program);const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);const loc=gl.getAttribLocation(program,'aPosition');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);const res=gl.getUniformLocation(program,'uResolution'),mouse=gl.getUniformLocation(program,'uMouse'),time=gl.getUniformLocation(program,'uTime'),scroll=gl.getUniformLocation(program,'uScroll');let w=0,h=0,dpr=1,mx=0,my=0,sc=0,raf=0,visible=true;const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function resize(){dpr=Math.min(devicePixelRatio||1,1.35);w=c.clientWidth;h=c.clientHeight;c.width=Math.max(1,Math.floor(w*dpr));c.height=Math.max(1,Math.floor(h*dpr));gl.viewport(0,0,c.width,c.height);gl.uniform2f(res,c.width,c.height);render(performance.now())}
+function render(now){if(!visible)return;gl.uniform2f(mouse,mx,my);gl.uniform1f(time,reduced?0:now*.001);gl.uniform1f(scroll,sc);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);if(!reduced)raf=requestAnimationFrame(render)}
+function pointer(e){if(e.pointerType==='touch'||reduced)return;mx=(e.clientX/innerWidth-.5)*2;my=(e.clientY/innerHeight-.5)*2}addEventListener('pointermove',pointer,{passive:true});addEventListener('scroll',()=>{sc=Math.min(1,scrollY/Math.max(1,document.documentElement.scrollHeight-innerHeight))},{passive:true});addEventListener('resize',resize,{passive:true});document.addEventListener('visibilitychange',()=>{visible=!document.hidden;if(visible&&!reduced)render(performance.now());else cancelAnimationFrame(raf)});resize();if(!reduced)render(performance.now());
+})();
+
 /* Procedural interactive 3D core: no image/model downloads required. */
 (()=>{const c=document.getElementById('core'),ctx=c.getContext('2d');let w,h,dpr,rx=0,ry=0,targetX=0,targetY=0,drag=false,moved=false,suppressClick=false,lastX=0,lastY=0,pulse=0,mode=0;const modes=['EXPLORATION','VOICE','SYSTEM'];function resize(){dpr=Math.min(devicePixelRatio||1,2);w=c.clientWidth;h=c.clientHeight;c.width=w*dpr;c.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0)}window.addEventListener('resize',resize);resize();
 function project(x,y,z){let cy=Math.cos(ry),sy=Math.sin(ry),cx=Math.cos(rx),sx=Math.sin(rx);let xx=x*cy-z*sy,zz=x*sy+z*cy,yy=y*cx-zz*sx,zzz=y*sx+zz*cx;let scale=420/(420+zzz);return{x:w/2+xx*scale,y:h/2+yy*scale,z:zzz,scale}}
