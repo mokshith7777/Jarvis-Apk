@@ -1,4 +1,5 @@
 name: Deploy JARVIS Blueprint to GitHub Pages
+# Retry after repository Pages source was manually set to GitHub Actions.
 on:
   push:
     branches: [main]
