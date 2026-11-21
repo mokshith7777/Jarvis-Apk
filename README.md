@@ -1,11 +1,17 @@
-# JARVIS PRO — Product Landing Page
+# JARVIS PRO — Interactive Product Storefront
 
-A single-file promotional landing page for the experimental JARVIS Android AI assistant.
+A mobile-first single-file product showcase for the experimental JARVIS Android AI companion.
 
-## Website
-- `index.html` — responsive product landing page, animated metallic reactor, feature overview, launch-price presentation, security notice, and APK release link.
-- No build step or local asset bundle is required.
-- Animation respects `prefers-reduced-motion`.
+## Experience
+- Procedural interactive 3D core rendered with Canvas (drag/touch to rotate, click to pulse/change mode)
+- Cinematic responsive hero and animated reveal-on-scroll sections
+- Interactive feature cards with expanded explanations and setup/use-case notes
+- Scenario tabs for voice, AI providers, local tooling and connected integrations (website simulation only)
+- Feature-card tilt interactions on pointer devices
+- FAQ accordion
+- Reduced-motion accessibility support
+- Mobile-responsive layouts and adaptive visual canvas
+- No downloaded 3D model or image assets required
 
 ## Product claims
 Content is based on the Android project documentation:
@@ -16,10 +22,10 @@ Content is based on the Android project documentation:
 - Local task history, settings and optional indexing
 - Optional Telegram and Home Assistant integrations
 
-Feature availability depends on device, Android version, permissions, and configuration. The app is experimental; the current documented public version is v3.3.1 and its APK is debug-signed for testing.
+Feature availability depends on device, Android version, permissions and configuration. The app is experimental; the documented public build is a test build and its release signing/readiness must be verified before distribution.
 
 ## Pricing presentation
-The page displays the requested ₹49 standard price and ₹19 first-week launch offer. Checkout/payment confirmation is deliberately not enabled. A trusted adult-managed payment account and secure checkout/verification implementation must be set up before accepting payments; do not publish private payment details in static site source.
+The page displays ₹49 standard price and ₹19 first-week launch offer. Checkout is a presentation-only CTA; no payment processing or automatic APK delivery is active. A trusted adult should manage payment setup, and a secure checkout/payment-verification flow must be implemented before sales.
 
 ## Deploy
 GitHub Pages workflow: `.github/workflows/pages.yml`.
