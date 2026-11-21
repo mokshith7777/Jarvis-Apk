@@ -74,6 +74,11 @@ jobs:
           if missing:
               raise SystemExit(f"JS references missing HTML IDs: {missing}")
           checks = {
+              "WebGL background canvas": 'id="background-canvas"' in html,
+              "procedural shader": "Procedural WebGL background plane" in scripts[0],
+              "responsive hero architecture": ".hero{min-height:100svh;grid-template-columns:minmax(0,1.02fr)" in html,
+              "WebGL fallback": "if(!gl)" in scripts[0],
+              "shader reduced motion": "prefers-reduced-motion: reduce" in scripts[0],
               "cinematic canvas": 'id="scene-canvas"' in html,
               "scene label": 'id="scene-label"' in html,
               "scene caption": 'id="scene-caption"' in html,
