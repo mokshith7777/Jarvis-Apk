@@ -154,10 +154,35 @@ body:before{opacity:.12;mask-image:linear-gradient(#000,transparent 70%)}
  #background-canvas{opacity:.8}
  .hero .copy,.hero .stage{transform:none!important}
 }
+
+/* CINEMATIC 3D JOURNEY — full-screen world, scroll-directed camera */
+#jarvis-world{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0;pointer-events:none;opacity:0;transition:opacity 1.2s}
+.cinematic-techfield{opacity:1!important}
+#background-canvas{opacity:.22!important}
+#scene-canvas{opacity:.18!important}
+body.three-ready #jarvis-world{opacity:1}
+body.three-ready #background-canvas,body.three-ready #scene-canvas{opacity:.08!important}
+body.three-ready .techfield-orb,body.three-ready .web-lattice,body.three-ready .tech-particles{opacity:.035!important}
+body.three-ready .scene-flare{opacity:.28}
+body.three-ready section:not(.hero){background:linear-gradient(180deg,#03060a45,#03060a18 45%,#03060a58)!important;backdrop-filter:none!important}
+body.three-ready .storybeat{background:linear-gradient(90deg,#03060a9e,#03060a45 65%,#03060a9e)!important}
+.hero{min-height:100svh;align-items:center;padding-top:clamp(112px,15vh,155px);padding-bottom:clamp(64px,9vh,90px)}
+.hero .copy{max-width:680px}
+.hero .eyebrow{background:#050a10d9;box-shadow:0 0 24px #65e8ff10}
+.hero h1{font-size:clamp(42px,6.4vw,90px);text-wrap:balance}
+.hero .lead{max-width:500px}
+.hero .stage{min-height:clamp(350px,58vh,580px)}
+.hero .corecanvas{height:clamp(350px,58vh,580px)}
+.cinematic-techfield .scene-label,.cinematic-techfield .scene-caption{z-index:5;text-shadow:0 2px 12px #000}
+#world-status{position:absolute;z-index:6;left:7vw;top:105px;color:#a7c5d8;font:8px var(--display);letter-spacing:.14em;opacity:.6}
+#world-progress{position:fixed;z-index:26;right:22px;bottom:26px;font:8px var(--display);letter-spacing:.15em;color:#a7c5d8;pointer-events:none}
+@media(max-width:900px){.hero{padding-top:118px;min-height:100svh}.hero .stage{min-height:clamp(280px,48vh,430px)}.hero .corecanvas{height:clamp(280px,48vh,430px)}}
+@media(max-width:600px){.hero{padding:112px 6vw 58px;min-height:100svh;gap:0}.hero .stage{min-height:260px;margin-top:-8px}.hero .corecanvas{height:260px}.hero h1{font-size:clamp(38px,11.4vw,62px)}#world-status{left:6vw;top:90px;font-size:7px}#world-progress{right:13px;bottom:18px;font-size:7px}}
+@media(prefers-reduced-motion:reduce){#jarvis-world{opacity:.75;transition:none}body.three-ready #background-canvas{opacity:.16!important}}
 </style></head>
 <body>
 <div class="cinematic-atmosphere" aria-hidden="true"><div class="atmo-glow atmo-red"></div><div class="atmo-glow atmo-blue"></div><div class="atmo-glow atmo-violet"></div><div class="atmo-grid"></div><div class="atmo-specks"></div><div class="atmo-vignette"></div></div>
-<div class="cinematic-techfield" aria-hidden="true"><canvas id="background-canvas"></canvas><canvas id="scene-canvas"></canvas></canvas><div class="scene-flare"></div><div class="scene-label" id="scene-label">01 / CORE IGNITION</div><div class="scene-caption" id="scene-caption">ENERGY SYSTEM · INITIALIZING</div><div class="techfield-orb"><div class="tech-ring ring-a"></div><div class="tech-ring ring-b"></div><div class="tech-ring ring-c"></div><div class="tech-core"></div><div class="tech-cross"></div></div><div class="web-lattice"><svg viewBox="0 0 1000 700" preserveAspectRatio="none"><g fill="none" stroke="currentColor" stroke-width="1"><path d="M0 0L500 350L1000 0M0 700L500 350L1000 700M0 350H1000M500 0V700M0 0L1000 700M1000 0L0 700"/><circle cx="500" cy="350" r="90"/><circle cx="500" cy="350" r="180"/><circle cx="500" cy="350" r="270"/></g></svg></div><div class="tech-particles"></div><div class="tech-vignette"></div></div><div class="progressline" aria-hidden="true"></div><nav class="chapterrail" aria-label="Page chapters"><a href="#top" class="active"><span>01 · ENTRY</span></a><a href="#story"><span>02 · REVEAL</span></a><a href="#features"><span>03 · CAPABILITIES</span></a><a href="#experience"><span>04 · LAB</span></a><a href="#integrations"><span>05 · ECOSYSTEM</span></a><a href="#pricing"><span>06 · OFFER</span></a></nav><div class="floatingnote" id="floatingnote"><small>JARVIS / FIELD NOTE</small><span id="floattext">An interface designed around your setup.</span></div><nav class="nav"><a href="#top" class="brand"><span class="logo">J</span> JARVIS <span style="color:#6d8494">/ PRO</span></a><div class="links"><a href="#features">FEATURES</a><a href="#experience">INTERACTIVE</a><a href="#integrations">ECOSYSTEM</a><a href="#pricing">OFFER</a></div><div class="nav-actions"><button class="sound-toggle" id="sound-toggle" aria-pressed="false" title="Sound effects are off">SFX <span>OFF</span></button><a class="navbuy" href="#pricing">EXPLORE / BUY ↓</a></div></nav>
+<div class="cinematic-techfield" aria-hidden="true"><canvas id="jarvis-world"></canvas><canvas id="background-canvas"></canvas><canvas id="scene-canvas"></canvas><div class="scene-flare"></div><div class="scene-label" id="scene-label">01 / CORE IGNITION</div><div class="scene-caption" id="scene-caption">ENERGY SYSTEM · INITIALIZING</div><div class="techfield-orb"><div class="tech-ring ring-a"></div><div class="tech-ring ring-b"></div><div class="tech-ring ring-c"></div><div class="tech-core"></div><div class="tech-cross"></div></div><div class="web-lattice"><svg viewBox="0 0 1000 700" preserveAspectRatio="none"><g fill="none" stroke="currentColor" stroke-width="1"><path d="M0 0L500 350L1000 0M0 700L500 350L1000 700M0 350H1000M500 0V700M0 0L1000 700M1000 0L0 700"/><circle cx="500" cy="350" r="90"/><circle cx="500" cy="350" r="180"/><circle cx="500" cy="350" r="270"/></g></svg></div><div class="tech-particles"></div><div class="tech-vignette"></div></div><div class="progressline" aria-hidden="true"></div><nav class="chapterrail" aria-label="Page chapters"><a href="#top" class="active"><span>01 · ENTRY</span></a><a href="#story"><span>02 · REVEAL</span></a><a href="#features"><span>03 · CAPABILITIES</span></a><a href="#experience"><span>04 · LAB</span></a><a href="#integrations"><span>05 · ECOSYSTEM</span></a><a href="#pricing"><span>06 · OFFER</span></a></nav><div class="floatingnote" id="floatingnote"><small>JARVIS / FIELD NOTE</small><span id="floattext">An interface designed around your setup.</span></div><nav class="nav"><a href="#top" class="brand"><span class="logo">J</span> JARVIS <span style="color:#6d8494">/ PRO</span></a><div class="links"><a href="#features">FEATURES</a><a href="#experience">INTERACTIVE</a><a href="#integrations">ECOSYSTEM</a><a href="#pricing">OFFER</a></div><div class="nav-actions"><button class="sound-toggle" id="sound-toggle" aria-pressed="false" title="Sound effects are off">SFX <span>OFF</span></button><a class="navbuy" href="#pricing">EXPLORE / BUY ↓</a></div></nav>
 <main id="top">
 <header class="hero"><div class="copy reveal"><div class="eyebrow">ANDROID AI COMPANION / EXPERIMENTAL</div><h1>MEET YOUR<br><span>AI CORE.</span></h1><p class="lead">A configurable AI companion for Android. Talk, explore connected AI providers, and experiment with user-directed tools and workflows from one interface.</p><div class="actions"><a class="btn" href="#pricing">JARVIS PRO · ₹19 ↗</a><a class="btn ghost" href="#experience">INTERACT WITH THE CORE</a></div><p class="fine">Experimental software. Capabilities vary by Android version, permissions, services and setup.</p></div>
 <div class="stage reveal"><canvas id="core" class="corecanvas" aria-label="Interactive 3D JARVIS core. Drag to rotate and tap to change energy mode."></canvas><span class="stagehud hudtop">CORE / 01</span><span class="stagehud hudright">DRAG TO ROTATE<br>TOUCH / CLICK TO PULSE</span><span class="stagehud hudbottom">NEURAL INTERFACE // ONLINE</span><span class="hudtag" id="coremode">MODE: EXPLORATION</span></div><div class="scrollhint"><i></i> SCROLL TO EXPLORE</div></header><section id="story" class="storybeat reveal"><div class="storyindex">02</div><div class="storycopy"><div class="chapter">THE REVEAL / 02</div><div class="micro">NOT A MAGIC BUTTON. A SYSTEM YOU CONFIGURE.</div><h2>Bring the pieces together.<br><span>Make it yours.</span></h2><p>JARVIS is an interface for experimenting with AI services, voice, and optional Android-connected tools. The experience is built around your choices: select your provider, configure your environment, and decide which integrations belong in your workflow.</p></div></section>
@@ -272,4 +297,70 @@ if(!reduce)requestAnimationFrame(draw)}requestAnimationFrame(draw);
 function updateScene(){let max=document.documentElement.scrollHeight-innerHeight;scroll=max>0?scrollY/max:0;let next=scroll<.18?0:scroll<.42?1:scroll<.72?2:3;if(next!==scene){scene=next;const data=[['01 / CORE IGNITION','ENERGY SYSTEM · INITIALIZING','reactor'],['02 / NETWORK AWAKENS','SIGNAL PATHS · CONNECTING','network'],['03 / INTERFACE LAYER','TOOLS · VOICE · AI PROVIDERS','interface'],['04 / DEPLOYMENT','YOUR DEVICE · YOUR CONFIGURATION','interface']][scene];label.textContent=data[0];caption.textContent=data[1];field.dataset.scene=data[2];if(enabled)fx(scene===1?'transition':'pulse')}}addEventListener('scroll',updateScene,{passive:true});updateScene();addEventListener('pointermove',e=>{if(e.pointerType==='touch'||reduce)return;px=e.clientX/W-.5;py=e.clientY/H-.5},{passive:true});
 function initAudio(){try{const AudioCtor=window.AudioContext||window.webkitAudioContext;if(!AudioCtor)return false;if(!audio)audio=new AudioCtor();if(audio.state==='suspended')audio.resume();return true}catch(err){return false}}function tone(freq,duration,type='sine',gain=.05,slide=0){if(!enabled||!initAudio())return;try{let osc=audio.createOscillator(),g=audio.createGain();osc.type=type;osc.frequency.setValueAtTime(freq,audio.currentTime);if(slide)osc.frequency.exponentialRampToValueAtTime(Math.max(30,freq+slide),audio.currentTime+duration);g.gain.setValueAtTime(.0001,audio.currentTime);g.gain.exponentialRampToValueAtTime(gain,audio.currentTime+.018);g.gain.exponentialRampToValueAtTime(.0001,audio.currentTime+duration);osc.connect(g);g.connect(audio.destination);osc.start();osc.stop(audio.currentTime+duration+.03)}catch(err){/* sound is optional; visual interaction remains available */}}function fx(kind){if(!enabled)return;if(kind==='ignite'){tone(110,.4,'sawtooth',.035,-65);setTimeout(()=>tone(440,.22,'sine',.035,180),120);setTimeout(()=>tone(760,.32,'triangle',.025,-220),240)}else if(kind==='transition'){tone(250,.18,'sine',.02,350);setTimeout(()=>tone(580,.24,'triangle',.018,-180),90)}else tone(520,.09,'sine',.018,110)}
 toggle.addEventListener('click',()=>{if(!enabled&&!initAudio()){toggle.title='Sound effects are unavailable in this browser';toggle.querySelector('span').textContent='UNAVAILABLE';return}enabled=!enabled;toggle.classList.toggle('enabled',enabled);toggle.setAttribute('aria-pressed',String(enabled));toggle.querySelector('span').textContent=enabled?'ON':'OFF';toggle.title=enabled?'Sound effects enabled':'Sound effects disabled';if(enabled)fx('ignite')});document.querySelectorAll('.btn,.navbuy,.demo-tab,.faqitem button,.expand,.chip').forEach(el=>el.addEventListener('click',()=>fx('pulse')));})();
+</script>
+<script type="module">
+/* JARVIS CINEMATIC WORLD — procedural 3D, native scroll as film timeline */
+try {
+  const THREE = await import('https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js');
+  const canvas = document.getElementById('jarvis-world');
+  const field = document.querySelector('.cinematic-techfield');
+  if (!canvas || !field) throw new Error('3D canvas unavailable');
+  const renderer = new THREE.WebGLRenderer({canvas,alpha:true,antialias:false,powerPreference:'low-power'});
+  renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.35));
+  renderer.setSize(innerWidth,innerHeight,false);
+  renderer.outputColorSpace=THREE.SRGBColorSpace;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.05;
+  const scene=new THREE.Scene();
+  scene.fog=new THREE.FogExp2(0x03060a,.018);
+  const camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,.1,220);
+  camera.position.set(0,1.1,5.5);
+  const ambient=new THREE.HemisphereLight(0x7db9ff,0x070914,1.05);scene.add(ambient);
+  const blue=new THREE.PointLight(0x258bff,18,70,2);blue.position.set(-5,3,-22);scene.add(blue);
+  const red=new THREE.PointLight(0xff184f,12,55,2);red.position.set(6,1,-48);scene.add(red);
+  const cyan=new THREE.PointLight(0x61f4ff,20,50,2);cyan.position.set(0,3,-70);scene.add(cyan);
+  const world=new THREE.Group();scene.add(world);
+  const mat=(color,emissive=color,emissiveIntensity=.5,metalness=.7,roughness=.25)=>new THREE.MeshStandardMaterial({color,emissive,emissiveIntensity,metalness,roughness});
+  const cyanMat=mat(0x0b2735,0x26c9ff,2.2,.8,.25),redMat=mat(0x260b19,0xff174c,1.8,.75,.28),steel=mat(0x111b2b,0x122d4a,.65,.9,.35),dark=mat(0x03070c,0x020814,.2,.85,.3),white=mat(0x9edaff,0x61bfff,1.4,.7,.2);
+  function addRing(parent,r,t,color,x,y,z,rx=0,rz=0){const m=new THREE.Mesh(new THREE.TorusGeometry(r,t,8,128),color);m.position.set(x,y,z);m.rotation.set(rx,0,rz);parent.add(m);return m}
+  function reactor(z,scale=1){const g=new THREE.Group();g.position.z=z;g.scale.setScalar(scale);world.add(g);
+    const core=new THREE.Mesh(new THREE.IcosahedronGeometry(1.05,4),new THREE.MeshPhysicalMaterial({color:0x7ddcff,emissive:0x179dff,emissiveIntensity:2.8,metalness:.4,roughness:.12,transmission:.12,clearcoat:1}));g.add(core);
+    const inner=new THREE.Mesh(new THREE.SphereGeometry(.54,32,24),new THREE.MeshBasicMaterial({color:0xc9ffff}));g.add(inner);
+    addRing(g,1.45,.035,cyanMat,0,0,0,.85,0);addRing(g,1.8,.025,redMat,0,0,0,-.72,.12);addRing(g,2.2,.018,white,0,0,0,.2,.5);
+    for(let i=0;i<6;i++){const a=i*Math.PI/3;const coil=new THREE.Mesh(new THREE.CylinderGeometry(.09,.14,.95,8),i%2?redMat:cyanMat);coil.position.set(Math.cos(a)*1.25,Math.sin(a)*1.25,0);coil.rotation.z=a;g.add(coil)}
+    const cage=new THREE.Mesh(new THREE.IcosahedronGeometry(2.5,1),new THREE.MeshBasicMaterial({color:0x4aaeff,wireframe:true,transparent:true,opacity:.14}));g.add(cage);g.userData.core=core;g.userData.rings=g.children.filter(o=>o.geometry?.type==='TorusGeometry');return g;
+  }
+  const heroReactor=reactor(-13,1.05),deepReactor=reactor(-73,1.65);
+  // Massive orbital frames and rotating ring gates along the camera path.
+  for(let i=0;i<9;i++){let z=-7-i*10.5,r=7+i*.45;const gate=new THREE.Group();gate.position.z=z;world.add(gate);addRing(gate,r,.055,i%3===0?redMat:cyanMat,0,0,0,Math.PI/2,0);addRing(gate,r*.84,.025,steel,0,0,0,Math.PI/2,.2);for(let n=0;n<24;n++){let a=n*Math.PI/12;const tick=new THREE.Mesh(new THREE.BoxGeometry(.055,.45,.12),n%6===0?white:steel);tick.position.set(Math.cos(a)*r,Math.sin(a)*r,0);gate.add(tick)}gate.userData.spin=(i%2?-.12:.1);gate.userData.offset=i*.4}
+  // The network/web chapter: 3D node lattice with linked edges and glowing junctions.
+  const net=new THREE.Group();net.position.set(0,0,-38);world.add(net);
+  const nodes=[];for(let row=0;row<6;row++)for(let col=0;col<9;col++){const x=(col-4)*2.2,y=(row-2.5)*1.65,z=(Math.sin(col*.8+row)*1.2);nodes.push(new THREE.Vector3(x,y,z))}
+  const pts=[];for(let row=0;row<6;row++)for(let col=0;col<9;col++){let idx=row*9+col;if(col<8){pts.push(nodes[idx],nodes[idx+1])}if(row<5){pts.push(nodes[idx],nodes[idx+9])}if(col<8&&row<5&&((row+col)%2===0)){pts.push(nodes[idx],nodes[idx+10])}}
+  const webgeo=new THREE.BufferGeometry().setFromPoints(pts);net.add(new THREE.LineSegments(webgeo,new THREE.LineBasicMaterial({color:0x3478c6,transparent:true,opacity:.32})));
+  const nodeGeo=new THREE.SphereGeometry(.055,8,8);nodes.forEach((p,i)=>{const m=new THREE.Mesh(nodeGeo,i%7===0?redMat:cyanMat);m.position.copy(p);net.add(m)});
+  // Tower corridor: procedural monoliths, windows and floor rails.
+  const city=new THREE.Group();city.position.z=-55;world.add(city);
+  for(let i=0;i<40;i++){const side=i%2?1:-1,depth=-Math.random()*22,x=side*(5+Math.random()*12),h=3+Math.random()*15,w=1.2+Math.random()*2.5;const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,2+Math.random()*3),i%4===0?cyanMat:steel);b.position.set(x,h/2,depth);city.add(b);
+    for(let k=0;k<Math.floor(h/1.3);k++){const win=new THREE.Mesh(new THREE.BoxGeometry(w*.72,.08,.04),i%3?cyanMat:redMat);win.position.set(x,h/2-h/2+k*1.25,depth+1.55);city.add(win)}
+  }
+  // Floor plane with true perspective grid.
+  const floor=new THREE.Mesh(new THREE.PlaneGeometry(140,160),new THREE.MeshBasicMaterial({color:0x061327,transparent:true,opacity:.32,side:THREE.DoubleSide}));floor.rotation.x=-Math.PI/2;floor.position.set(0,-5,-47);world.add(floor);
+  const grid=new THREE.GridHelper(140,70,0x2c75c0,0x163858);grid.position.set(0,-4.98,-47);grid.material.transparent=true;grid.material.opacity=.22;world.add(grid);
+  // Depth particles, with color and motion sampled in 3D.
+  const count=innerWidth<700?650:1500,positions=new Float32Array(count*3),colors=new Float32Array(count*3),vel=new Float32Array(count);
+  for(let i=0;i<count;i++){positions[i*3]=(Math.random()-.5)*65;positions[i*3+1]=(Math.random()-.5)*45;positions[i*3+2]=-Math.random()*100;let c=new THREE.Color(i%5===0?0xff355a:0x58bfff);colors[i*3]=c.r;colors[i*3+1]=c.g;colors[i*3+2]=c.b;vel[i]=.08+Math.random()*.35}
+  const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.BufferAttribute(positions,3));pg.setAttribute('color',new THREE.BufferAttribute(colors,3));
+  const points=new THREE.Points(pg,new THREE.PointsMaterial({size:.075,vertexColors:true,transparent:true,opacity:.8,depthWrite:false,blending:THREE.AdditiveBlending}));world.add(points);
+  // Volumetric-style light shafts as translucent tapered beams.
+  for(let i=0;i<7;i++){const beam=new THREE.Mesh(new THREE.CylinderGeometry(.05,1.1,45,8,1,true),new THREE.MeshBasicMaterial({color:i%2?0x135dff:0xff124e,transparent:true,opacity:.035,side:THREE.DoubleSide,depthWrite:false}));beam.position.set((i-3)*4,4,-30-i*7);beam.rotation.z=(i-3)*.1;world.add(beam)}
+  const progress={v:0},target={v:0};let mx=0,my=0,active=true,last=0,scrollYNorm=0,reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  function onScroll(){target.v=clamp(scrollY/(document.documentElement.scrollHeight-innerHeight||1),0,1);scrollYNorm=target.v}
+  function onPointer(e){if(e.pointerType==='touch')return;mx=(e.clientX/innerWidth-.5)*2;my=(e.clientY/innerHeight-.5)*2}
+  function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight,false);renderer.setPixelRatio(Math.min(devicePixelRatio||1,innerWidth<700?1:1.35))}
+  function cameraPath(p){const z=5.5-p*88;const x=Math.sin(p*Math.PI*2)*1.8+mx*.35;const y=1.1+Math.sin(p*Math.PI*3)*1.15-my*.3;camera.position.set(x,y,z);camera.lookAt(x*.22,Math.sin(p*4)*.5,z-12);camera.rotation.z=Math.sin(p*3.1)*.018}
+  function frame(now){if(!active)return;requestAnimationFrame(frame);if(now-last<(innerWidth<700?33:24))return;last=now;progress.v+= (target.v-progress.v)*(reduce?1:.075);cameraPath(progress.v);heroReactor.rotation.y=now*.00022;heroReactor.rotation.z=now*.00011;deepReactor.rotation.y=-now*.00016;deepReactor.rotation.x=now*.00009;world.children.forEach(o=>{if(o.userData.spin){o.rotation.z=Math.sin(now*.0004+o.userData.offset)*.1;o.rotation.y=now*.0001*o.userData.spin}});points.rotation.y=mx*.025;renderer.render(scene,camera);document.documentElement.style.setProperty('--world-progress',progress.v);const status=document.getElementById('world-progress');if(status)status.textContent=String(Math.round(progress.v*100)).padStart(3,'0')+' / JOURNEY'}
+  onScroll();addEventListener('scroll',onScroll,{passive:true});addEventListener('pointermove',onPointer,{passive:true});addEventListener('resize',resize,{passive:true});document.addEventListener('visibilitychange',()=>{active=!document.hidden;if(active&&!reduce)requestAnimationFrame(frame)});canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();canvas.style.display='none';document.body.classList.remove('three-ready')});if(reduce){onScroll();cameraPath(target.v);renderer.render(scene,camera)}else requestAnimationFrame(frame);document.body.classList.add('three-ready');
+}catch(err){console.warn('JARVIS cinematic world fallback:',err);const c=document.getElementById('jarvis-world');if(c)c.style.display='none';}
 </script></body></html>
