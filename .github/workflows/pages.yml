@@ -1,4 +1,4 @@
-name: Deploy JARVIS Blueprint to GitHub Pages
+name: Deploy JARVIS PRO Storefront to GitHub Pages
 # Retry after repository Pages source was manually set to GitHub Actions.
 on:
   push:
@@ -20,6 +20,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Validate storefront files
+        run: |
+          test -s index.html
+          grep -q 'JARVIS PRO' index.html
+          grep -q 'BUY JARVIS PRO' index.html
+          grep -q '₹19' index.html
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload site
