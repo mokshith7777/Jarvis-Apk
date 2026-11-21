@@ -26,6 +26,11 @@ jobs:
           grep -q 'JARVIS PRO' index.html
           grep -q 'BUY JARVIS PRO' index.html
           grep -q '₹19' index.html
+          grep -q 'id="core"' index.html
+          grep -q 'INTERACTIVE LAB' index.html
+          grep -q 'demoscreen' index.html
+          grep -q 'FAQ' index.html
+          grep -q 'pointermove' index.html
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload site
