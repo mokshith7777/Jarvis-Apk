@@ -565,7 +565,7 @@ toggle.addEventListener('click',()=>{if(!enabled&&!initAudio()){toggle.title='So
 </script>
 <script>
 window.__JARVIS_RUNTIME__={status:'loading',renderer:'three',startedAt:performance.now()};
-window.__jarvisReadyTimer=setTimeout(()=>{const loading=document.getElementById('loading'),fallback=document.getElementById('fallback'),runtime=window.__JARVIS_RUNTIME__;if(runtime?.status==='active')return;if(runtime){runtime.status='fallback';runtime.reason=runtime.reason||'module-load-timeout'}if(loading)loading.classList.add('done');if(fallback){fallback.hidden=false;const p=fallback.querySelector('p');if(p)p.textContent='The cinematic module did not initialize (network, browser, or graphics limitation). The storefront is still available.'}},20000);
+window.__jarvisReadyTimer=setTimeout(()=>{const loading=document.getElementById('loading'),fallback=document.getElementById('fallback'),runtime=window.__JARVIS_RUNTIME__;if(runtime?.status==='active')return;if(runtime){runtime.status='fallback';runtime.reason=runtime.reason||'module-load-timeout'}if(loading)loading.classList.add('done');if(fallback){fallback.hidden=false;const p=fallback.querySelector('p');if(p)p.textContent='The cinematic module did not initialize (network, browser, or graphics limitation). The storefront is still available.'}},45000);
 document.getElementById('runtime-reload')?.addEventListener('click',()=>location.reload());
 </script>
 <script type="module" src="./src/main.js"></script>
