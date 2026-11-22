@@ -36,7 +36,7 @@ jobs:
           import json,re
           from pathlib import Path
           html=Path('index.html').read_text()
-          maps=re.findall(r'<script type="importmap">([\\s\\S]*?)</script>',html)
+          maps=re.findall(r'<script type="importmap">([\s\S]*?)</script>',html)
           if len(maps)!=1: raise SystemExit(f'Expected one import map, found {len(maps)}')
           data=json.loads(maps[0])
           imports=data.get('imports',{})
