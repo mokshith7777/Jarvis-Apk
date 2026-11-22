@@ -234,6 +234,15 @@ html{scroll-behavior:smooth}
 @media(prefers-reduced-motion:reduce){#cinematic-world{opacity:.5}}
 body.cinematic-fallback #cinematic-world{display:none}
 body.cinematic-fallback{background:radial-gradient(ellipse at 50% 20%,#172d40,#030508 70%)!important}
+</style><style id="cinematic-layout">
+.stage{display:none!important}
+.hero{grid-template-columns:1fr!important;min-height:100svh;padding:140px 7vw 80px}
+.hero .copy{max-width:680px;width:58%;transform:none!important}
+.hero .actions{margin-top:34px}
+.hero .lead{max-width:530px}
+section{min-height:55vh}
+@media(max-width:800px){.hero{grid-template-columns:1fr!important;padding:118px 6vw 65px}.hero .copy{width:100%;max-width:600px}.hero .lead{max-width:480px}}
+@media(max-width:560px){.hero{padding-top:110px}.hero .copy{max-width:100%}.hero h1{font-size:clamp(40px,13vw,66px)}}
 </style></head>
 <body><canvas id="cinematic-world" aria-hidden="true"></canvas>
 <div class="cinematic-atmosphere" aria-hidden="true"><div class="atmo-glow atmo-red"></div><div class="atmo-glow atmo-blue"></div><div class="atmo-glow atmo-violet"></div><div class="atmo-grid"></div><div class="atmo-specks"></div><div class="atmo-vignette"></div></div>
@@ -423,7 +432,7 @@ try {
   const parts=[];
   function part(name,pos,mat,explode,rot=[0,0,0]){const g=new THREE.Group();suit.add(g);g.position.set(...pos);g.rotation.set(...rot);g.userData.base=[...pos];g.userData.explode=explode;g.userData.partName=name;parts.push(g);return g}
   // Torso / chest: layered armor plates and a mechanical inner frame.
-  const torso=part('torso',[0,0,0],mats.red,[0,0,-1.1]);
+  const torso=part('torso',[0,0,0],mats.red,[0,0,-3.2]);
   box(torso,mats.dark,[0,0,0],[1.45,1.75,.72]);
   ell(torso,mats.red,[0,.62,.05],[.82,.57,.48]);
   box(torso,mats.red,[0,.18,.23],[1.25,.72,.42]);
@@ -438,38 +447,38 @@ try {
   for(let i=0;i<3;i++){const ring=mesh(new THREE.TorusGeometry(.47+i*.12,.025,8,64),i===1?mats.gold:mats.steel,reactorG,[0,0,.05]);ring.rotation.x=Math.PI/2;ring.userData.spin=(i%2?1:-1)*.6}
   reactorG.userData.reactor=true;
   // Helmet: sculpted dome, cheek plates, gold face mask, eye slits.
-  const head=part('helmet',[0,1.45,.02],[mats.red],[0,2.4,.5]);
+  const head=part('helmet',[0,1.45,.02],[mats.red],[0,3.2,1.8]);
   ell(head,mats.red,[0,.18,0],[.48,.58,.42]);
   ell(head,mats.gold,[0,-.12,.31],[.36,.27,.16]);
   box(head,mats.gold,[0,-.22,.34],[.42,.12,.13]);
   box(head,mats.dark,[-.18,.04,.37],[.12,.035,.08]);box(head,mats.dark,[.18,.04,.37],[.12,.035,.08]);
   ell(head,mats.red,[-.38,-.14,.06],[.16,.27,.2]);ell(head,mats.red,[.38,-.14,.06],[.16,.27,.2]);
   // Shoulders.
-  for(const side of [-1,1]){const shoulder=part(side<0?'left shoulder':'right shoulder',[side*.92,.72,0],[side*1.2,1.15,.4],[0,0,side*.25]);ell(shoulder,mats.red,[0,0,0],[.46,.42,.43]);ell(shoulder,mats.gold,[side*.1,.08,.26],[.28,.2,.15]);}
+  for(const side of [-1,1]){const shoulder=part(side<0?'left shoulder':'right shoulder',[side*.92,.72,0],[side*2.6,1.55,.9],[0,0,side*.25]);ell(shoulder,mats.red,[0,0,0],[.46,.42,.43]);ell(shoulder,mats.gold,[side*.1,.08,.26],[.28,.2,.15]);}
   // Arms with forearm shells, exposed joints and hands.
   for(const side of [-1,1]){
-    const upper=part(side<0?'left upper arm':'right upper arm',[side*1.18,.05,0],[side*1.65,.3,.2],[0,0,side*.5]);
+    const upper=part(side<0?'left upper arm':'right upper arm',[side*1.18,.05,0],[side*3.3,.65,.8],[0,0,side*.5]);
     ell(upper,mats.dark,[0,0,0],[.27,.44,.27]);ell(upper,mats.red,[side*.08,-.12,.08],[.3,.37,.31]);
-    const fore=part(side<0?'left forearm':'right forearm',[side*1.38,-.68,.06],[side*1.7,-.75,.25],[0,0,side*.25]);
+    const fore=part(side<0?'left forearm':'right forearm',[side*1.38,-.68,.06],[side*3.6,-1.2,1.2],[0,0,side*.25]);
     ell(fore,mats.dark,[0,0,0],[.28,.42,.28]);ell(fore,mats.red,[0,-.06,.1],[.31,.4,.32]);ell(fore,mats.gold,[0,.19,.22],[.22,.1,.12]);
-    const hand=part(side<0?'left hand':'right hand',[side*1.42,-1.12,.15],[side*1.9,-1.5,.45],[0,0,side*.2]);
+    const hand=part(side<0?'left hand':'right hand',[side*1.42,-1.12,.15],[side*4,-2,1.8],[0,0,side*.2]);
     ell(hand,mats.dark,[0,0,0],[.22,.28,.2]);for(let f=0;f<4;f++)cyl(hand,mats.steel,[side*(f-1.5)*.085,-.23,.03],.035,.04,.18);
   }
   // Pelvis, thighs, knees, shins and feet.
-  const pelvis=part('pelvis',[0,-.95,0],[0,-1.4,-.3]);
+  const pelvis=part('pelvis',[0,-.95,0],[0,-2.6,-1.5]);
   box(pelvis,mats.dark,[0,0,0],[1.1,.42,.56]);ell(pelvis,mats.red,[0,.02,.1],[.62,.3,.42]);
   for(const side of [-1,1]){
-    const thigh=part(side<0?'left thigh':'right thigh',[side*.42,-1.55,0],[side*.65,-2.15,.2]);
+    const thigh=part(side<0?'left thigh':'right thigh',[side*.42,-1.55,0],[side*2.2,-3.35,.9]);
     ell(thigh,mats.dark,[0,0,0],[.34,.52,.34]);ell(thigh,mats.red,[0,-.06,.13],[.36,.48,.3]);
-    const knee=part(side<0?'left knee':'right knee',[side*.43,-2.1,.16],[side*.7,-2.55,.25]);
+    const knee=part(side<0?'left knee':'right knee',[side*.43,-2.1,.16],[side*2.5,-4,.9]);
     ell(knee,mats.gold,[0,0,.1],[.29,.25,.25]);ell(knee,mats.red,[0,-.05,.17],[.26,.2,.23]);
-    const shin=part(side<0?'left shin':'right shin',[side*.45,-2.65,.03],[side*.8,-3.25,.35]);
+    const shin=part(side<0?'left shin':'right shin',[side*.45,-2.65,.03],[side*2.7,-4.8,1.5]);
     ell(shin,mats.dark,[0,0,0],[.3,.52,.3]);ell(shin,mats.red,[0,-.08,.13],[.32,.5,.3]);box(shin,mats.gold,[0,-.1,.35],[.24,.36,.06]);
-    const foot=part(side<0?'left boot':'right boot',[side*.46,-3.15,.28],[side*.9,-3.65,.6]);
+    const foot=part(side<0?'left boot':'right boot',[side*.46,-3.15,.28],[side*2.9,-5.3,2]);
     ell(foot,mats.dark,[0,0,0],[.32,.23,.48]);box(foot,mats.red,[0,-.05,.12],[.45,.23,.5]);
   }
   // Extra chest fins and side modules that visibly separate in the exploded chapter.
-  for(let side of [-1,1]){const fin=part('side armor',[side*.72,.05,.12],[side*1.05,.15,-.1],[0,0,side*.35]);box(fin,mats.gold,[0,0,0],[.24,.7,.28]);box(fin,mats.red,[0,.08,.1],[.18,.55,.24])}
+  for(let side of [-1,1]){const fin=part('side armor',[side*.72,.05,.12],[side*2.5,.2,-.6],[0,0,side*.35]);box(fin,mats.gold,[0,0,0],[.24,.7,.28]);box(fin,mats.red,[0,.08,.1],[.18,.55,.24])}
   // Reactor halo stays as the hero focus, then scales toward camera during scroll.
   const halo=new THREE.Group();halo.position.set(0,.1,.72);torso.add(halo);
   for(let i=0;i<5;i++){const r=mesh(new THREE.TorusGeometry(.72+i*.17,.025,8,96),i%2?mats.red:mats.glow,halo);r.rotation.x=Math.PI/2;r.userData.spin=(i%2?-.7:.5)}
