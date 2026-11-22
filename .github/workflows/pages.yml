@@ -72,6 +72,8 @@ jobs:
           name: cinematic-pages-${{ github.run_id }}-${{ github.run_attempt }}
           path: .
           include-hidden-files: true
+      - name: Wait for Pages artifact metadata propagation
+        run: sleep 10
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v5
