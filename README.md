@@ -1,29 +1,33 @@
-# JARVIS PRO — Cinematic Phase 1
+# JARVIS PRO Storefront
 
-The active GitHub Pages site is a scene-first WebGL prototype, not the product storefront. It demonstrates a scroll-driven armor reveal, modular fracture, camera flight, and reactor close-up.
+The active GitHub Pages site is the full JARVIS PRO product storefront, restored from the previous site content and rebuilt around the supplied Iron Man 2020 suit image.
 
-## Current experience
-- Fixed full-page Three.js canvas with a procedural hangar, armor, fog, lighting, particles, bloom and film effects.
-- Five scroll chapters: Awaken, Approach, Fracture, Flight, Reactor.
-- Procedural armor is a placeholder; no photoreal suit or cinematic video asset is included.
-- Custom GLB/GLTF models can be loaded from a same-origin file through the `?model=` parameter or the browser console API.
-- Audio is synthesized only after the visitor enables it; it defaults off.
-- Mobile rendering is capped and reduced-motion preferences are supported.
-- A fallback is shown if WebGL initialization or the graphics context fails.
+## Cinematic entry
+- Uses the exact supplied armor reference image (hotlinked from its source wallpaper page), not a procedural toy armor model.
+- Scroll choreography zooms toward the chest area and transitions to a layered Arc Reactor graphic.
+- No video/training-video asset or autoplay media is used.
+- Scroll reveal respects reduced-motion preferences.
+
+## Restored storefront content
+- Product hero and product purpose
+- Feature cards: Voice + Chat, AI Provider Choice, Local Tooling, Android Workflows, History + Settings, Connected Services
+- Interactive demo scenarios
+- Provider connection sandbox
+- Ecosystem/integrations overview
+- Android setup walkthrough and device-specific steps
+- Product/launch pricing presentation and purchase status disclaimer
+- FAQ and footer information
+
+The checkout and APK delivery are still presentation-only and are clearly described as inactive; do not treat this page as a live payment or delivery system.
+
+## Source image
+Armor image attribution is shown on the site: ultraraw26 via HDQWalls. The source page is linked from the footer.
 
 ## Files
-- `index.html`: minimal HUD, fixed canvas and scroll chapters.
-- `styles/cinematic.css`: overlay, responsive and reduced-motion styles.
-- `src/main.js`: Three.js scene, scroll choreography, audio and context handling.
-- `src/armor.js`: procedural armor geometry and fracture vectors.
-- `CINEMATIC_PHASE1.md`: scene and architecture notes.
-- `archive/storefront-v1.html`: the older product storefront, retained for reference and not deployed.
-- `scripts/validate_site.py`: static HTML, asset, accessibility and scene-integrity checks.
-
-## Release status
-Deployment and source-integrity checks can pass while the visual design is still pending review. The requested realistic cinematic, video-like full-page environment is **not yet accepted**: the current environment is procedural shader/3D artwork, not an actual cinematic video or photoreal scene asset. A supplied visual reference or recording should guide the next art pass.
-
-The storefront product copy, price, setup guide, payment checkout and APK delivery are not present in this Phase 1 page. The archived storefront is reference material only.
+- `index.html`: full storefront, cinematic scroll reveal, restored content and interactions.
+- `archive/storefront-v1.html`: preserved original storefront snapshot.
+- `scripts/validate_site.py`: static integrity and content checks.
+- `.github/workflows/pages.yml`: validation, Pages artifact upload, deploy and live SHA verification.
 
 ## Deploy
-GitHub Pages is deployed by `.github/workflows/pages.yml`. The workflow runs actionlint, site integrity checks, JavaScript/CSS parsing, Prettier checks on temporary copies, uploads the site artifact, deploys it, then requires HTTP 200 and an exact SHA-256 match of the live page to the checked-out `index.html`.
+GitHub Pages is deployed by `.github/workflows/pages.yml`. The workflow runs actionlint and site checks, parses inline JavaScript, validates HTML/CSS formatting, uploads the site artifact, deploys, and requires HTTP 200 plus an exact SHA-256 match of the live page to the checked-out `index.html`.
