@@ -7,6 +7,7 @@ import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
 import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
 import {ShaderPass} from 'three/addons/postprocessing/ShaderPass.js';
 import {BokehPass} from 'three/addons/postprocessing/BokehPass.js';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {createArmor,setExploded,disposeArmor} from './armor.js';
 import Lenis from 'https://cdn.jsdelivr.net/npm/lenis@1.1.16/+esm';
 import {gsap} from 'https://cdn.jsdelivr.net/npm/gsap@3.12.7/+esm';
@@ -17,7 +18,7 @@ const progressFill=document.querySelector('#progress-fill'),chapterNum=document.
 const mobile=matchMedia('(max-width: 700px)').matches||matchMedia('(pointer: coarse)').matches,reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:!mobile,powerPreference:'high-performance'});
 renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,mobile?1.35:1.8));renderer.setSize(innerWidth,innerHeight,false);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.08;renderer.shadowMap.enabled=!mobile;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
-const scene=new THREE.Scene();scene.background=null;scene.fog=new THREE.FogExp2(0x050b12,.055);
+const scene=new THREE.Scene();scene.background=null;scene.fog=new THREE.FogExp2(0x050b12,.055);const pmrem=new THREE.PMREMGenerator(renderer);const studioEnvironment=pmrem.fromScene(new RoomEnvironment(renderer),.04).texture;scene.environment=studioEnvironment;scene.environmentIntensity=1.15;pmrem.dispose();
 const camera=new THREE.PerspectiveCamera(38,innerWidth/innerHeight,.08,160);camera.position.set(0,1.5,8.8);
 const clock=new THREE.Clock(),state={target:0,progress:0,mouseX:0,mouseY:0,mouseTargetX:0,mouseTargetY:0,phase:0,paused:false};
 const world=new THREE.Group();scene.add(world);
