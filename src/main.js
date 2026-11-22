@@ -59,7 +59,7 @@ function updateTrails(amount){const arr=trailGeo.attributes.position.array;armor
 const filmShader={uniforms:{tDiffuse:{value:null},uTime:{value:0},uAmount:{value:.0015},uAberration:{value:.0018}},vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',fragmentShader:'varying vec2 vUv;uniform sampler2D tDiffuse;uniform float uTime;uniform float uAmount;uniform float uAberration;float hash(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}void main(){vec2 d=vUv-.5;float r=length(d);vec2 off=d*uAberration*(1.0+r*2.0);vec3 c;c.r=texture2D(tDiffuse,vUv+off).r;c.g=texture2D(tDiffuse,vUv).g;c.b=texture2D(tDiffuse,vUv-off).b;float grain=(hash(vUv*vec2(1920.,1080.)+uTime)-.5)*uAmount;c+=grain;float vig=1.0-smoothstep(.42,.78,r)*.16;c*=vig;gl_FragColor=vec4(c,1.);}'};
 const composer=new EffectComposer(renderer);composer.addPass(new RenderPass(scene,camera));const bloom=new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight),mobile?.35:.72,.65,.22);composer.addPass(bloom);const film=new ShaderPass(filmShader);composer.addPass(film);let bokeh=null;if(!mobile&&!reduceMotion){try{bokeh=new BokehPass(scene,camera,{focus:4.6,aperture:.00009,maxblur:.008});composer.addPass(bokeh)}catch(e){console.warn('DOF unavailable, continuing',e)}}
 const chapters=[{label:'AWAKEN',phase:'01 / AWAKEN'},{label:'APPROACH',phase:'02 / APPROACH'},{label:'FRACTURE',phase:'03 / FRACTURE'},{label:'FLIGHT',phase:'04 / FLIGHT'},{label:'REACTOR',phase:'05 / REACTOR'}];
-const cameraCurve=new THREE.CatmullRomCurve3([new THREE.Vector3(0,1.55,9.2),new THREE.Vector3(.12,1.7,7.2),new THREE.Vector3(0,1.58,5.25),new THREE.Vector3(0,1.52,3.45),new THREE.Vector3(0,1.52,2.05),new THREE.Vector3(0,1.52,1.2),new THREE.Vector3(0,1.52,.82)],false,'catmullrom',.42);
+const cameraCurve=new THREE.CatmullRomCurve3([new THREE.Vector3(-.18,1.58,6.5),new THREE.Vector3(.05,1.66,5.6),new THREE.Vector3(0,1.58,4.45),new THREE.Vector3(0,1.52,3.25),new THREE.Vector3(0,1.52,2.05),new THREE.Vector3(0,1.52,1.2),new THREE.Vector3(0,1.52,.82)],false,'catmullrom',.42);
 const targetCurve=new THREE.CatmullRomCurve3([new THREE.Vector3(0,1.24,0),new THREE.Vector3(0,1.35,.08),new THREE.Vector3(0,1.48,.18),new THREE.Vector3(0,1.52,.28),new THREE.Vector3(0,1.52,.42),new THREE.Vector3(0,1.52,.48),new THREE.Vector3(0,1.52,.48)],false,'catmullrom',.4);
 function smooth(a,b,x){const t=THREE.MathUtils.clamp((x-a)/(b-a),0,1);return t*t*(3-2*t)}
 function phaseAt(p){if(p<.18)return 0;if(p<.5)return 1;if(p<.69)return 2;if(p<.84)return 3;return 4}
@@ -80,7 +80,7 @@ function applyCinematic(p){
  camera.lookAt(target);
  key.position.set(-4+state.mouseX*2,7+state.mouseY*1.2,5+state.mouseY*2);
  rim.position.set(4+state.mouseX*2.8,5+state.mouseY*1.4,-3);
- world.position.y=-.04+Math.sin(smooth(0,.12,p)*Math.PI)*.025;
+ world.position.y=-.04+Math.sin(smooth(0,.12,p)*Math.PI)*.025;world.position.x=.46*(1-approach);
  world.scale.setScalar(.94+intro*.06-approach*.025);
  world.rotation.y=state.mouseX*.045*(1-suitFracture*.8);
  if(activeArmor===armor){
