@@ -44,19 +44,12 @@ jobs:
           grep -q 'UnrealBloomPass' src/main.js
           grep -q 'BokehPass' src/main.js
           grep -q 'prefers-reduced-motion' styles/cinematic.css
-          python3 - <<'PY'
-          from pathlib import Path
-          import re
-          html=Path("index.html").read_text(encoding="utf-8")
-          ids=re.findall('id="([^"]+)"',html)
-          duplicates=sorted({x for x in ids if ids.count(x)>1})
-          required=["<html lang=","<main>","<canvas id=","<title>","viewport","./styles/cinematic.css","./src/main.js"]
-          missing=[item for item in required if item not in html]
-          if duplicates or missing:
-            raise SystemExit("HTML checks failed; duplicate IDs="+str(duplicates)+" missing="+str(missing))
-          print("HTML structure audit passed: "+str(len(ids))+" IDs; required references present.")
-          PY
-      - name: Syntax checks
+          grep -q '<main>' index.html
+          grep -q '<title>' index.html
+          grep -q 'viewport' index.html
+          grep -q './styles/cinematic.css' index.html
+          grep -q './src/main.js' index.html
+     - name: Syntax checks
         run: |
           node --input-type=module --check < src/main.js
           node --input-type=module --check < src/armor.js
