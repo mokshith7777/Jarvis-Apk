@@ -3,10 +3,17 @@
 The active GitHub Pages site is the full JARVIS PRO product storefront, restored from the previous site content and rebuilt around the supplied Iron Man 2020 suit image.
 
 ## Cinematic entry
-- Uses the exact supplied armor reference image (hotlinked from its source wallpaper page), not a procedural toy armor model.
-- Scroll choreography zooms toward the chest area and transitions to a layered Arc Reactor graphic.
+- The hero currently uses an externally hosted Iron Man 2020 suit image. Exact matching against the user's original reference set has not been verified.
+- Scroll choreography zooms toward the chest area and transitions to a layered Arc Reactor graphic. The current active Three.js scene remains a procedural hangar/armor prototype, not the requested realistic nature environment.
 - No video/training-video asset or autoplay media is used.
 - Scroll reveal respects reduced-motion preferences.
+
+## Visual acceptance status
+
+- The abstract background grid overlay is disabled and scroll reveals now have one GSAP owner; reduced-motion and runtime-fallback states keep content visible.
+- The requested realistic, full-page interactive 3D nature background is not yet integrated or visually verified. A separate Manus task is pending review; its output is not merged into this repository.
+- The exact five armor/Arc Reactor reference images are not present in the accessible repository or Library files at audit time. Reattach them before claiming exact fidelity.
+- Checkout/APK delivery remains presentation-only; no live payment or download fulfillment is active.
 
 ## Restored storefront content
 - Product hero and product purpose
