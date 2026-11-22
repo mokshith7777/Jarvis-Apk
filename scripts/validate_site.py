@@ -227,6 +227,17 @@ check('id="cinematic-world"' in HTML and 'id="progress-fill"' in HTML and 'id="c
 check('id="loading"' in HTML and 'id="fallback"' in HTML and 'id="load-progress"' in HTML, "Runtime loading/fallback DOM missing")
 check("webglcontextrestored" in MAIN and "composer.setSize" in MAIN, "WebGL restoration does not resize postprocessing")
 check("renderer.resetState()" in MAIN, "WebGL restoration does not reset renderer state")
+check("window.__JARVIS_RUNTIME__" in MAIN and "status:'active'" in MAIN and "frames" in MAIN, "runtime execution marker/frame telemetry missing")
+check("contextRestorations" in MAIN and "status='context-lost'" in MAIN, "context loss/restoration runtime telemetry missing")
+check("window.__JARVIS_RUNTIME__" in HTML and "module-load-timeout" in HTML, "module-load watchdog fallback telemetry missing")
+SMOKE = ROOT / "scripts/runtime_smoke.cjs"
+check(SMOKE.is_file(), "Browser runtime smoke script missing")
+if SMOKE.is_file():
+    SMOKE_TEXT = SMOKE.read_text(encoding="utf-8")
+    check("WEBGL_lose_context" in SMOKE_TEXT and "contextRestorations" in SMOKE_TEXT, "Browser smoke does not verify context recovery")
+    check("demo-tab" in SMOKE_TEXT and "devicefamily" in SMOKE_TEXT and "setup-reset" in SMOKE_TEXT, "Browser smoke misses core interactions")
+check("Browser smoke for staged Pages artifact" in WORKFLOW and "runtime_smoke.cjs" in WORKFLOW, "Staged browser runtime smoke is not a CI gate")
+check("Browser smoke for live Pages deployment" in WORKFLOW, "Live browser runtime smoke is not a CI gate")
 
 # This is a warning, not a release-blocking test: cinematic realism requires human visual approval.
 if not re.search(r"<video\b|\.(?:mp4|webm|mov)(?:[?#]|$)", HTML, re.I):
