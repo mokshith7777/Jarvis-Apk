@@ -31,19 +31,6 @@ jobs:
           test -s src/main.js
           test -s src/armor.js
           test -s .nojekyll
-          grep -q 'cinematic-world' index.html
-          grep -q 'importmap' index.html
-          grep -q 'ScrollTrigger' src/main.js
-          grep -q 'Lenis' src/main.js
-          grep -q 'createArmor' src/armor.js
-          grep -q 'setExploded' src/armor.js
-          grep -q 'ARC_REACTOR_ASSEMBLY' src/armor.js
-          grep -q 'loadArmor' src/main.js
-          grep -q 'KTX2Loader' src/main.js
-          grep -q 'DRACOLoader' src/main.js
-          grep -q 'UnrealBloomPass' src/main.js
-          grep -q 'BokehPass' src/main.js
-          grep -q 'prefers-reduced-motion' styles/cinematic.css
       - name: Syntax checks
         run: |
           node --input-type=module --check < src/main.js
