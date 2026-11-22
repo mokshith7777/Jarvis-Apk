@@ -130,7 +130,7 @@ function applyCinematic(p){
 const lenis=new Lenis({smoothWheel:!reduceMotion,smoothTouch:false,lerp:reduceMotion?1:mobile?.14:.12,gestureOrientation:'vertical',wheelMultiplier:1.0,prevent:node=>node?.closest?.('[data-native-scroll]')});lenis.on('scroll',()=>ScrollTrigger.update());gsap.ticker.add(t=>lenis.raf(t*1000));gsap.ticker.lagSmoothing(0);
 // Drive the cinematic journey from the entire document, not just the short hero.
 // This keeps camera/armor/reactor chapters aligned with actual page scroll.
-ScrollTrigger.create({start:0,end:()=>Math.max(1,ScrollTrigger.maxScroll(window)),invalidateOnRefresh:true,onUpdate:self=>{state.target=self.progress}});const entryGate=document.querySelector('#entry-gate'),enterButton=document.querySelector('#enter-experience'),sceneCopy=document.querySelector('#scene-copy');
+gsap.to(state,{target:1,ease:'none',scrollTrigger:{start:0,end:()=>Math.max(1,ScrollTrigger.maxScroll(window)),invalidateOnRefresh:true,scrub:reduceMotion?false:.25,onUpdate:self=>{state.target=self.progress}}});const entryGate=document.querySelector('#entry-gate'),enterButton=document.querySelector('#enter-experience'),sceneCopy=document.querySelector('#scene-copy');
 /* No invisible entry gate: scrolling is available immediately. */
 enterButton?.addEventListener('click',()=>{entryGate?.classList.add('dismissed');state.entered=true;if(sceneCopy)gsap.fromTo(sceneCopy,{x:-18,opacity:0},{x:0,opacity:1,duration:1.15,ease:'power3.out'});});
 
