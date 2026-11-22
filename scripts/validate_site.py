@@ -70,7 +70,7 @@ check("iron-man-2020-suit-xf-1440x2560.jpg" in HTML,"Supplied Iron Man reference
 check("armor-image" in HTML and "reactor-transition" in HTML,"Scroll zoom / reactor transition markup missing")
 check("requestAnimationFrame(render)" in HTML and "armor-scroll" in HTML,"Scroll-driven animation code missing")
 check("prefers-reduced-motion" in HTML,"Reduced motion handling missing")
-check(not re.search(r"<video\\b",HTML,re.I),"Unexpected video element; image-based reveal is intended")
+check(not re.search(r"<video\b",HTML,re.I),"Unexpected video element; image-based reveal is intended")
 check("JARVIS PRO" in HTML and "₹19" in HTML and "PRODUCT DETAILS" in HTML,"Storefront product/pricing content missing")
 check("Questions, answered." in HTML and "Bring JARVIS online." in HTML,"FAQ or setup guide content missing")
 if errors:
