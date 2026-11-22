@@ -82,12 +82,12 @@ jobs:
           set -euo pipefail
           rm -rf "$RUNNER_TEMP/pages"
           mkdir -p "$RUNNER_TEMP/pages"
-          cp index.html .nojekyll "$RUNNER_TEMP/pages/"
+          cp index.html .nojekyll "$RUNNER_TEMP/pages/"\n          cp -R src styles "$RUNNER_TEMP/pages/"
           test -s "$RUNNER_TEMP/pages/index.html"
           test -f "$RUNNER_TEMP/pages/.nojekyll"
           cmp -s index.html "$RUNNER_TEMP/pages/index.html"
-          test "$(find "$RUNNER_TEMP/pages" -mindepth 1 -maxdepth 1 -type f | wc -l)" -eq 2
-          echo "Pages artifact allowlist: index.html and .nojekyll only."
+          test -s "$RUNNER_TEMP/pages/src/main.js"\n          test -s "$RUNNER_TEMP/pages/src/armor.js"\n          test -s "$RUNNER_TEMP/pages/styles/cinematic.css"\n          test "$(find "$RUNNER_TEMP/pages" -mindepth 1 -maxdepth 1 | wc -l)" -eq 4
+          echo "Pages artifact allowlist: index.html, .nojekyll, src/, styles/."
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
