@@ -164,7 +164,7 @@ jobs:
               raise SystemExit(f"Expected storefront + fallback scripts, found {len(scripts)}")
           if len(modules) != 1:
               raise SystemExit(f"Expected exactly one cinematic module, found {len(modules)}")
-          fallback_script, storefront_script = scripts
+          storefront_script, fallback_script = scripts
           Path("/tmp/storefront.js").write_text(storefront_script)
           Path("/tmp/cinematic-fallback.js").write_text(fallback_script)
           Path("/tmp/cinematic-world.js").write_text(modules[0])
