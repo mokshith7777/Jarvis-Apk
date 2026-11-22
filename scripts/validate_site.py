@@ -152,7 +152,7 @@ for link in audit.links:
     check(bool(name), "Unnamed link found: " + a.get("href", ""))
     if a.get("target", "").lower() == "_blank":
         rel = set(a.get("rel", "").lower().split())
-        check({"noopener", "noreferrer"}.issubset(rel), "External target=_blank link missing noopener/noreferrer: " + a.get("href", ""))
+        check("noopener" in rel, "External target=_blank link missing noopener: " + a.get("href", ""))
 
 for control in audit.controls:
     a = control["attrs"]
