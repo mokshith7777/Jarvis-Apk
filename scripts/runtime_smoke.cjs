@@ -29,6 +29,11 @@ async function installPinnedDependencyRoute(page){
 }
 (async()=>{
 const browser=await chromium.launch({headless:true,args:browserArgs});
+async function revealBeforeInteraction(page,locator,label){
+ await locator.scrollIntoViewIfNeeded();
+ const reveal=await locator.evaluateHandle(e=>e.closest('.reveal')||e);
+ await page.waitForFunction(el=>{const cs=getComputedStyle(el);return cs.visibility==='visible'&&Number(cs.opacity)>.95},reveal,{timeout:10000}).catch(async error=>{const details=await reveal.evaluate(el=>({tag:el.tagName,className:el.className,visibility:getComputedStyle(el).visibility,opacity:getComputedStyle(el).opacity,rect:el.getBoundingClientRect().toJSON()}));throw new Error(label+' reveal did not become visible: '+JSON.stringify(details)+'; '+error.message)});
+}
 async function openAndVerify(page,label){
  const pageErrors=[],failedModules=[],localDependencyFailures=await installPinnedDependencyRoute(page)||[];
  page.on('pageerror',e=>pageErrors.push(e.message));
@@ -60,20 +65,20 @@ try{
   await desktop.waitForFunction(()=>window.__JARVIS_RUNTIME__?.status==='active'&&window.__JARVIS_RUNTIME__?.contextRestorations>=1,null,{timeout:20000});
   assert.equal(await desktop.locator('#fallback').isVisible(),false,'fallback must hide after successful context restoration');
   await desktop.waitForFunction(()=>window.__JARVIS_RUNTIME__?.frames>=3,null,{timeout:15000});
-  const demo=desktop.locator('.demo-tab[data-demo="providers"]');await demo.click();
+  const demo=desktop.locator('.demo-tab[data-demo="providers"]');await revealBeforeInteraction(desktop,demo,'provider demo tab');await demo.click();
   assert(await demo.evaluate(e=>e.classList.contains('active')),'demo tab should become active');
   assert((await desktop.locator('#demoscreen').innerText()).includes('Choose the engine.'),'demo tab content should update');
-  const faq=desktop.locator('.faqitem button').first();await faq.click();
+  const faq=desktop.locator('.faqitem button').first();await revealBeforeInteraction(desktop,faq,'FAQ button');await faq.click();
   assert(await faq.evaluate(e=>e.parentElement.classList.contains('active')),'FAQ should expand');
-  const expand=desktop.locator('.expand').first();await expand.click();
+  const expand=desktop.locator('.expand').first();await revealBeforeInteraction(desktop,expand,'feature expand button');await expand.click();
   assert(await expand.evaluate(e=>e.closest('.feature').classList.contains('open')),'feature card should expand');
-  await desktop.locator('.chip[data-provider="Hosted AI"]').click();await desktop.locator('#dropzone').click();
+  const hosted=desktop.locator('.chip[data-provider="Hosted AI"]');await revealBeforeInteraction(desktop,hosted,'provider chip');await hosted.click();const dropzone=desktop.locator('#dropzone');await revealBeforeInteraction(desktop,dropzone,'dropzone');await dropzone.click();
   assert((await desktop.locator('#dropstatus').innerText()).includes('HOSTED AI'),'sandbox provider tap should connect demo');
-  const deviceFamily=desktop.locator('#devicefamily');await deviceFamily.scrollIntoViewIfNeeded();await desktop.waitForFunction(()=>{const e=document.querySelector('#devicefamily'),p=e?.closest('.reveal'),cs=p&&getComputedStyle(p);return e&&cs&&cs.visibility==='visible'&&Number(cs.opacity)>.95},null,{timeout:10000});await deviceFamily.selectOption('realme');
+  const deviceFamily=desktop.locator('#devicefamily');await revealBeforeInteraction(desktop,deviceFamily,'device selector');await desktop.waitForFunction(()=>{const e=document.querySelector('#devicefamily'),p=e?.closest('.reveal'),cs=p&&getComputedStyle(p);return e&&cs&&cs.visibility==='visible'&&Number(cs.opacity)>.95},null,{timeout:10000});await deviceFamily.selectOption('realme');
   assert((await desktop.locator('#device-tip').innerText()).includes('Realme'),'device selector should update help');
-  const checklist=desktop.locator('.step-done').first();await checklist.check();
+  const checklist=desktop.locator('.step-done').first();await revealBeforeInteraction(desktop,checklist,'setup checklist');await checklist.check();
   assert(await checklist.isChecked(),'setup checklist should accept a check');
-  await desktop.locator('#setup-reset').click();assert.equal(await checklist.isChecked(),false,'setup reset should clear checklist');
+  const reset=desktop.locator('#setup-reset');await revealBeforeInteraction(desktop,reset,'setup reset');await reset.click();assert.equal(await checklist.isChecked(),false,'setup reset should clear checklist');
   const audio=desktop.locator('#audio-toggle');assert.equal(await audio.getAttribute('aria-pressed'),'false','ambient audio must start off');
   await audio.click();assert.equal(await audio.getAttribute('aria-pressed'),'true','audio toggle should turn on');await audio.click();assert.equal(await audio.getAttribute('aria-pressed'),'false','audio toggle should turn off');
   const sound=desktop.locator('#sound-toggle');assert.equal(await sound.getAttribute('aria-pressed'),'false','sound effects must start off');
@@ -81,7 +86,7 @@ try{
   await desktop.mouse.move(420,360);await desktop.waitForTimeout(150);
   const pointerX=await desktop.evaluate(()=>getComputedStyle(document.body).getPropertyValue('--pointer-x'));
   assert(pointerX.trim(),'hero pointer parallax should respond to pointer movement');
-  await desktop.locator('a[href="#pricing"]').first().click();assert.equal(new URL(desktop.url()).hash,'#pricing','hero CTA should navigate to pricing anchor');
+  const pricingAnchor=desktop.locator('a[href="#pricing"]').first();await revealBeforeInteraction(desktop,pricingAnchor,'pricing CTA');await pricingAnchor.click();assert.equal(new URL(desktop.url()).hash,'#pricing','hero CTA should navigate to pricing anchor');
   await desktop.locator('#story').scrollIntoViewIfNeeded();await desktop.waitForTimeout(600);const initialScroll=await desktop.evaluate(()=>window.__JARVIS_RUNTIME__?.scrollProgress||0);await desktop.mouse.wheel(0,650);await desktop.waitForFunction(()=>window.__JARVIS_RUNTIME__?.scrollProgress>.05,null,{timeout:10000});const firstScroll=await desktop.evaluate(()=>window.__JARVIS_RUNTIME__.scrollProgress);await desktop.mouse.wheel(0,900);await desktop.waitForFunction(p=>window.__JARVIS_RUNTIME__?.scrollProgress>p+.025,firstScroll,{timeout:10000});const secondScroll=await desktop.evaluate(()=>window.__JARVIS_RUNTIME__.scrollProgress);assert(secondScroll>firstScroll,'full-page cinematic progress should increase smoothly as the page scrolls');await desktop.mouse.wheel(0,-1100);await desktop.waitForFunction(()=>window.__JARVIS_RUNTIME__?.scrollProgress<.9,null,{timeout:10000});assert(initialScroll>=0,'scroll telemetry should be initialized');const firstReveal=desktop.locator('#features .feature.reveal').first();await firstReveal.scrollIntoViewIfNeeded();await desktop.waitForFunction(()=>{const e=document.querySelector('#features .feature.reveal'),cs=e&&getComputedStyle(e);return cs&&cs.visibility==='visible'&&Number(cs.opacity)>.95},null,{timeout:10000});await desktop.mouse.wheel(0,-6000);await desktop.waitForFunction(()=>window.scrollY<100,null,{timeout:10000});await desktop.waitForFunction(()=>{const e=document.querySelector('#features .feature.reveal'),cs=e&&getComputedStyle(e);return cs&&cs.visibility==='hidden'&&Number(cs.opacity)<.1},null,{timeout:10000});
  }
  const mobileContext=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'reduce'});
@@ -89,7 +94,7 @@ try{
  assert.equal(mobileRuntime.mobile,true,'mobile optimization should be active');
  assert.equal(mobileRuntime.reducedMotion,true,'reduced-motion preference should be respected');
  assert.equal(await mobile.locator('#audio-toggle').getAttribute('aria-pressed'),'false','mobile audio must default off');
- if(mode==='full'){await mobile.locator('.chip[data-provider="Local endpoint"]').tap();await mobile.locator('#dropzone').tap();assert((await mobile.locator('#dropstatus').innerText()).includes('LOCAL ENDPOINT'),'mobile tap sandbox interaction should work')}
+ if(mode==='full'){const localChip=mobile.locator('.chip[data-provider="Local endpoint"]');await revealBeforeInteraction(mobile,localChip,'mobile local provider chip');await localChip.tap();const mobileDrop=mobile.locator('#dropzone');await revealBeforeInteraction(mobile,mobileDrop,'mobile dropzone');await mobileDrop.tap();assert((await mobile.locator('#dropstatus').innerText()).includes('LOCAL ENDPOINT'),'mobile tap sandbox interaction should work')}
  await mobileContext.close();await desktop.close();
  console.log('BROWSER RUNTIME SMOKE PASSED: Three.js executed, render frames observed, '+(mode==='full'?'WebGL context recovery and desktop/mobile interactions verified.':'live runtime execution verified.'));
  console.log('Visual acceptance is NOT assessed by this automated browser smoke; realistic cinematic media still requires human review.');
