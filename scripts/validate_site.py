@@ -216,14 +216,17 @@ check("prefers-reduced-motion" in CSS, "Source cinematic CSS lacks reduced-motio
 check("@media" in CSS, "Source cinematic CSS lacks responsive breakpoints")
 check("import './armor.js'" not in MAIN and "from './armor.js'" in MAIN, "Local armor module import missing")
 
-# Runtime coverage warnings: source modules are audited but not necessarily deployed.
+# Three.js must be wired into the deployed HTML and artifact, not source-only.
 WORKFLOW = (ROOT / ".github/workflows/pages.yml").read_text(encoding="utf-8")
-main_runtime_loaded = bool(re.search(r"<script[^>]+src=[\"'][^\"']*src/main\.js", HTML, re.I) or "src/main.js" in HTML)
-single_file_artifact = bool(re.search(r"cp index\.html \.nojekyll", WORKFLOW))
-if not main_runtime_loaded and single_file_artifact:
-    print("THREE.JS RUNTIME NOT DEPLOYED: src/main.js and src/armor.js are source-audited only; the Pages artifact ships index.html and .nojekyll. Three.js fallback/HUD/context-recovery checks do not prove active runtime behavior.")
-if "webglcontextlost" in HTML and "webglcontextrestored" not in HTML:
-    print("WEBGL RECOVERY PENDING: the active background canvas falls back on context loss but has no restoration handler.")
+main_runtime_loaded = bool(re.search(r"<script[^>]+src=[\"'][^\"']*src/main\.js", HTML, re.I))
+runtime_artifact = "cp -R src styles" in WORKFLOW
+check(main_runtime_loaded, "Three.js module is not loaded by deployed index.html")
+check(runtime_artifact, "Pages artifact does not include src/ and styles/ runtime files")
+check('type="importmap"' in HTML and '"three":' in HTML and '"three/addons/"' in HTML, "Three.js import map missing/incomplete")
+check('id="cinematic-world"' in HTML and 'id="progress-fill"' in HTML and 'id="chapter-number"' in HTML and 'id="chapter-name"' in HTML and 'id="hud-phase"' in HTML, "Three.js canvas/HUD DOM missing")
+check('id="loading"' in HTML and 'id="fallback"' in HTML and 'id="load-progress"' in HTML, "Runtime loading/fallback DOM missing")
+check("webglcontextrestored" in MAIN and "composer.setSize" in MAIN, "WebGL restoration does not resize postprocessing")
+check("renderer.resetState()" in MAIN, "WebGL restoration does not reset renderer state")
 
 # This is a warning, not a release-blocking test: cinematic realism requires human visual approval.
 if not re.search(r"<video\b|\.(?:mp4|webm|mov)(?:[?#]|$)", HTML, re.I):
