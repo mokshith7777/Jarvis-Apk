@@ -160,14 +160,16 @@ jobs:
           html = Path("index.html").read_text()
           scripts = re.findall(r"<script>(.*?)</script>", html, re.S)
           modules = re.findall(r'<script type="module">(.*?)</script>', html, re.S)
-          if len(scripts) != 1:
-              raise SystemExit(f"Expected exactly one inline script, found {len(scripts)}")
+          if len(scripts) != 2:
+              raise SystemExit(f"Expected storefront + fallback scripts, found {len(scripts)}")
           if len(modules) != 1:
               raise SystemExit(f"Expected exactly one cinematic module, found {len(modules)}")
-          Path("/tmp/storefront.js").write_text(scripts[0])
+          fallback_script, storefront_script = scripts
+          Path("/tmp/storefront.js").write_text(storefront_script)
+          Path("/tmp/cinematic-fallback.js").write_text(fallback_script)
           Path("/tmp/cinematic-world.js").write_text(modules[0])
           ids = set(re.findall(r'\bid="([^"]+)"', html))
-          js = scripts[0] + modules[0]
+          js = fallback_script + storefront_script + modules[0]
           js_ids = set(re.findall(r"getElementById\(\s*['\"]([^'\"]+)['\"]\s*\)", js))
           selectors = re.findall(r"(?:querySelector|querySelectorAll)\(\s*['\"]([^'\"]+)['\"]\s*\)", js)
           js_ids.update(x[1:] for x in selectors if x.startswith("#") and re.match(r"#[A-Za-z_][\w-]*$", x))
@@ -182,7 +184,7 @@ jobs:
               "WebGL context fallback": "webglcontextlost" in modules[0],
               "module fallback": "catch(error)" in modules[0],
               "background canvas": 'id="background-canvas"' in html,
-              "procedural shader": "Procedural WebGL background plane" in scripts[0],
+              "cinematic fallback canvas": "cinematic-fallback-canvas" in fallback_script,
               "full-page fixed canvas": "#cinematic-world{position:fixed" in html,
               "background visible across sections": "section{background:linear-gradient(180deg,#02040816" in html,
               "city skyline shader": "const parts=[]" in modules[0],
@@ -191,10 +193,10 @@ jobs:
               "reactor scene transition": "reactorG.scale.setScalar" in modules[0],
               "scroll-based film timeline": "state.progress+=(state.target-state.progress)" in modules[0],
               "responsive hero architecture": "@media(max-width:900px)" in html and "@media(max-width:600px)" in html,
-              "WebGL fallback": "if(!gl)" in scripts[0],
-              "context-loss fallback": "webglcontextlost" in scripts[0],
-              "background frame throttle": "lastFrame>=33" in scripts[0],
-              "shader reduced motion": "prefers-reduced-motion: reduce" in scripts[0],
+              "2D visual fallback": "getContext('2d')" in fallback_script,
+              "fallback scene progress": "scrollY/" in fallback_script,
+              "fallback pointer parallax": "pointermove" in fallback_script,
+              "fallback draws immediately": "draw();" in fallback_script,
               "cinematic canvas": 'id="scene-canvas"' in html,
               "scene label": 'id="scene-label"' in html,
               "scene caption": 'id="scene-caption"' in html,
