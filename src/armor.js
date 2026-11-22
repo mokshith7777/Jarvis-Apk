@@ -109,7 +109,7 @@ rounded(g,'face-mask',[.32,.21,.1],[0,-.19,.23],goldBright,.06);
 rounded(g,'chin-plate',[.22,.09,.1],[0,-.27,.22],goldBright,.035);
 const eyeMat=new THREE.MeshStandardMaterial({color:0xcdfbff,emissive:0x63dfff,emissiveIntensity:4,roughness:.1});
 for(const s of [-1,1]){const eye=rounded(g,'eye-'+s,[.13,.035,.035],[s*.11,-.08,.25],eyeMat,.015);eye.rotation.z=s*.1}
-rounded(g,'helmet-crown',[.32,.12,.24],[0,.25,.04],red,.05;
+rounded(g,'helmet-crown',[.32,.12,.24],[0,.25,.04],red,.05);
 for(const s of [-1,1])rounded(g,'temple-panel-'+s,[.12,.24,.19],[s*.27,.02,.02],goldBright,.04);
 });
 const rear=addPart(body,'backpack-reactor',[0,1.45,-.25],[0,.18,-.5],g=>{
