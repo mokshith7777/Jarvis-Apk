@@ -118,6 +118,7 @@ jobs:
           trap 'kill "$server_pid" 2>/dev/null || true' EXIT
           for attempt in 1 2 3 4 5; do
             if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
+              echo "Artifact server ready after probe $attempt"
               break
             fi
             sleep 1
