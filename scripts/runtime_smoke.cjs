@@ -45,6 +45,7 @@ async function openAndVerify(page,label){
  assert.equal(runtime.renderer,'three',label+' renderer marker');
  assert(runtime.webglVersion>=1,label+' WebGL context version missing');
  assert.equal(runtime.canvasId,'cinematic-world',label+' renderer canvas marker');
+ const legacyField=page.locator('.cinematic-techfield');assert.equal(await legacyField.evaluate(el=>getComputedStyle(el).display),'none',label+' obsolete abstract techfield must remain hidden');const abstractGrid=page.locator('.atmo-grid');if(await abstractGrid.count())assert.equal(await abstractGrid.first().evaluate(el=>getComputedStyle(el).display),'none',label+' abstract grid overlay must remain hidden');
  await page.waitForFunction(()=>window.__JARVIS_RUNTIME__?.frames>=3,null,{timeout:15000});
  assert.equal(pageErrors.length,0,label+' uncaught browser exceptions: '+pageErrors.join(' | '));
  return runtime;
