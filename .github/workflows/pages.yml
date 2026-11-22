@@ -36,38 +36,63 @@ jobs:
           python3 - <<'PY'
           from html.parser import HTMLParser
           from pathlib import Path
-          import os
+          import json, os
           class Extractor(HTMLParser):
             def __init__(self):
-              super().__init__(); self.active=False; self.parts=[]
+              super().__init__(); self.kind=None; self.scripts=[]; self.importmaps=[]; self.styles=[]; self.buf=[]
             def handle_starttag(self,tag,attrs):
               a=dict(attrs)
-              if tag=='script' and not a.get('src') and a.get('type','').lower()!='importmap': self.active=True
+              if tag=='script' and not a.get('src'):
+                self.kind='importmap' if a.get('type','').lower()=='importmap' else 'script'; self.buf=[]
+              elif tag=='style': self.kind='style'; self.buf=[]
             def handle_endtag(self,tag):
-              if tag=='script' and self.active:self.active=False
+              if tag=='script' and self.kind in ('script','importmap'):
+                (self.importmaps if self.kind=='importmap' else self.scripts).append(''.join(self.buf)); self.kind=None; self.buf=[]
+              elif tag=='style' and self.kind=='style':
+                self.styles.append(''.join(self.buf)); self.kind=None; self.buf=[]
             def handle_data(self,data):
-              if self.active:self.parts.append(data)
-          p=Extractor();p.feed(Path('index.html').read_text())
-          Path(os.environ['RUNNER_TEMP'],'inline-script.js').write_text('\n'.join(p.parts))
+              if self.kind: self.buf.append(data)
+          p=Extractor(); p.feed(Path('index.html').read_text(encoding='utf-8')); p.close()
+          out=Path(os.environ['RUNNER_TEMP'],'parse'); out.mkdir(parents=True,exist_ok=True)
+          if not p.scripts: raise SystemExit('No inline executable scripts found')
+          for i,s in enumerate(p.scripts): (out/f'inline-{i}.js').write_text(s,encoding='utf-8')
+          for i,s in enumerate(p.styles): (out/f'inline-style-{i}.css').write_text(s,encoding='utf-8')
+          for m in p.importmaps: json.loads(m)
+          print(f'Extracted {len(p.scripts)} executable inline scripts, {len(p.importmaps)} import maps and {len(p.styles)} inline CSS blocks.')
           PY
-          node --check < "$RUNNER_TEMP/inline-script.js"
-          python3 - <<'PY'
-          from pathlib import Path
-          css=Path('index.html').read_text()
-          if '<style' not in css: raise SystemExit('Inline styles missing')
-          print('HTML style presence validated')
-          PY
+          for js in "$RUNNER_TEMP"/parse/inline-*.js; do node --check --input-type=module < "$js"; done
+          node --check --input-type=module < src/main.js
+          node --check --input-type=module < src/armor.js
           cp index.html "$RUNNER_TEMP/index-parse.html"
           npx --yes prettier@3.5.3 --parser html --write "$RUNNER_TEMP/index-parse.html"
+          for js in "$RUNNER_TEMP"/parse/inline-*.js src/main.js src/armor.js; do
+            cp "$js" "$RUNNER_TEMP/$(basename "$js").parse.js"
+            npx --yes prettier@3.5.3 --parser babel --write "$RUNNER_TEMP/$(basename "$js").parse.js"
+          done
+          for css in "$RUNNER_TEMP"/parse/inline-style-*.css styles/cinematic.css; do
+            cp "$css" "$RUNNER_TEMP/$(basename "$css").parse.css"
+            npx --yes prettier@3.5.3 --parser css --write "$RUNNER_TEMP/$(basename "$css").parse.css"
+          done
           cp scripts/validate_site.py "$RUNNER_TEMP/validator.py"
           python3 -m py_compile "$RUNNER_TEMP/validator.py"
       - name: Configure Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d
+      - name: Stage Pages artifact
+        run: |
+          set -euo pipefail
+          rm -rf "$RUNNER_TEMP/pages"
+          mkdir -p "$RUNNER_TEMP/pages"
+          cp index.html .nojekyll "$RUNNER_TEMP/pages/"
+          test -s "$RUNNER_TEMP/pages/index.html"
+          test -f "$RUNNER_TEMP/pages/.nojekyll"
+          cmp -s index.html "$RUNNER_TEMP/pages/index.html"
+          test "$(find "$RUNNER_TEMP/pages" -mindepth 1 -maxdepth 1 -type f | wc -l)" -eq 2
+          echo "Pages artifact allowlist: index.html and .nojekyll only."
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           name: jarvis-storefront-${{ github.run_id }}-${{ github.run_attempt }}
-          path: .
+          path: "$RUNNER_TEMP/pages"
           include-hidden-files: true
       - name: Wait for Pages artifact metadata propagation
         run: sleep 10
