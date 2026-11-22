@@ -321,6 +321,30 @@ body:before,body:after{display:block!important}
 .hero.cinematic-hero{background:transparent!important}
 .hero.cinematic-hero .stage.armor-stage{background:transparent!important}
 @media(max-width:650px){.techfield-orb{width:90vw;right:-30vw;top:12vh}.scene-label{top:88px;left:5vw}.scene-caption{left:5vw;bottom:15px}}
+</style><style id="actual-background-visibility-fix">
+/* Restore the fixed cinematic environment: previous overrides were hiding every background layer. */
+body{background:#020307!important;color:#f3f7fb!important}
+.cinematic-atmosphere{display:block!important;opacity:1!important;z-index:0!important}
+.cinematic-techfield{display:block!important;opacity:.72!important;z-index:0!important}
+#jarvis-world,#background-canvas,#scene-canvas{display:block!important;visibility:visible!important}
+#jarvis-world{position:absolute!important;inset:0!important;opacity:.52!important;z-index:0!important}
+#background-canvas{opacity:.54!important;z-index:1!important}
+#scene-canvas{opacity:.32!important;z-index:2!important}
+body.three-ready #jarvis-world{opacity:.6!important}
+body.three-ready #background-canvas{opacity:.48!important}
+body.three-ready #scene-canvas{opacity:.3!important}
+body.three-ready .techfield-orb,body.three-ready .web-lattice,body.three-ready .tech-particles{opacity:.13!important}
+body.three-ready .scene-flare{opacity:.3!important}
+.cinematic-vignette,.tech-vignette{display:block!important}
+.progressline,.chapterrail,.floatingnote{display:block!important}
+.hero.cinematic-hero{background:transparent!important}
+.hero.cinematic-hero .stage.armor-stage{background:radial-gradient(ellipse at center,#18232d88,transparent 70%)!important}
+.hero.cinematic-hero .copy{z-index:5!important}
+#story,.storybeat{min-height:55svh!important;background:linear-gradient(90deg,#03060a9a,#03060a45 65%,#03060a9a)!important}
+.storybeat .storyindex{color:#4b7b92!important;text-shadow:0 0 24px #65e8ff18}
+.storybeat h2,.storybeat p,.storybeat .micro{opacity:1!important;visibility:visible!important}
+section:not(.hero){background:linear-gradient(180deg,#03060a55,#03060a20 45%,#03060a70)!important}
+@media(max-width:700px){.cinematic-techfield{opacity:.88!important}.atmo-glow{opacity:.18!important}#background-canvas{opacity:.72!important}#jarvis-world{opacity:.72!important}.storybeat{min-height:42svh!important}}
 </style></head>
 <body>
 <div class="cinematic-atmosphere" aria-hidden="true"><div class="atmo-glow atmo-red"></div><div class="atmo-glow atmo-blue"></div><div class="atmo-glow atmo-violet"></div><div class="atmo-grid"></div><div class="atmo-specks"></div><div class="atmo-vignette"></div></div>
