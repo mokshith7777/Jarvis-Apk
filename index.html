@@ -215,7 +215,7 @@ section:not(.hero){background:linear-gradient(180deg,#03060a36,#03060a20 48%,#03
 .cinematic-vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 35%,#020408aa 100%),linear-gradient(180deg,#02040866,transparent 30%,#02040870 100%);mix-blend-mode:multiply}
 body:before,body:after,.cinematic-techfield,.progressline,.chapterrail,.floatingnote{display:none!important}
 body{background:transparent!important}
-body.cinematic-ready #background-canvas,body.cinematic-ready #scene-canvas,body.cinematic-ready #jarvis-world,body.cinematic-ready .cinematic-techfield{display:none!important}
+#background-canvas,#scene-canvas,#jarvis-world,.cinematic-techfield{display:none!important}
 nav,.hero,section,.footer{position:relative;z-index:2}
 .hero{background:linear-gradient(90deg,#020408dd 0%,#02040885 48%,transparent 100%);border:0!important}
 .hero:after{display:none}
@@ -421,7 +421,7 @@ try {
   // Character assembly, assembled at the beginning. Each major section has a hidden explode target.
   const suit=groupAt([0,0,-8.5]);suit.userData.base=[0,0,-8.5];
   const parts=[];
-  function part(name,pos,mat,explode,rot=[0,0,0]){const g=groupAt(pos);g.rotation.set(...rot);g.userData.base=[...pos];g.userData.explode=explode;g.userData.partName=name;parts.push(g);return g}
+  function part(name,pos,mat,explode,rot=[0,0,0]){const g=new THREE.Group();suit.add(g);g.position.set(...pos);g.rotation.set(...rot);g.userData.base=[...pos];g.userData.explode=explode;g.userData.partName=name;parts.push(g);return g}
   // Torso / chest: layered armor plates and a mechanical inner frame.
   const torso=part('torso',[0,0,0],mats.red,[0,0,-1.1]);
   box(torso,mats.dark,[0,0,0],[1.45,1.75,.72]);
@@ -498,7 +498,7 @@ try {
     const push=smooth(0,.2,p),explode=smooth(.22,.42,p)*(1-smooth(.48,.62,p)),reveal=smooth(.52,.68,p),reassemble=smooth(.72,.88,p),final=smooth(.9,1,p);
     // Camera continuously moves from character-wide to reactor macro, then through the final reveal.
     const camZ=lerp(9,2.4,push);const macro=smooth(.38,.57,p);
-    camera.position.set(state.dragX*(1-macro),lerp(1.15,.2,macro)+state.dragY,lerp(camZ,-7.5,macro)+lerp(-7.5,-13.5,final));
+    camera.position.set(state.dragX*(1-macro),lerp(1.15,.2,macro)+state.dragY,lerp(9,-22,macro)+final*2);
     const lookZ=lerp(-8.5,-32,macro);camera.lookAt(lerp(0,0,macro),lerp(0,.1,macro),lookZ);
     camera.fov=lerp(38,30,macro);camera.updateProjectionMatrix();
     suit.scale.setScalar(1-push*.05);suit.rotation.y=state.dragX*.35;
