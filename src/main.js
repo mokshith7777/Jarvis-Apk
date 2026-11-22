@@ -119,10 +119,13 @@ function applyCinematic(p){
  if(bokeh){bokeh.uniforms.focus.value=5.4-approach*3.4+reactorClose*.5;bokeh.uniforms.aperture.value=.00006+approach*.00003+reactorExplode*.000015}
  const ph=phaseAt(p);
  if(ph!==state.phase){state.phase=ph;chapterNum.textContent=String(ph+1).padStart(2,'0');chapterName.textContent=chapters[ph].label;hudPhase.textContent=chapters[ph].phase}
- progressFill.style.width=(p*100).toFixed(2)+'%';
+ progressFill.style.width=(p*100).toFixed(2)+'%';if(sceneCopy)sceneCopy.style.opacity=1-smooth(.16,.34,p);
 }
 const lenis=new Lenis({duration:reduceMotion?0.8:mobile?1.05:1.22,smoothWheel:!reduceMotion,smoothTouch:false,lerp:reduceMotion?1:mobile?.085:.07,gestureOrientation:'vertical',wheelMultiplier:1});lenis.on('scroll',ScrollTrigger.update);gsap.ticker.add(t=>lenis.raf(t*1000));gsap.ticker.lagSmoothing(0);
-ScrollTrigger.create({trigger:document.querySelector('main'),start:'top top',end:'bottom bottom',scrub:reduceMotion?0:1.15,onUpdate:s=>{state.target=s.progress}});
+ScrollTrigger.create({trigger:document.querySelector('main'),start:'top top',end:'bottom bottom',scrub:reduceMotion?0:1.15,onUpdate:s=>{state.target=s.progress}});const entryGate=document.querySelector('#entry-gate'),enterButton=document.querySelector('#enter-experience'),sceneCopy=document.querySelector('#scene-copy');
+document.body.classList.add('entry-locked');lenis.stop();
+enterButton?.addEventListener('click',()=>{entryGate?.classList.add('dismissed');document.body.classList.remove('entry-locked');lenis.start();state.entered=true;if(sceneCopy)gsap.fromTo(sceneCopy,{x:-18,opacity:0},{x:0,opacity:1,duration:1.15,ease:'power3.out'});});
+
 document.querySelectorAll('.story-spacer').forEach((s,i)=>ScrollTrigger.create({trigger:s,start:'top center',end:'bottom center',onEnter:()=>setChapter(i),onEnterBack:()=>setChapter(i)}));
 function setChapter(i){chapterNum.textContent=String(i+1).padStart(2,'0');chapterName.textContent=chapters[i].label;hudPhase.textContent=chapters[i].phase}
 window.addEventListener('pointermove',e=>{if(!reduceMotion){state.mouseTargetX=(e.clientX/innerWidth-.5)*2;state.mouseTargetY=(e.clientY/innerHeight-.5)*2}const light=document.querySelector('.cursor-light');if(light&&!reduceMotion)light.style.transform='translate('+e.clientX+'px,'+e.clientY+'px) translate(-50%,-50%)'},{passive:true});
