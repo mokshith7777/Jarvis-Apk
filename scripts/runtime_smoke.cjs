@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 const assert=require('node:assert/strict');
+const fs=require('node:fs');
 const path=require('node:path');
 const packageRoot=process.argv[3];
 const mode=process.argv[4]||'full';
@@ -8,16 +9,34 @@ const target=process.argv[2];
 if(!target||!packageRoot)throw new Error('Usage: runtime_smoke.cjs URL PLAYWRIGHT_NODE_MODULES [full|live]');
 const {chromium}=require(path.join(packageRoot,'playwright'));
 const browserArgs=['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader','--disable-gpu-sandbox','--enable-unsafe-swiftshader'];
+async function installPinnedDependencyRoute(page){
+ if(mode!=='full')return;
+ const packages={three:'three@0.170.0',gsap:'gsap@3.12.7',lenis:'lenis@1.1.16'};
+ const dependencyFailures=[];
+ await page.route('https://cdn.jsdelivr.net/npm/**',async route=>{
+  const pathname=new URL(route.request().url()).pathname;
+  let relative=null,packageName=null;
+  if(pathname.startsWith('/npm/three@0.170.0/')){packageName='three';relative=pathname.slice('/npm/three@0.170.0/'.length);}
+  else if(pathname.startsWith('/npm/gsap@3.12.7/')){packageName='gsap';relative=pathname.slice('/npm/gsap@3.12.7/'.length);if(relative==='+esm')relative='index.js';else if(relative==='ScrollTrigger/+esm')relative='ScrollTrigger.js';}
+  else if(pathname.startsWith('/npm/lenis@1.1.16/')){packageName='lenis';relative=pathname.slice('/npm/lenis@1.1.16/'.length);if(relative==='+esm')relative='dist/lenis.mjs';}
+  if(!packageName||!relative){dependencyFailures.push('unmapped '+pathname);return route.abort();}
+  const file=path.resolve(packageRoot,packageName,relative);
+  const base=path.resolve(packageRoot,packageName)+path.sep;
+  if(!file.startsWith(base)||!fs.existsSync(file)){dependencyFailures.push('missing '+packages[packageName]+'/'+relative);return route.abort();}
+  await route.fulfill({status:200,contentType:'text/javascript; charset=utf-8',headers:{'access-control-allow-origin':'*'},body:fs.readFileSync(file)});
+ });
+ return dependencyFailures;
+}
 (async()=>{
 const browser=await chromium.launch({headless:true,args:browserArgs});
 async function openAndVerify(page,label){
- const pageErrors=[],failedModules=[];
+ const pageErrors=[],failedModules=[],localDependencyFailures=await installPinnedDependencyRoute(page)||[];
  page.on('pageerror',e=>pageErrors.push(e.message));
  page.on('requestfailed',r=>{if(/three|gsap|lenis|main\.js|armor\.js/i.test(r.url()))failedModules.push(r.url()+': '+r.failure()?.errorText)});
- await page.goto(target,{waitUntil:'domcontentloaded',timeout:90000});
+ await page.goto(target,{waitUntil:'commit',timeout:30000});
  await page.waitForFunction(()=>['active','fallback'].includes(window.__JARVIS_RUNTIME__?.status),null,{timeout:45000}).catch(()=>{});
  const runtime=await page.evaluate(()=>window.__JARVIS_RUNTIME__||null);
- assert(runtime&&runtime.status==='active',label+' runtime did not execute Three.js: '+JSON.stringify(runtime)+' pageErrors='+pageErrors.join(' | ')+' moduleRequests='+failedModules.join(' | '));
+ assert(runtime&&runtime.status==='active',label+' runtime did not execute Three.js: '+JSON.stringify(runtime)+' pageErrors='+pageErrors.join(' | ')+' moduleRequests='+failedModules.join(' | ')+' localDependencies='+localDependencyFailures.join(' | '));
  assert.equal(runtime.renderer,'three',label+' renderer marker');
  assert(runtime.webglVersion>=1,label+' WebGL context version missing');
  assert.equal(runtime.canvasId,'cinematic-world',label+' renderer canvas marker');
