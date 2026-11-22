@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
       - name: Validate workflow
         run: |
           curl -fsSL https://github.com/rhysd/actionlint/releases/download/v1.7.7/actionlint_1.7.7_linux_amd64.tar.gz -o "$RUNNER_TEMP/actionlint.tar.gz"
@@ -30,7 +30,9 @@ jobs:
           test -s styles/cinematic.css
           test -s src/main.js
           test -s src/armor.js
+          test -f scripts/validate_site.py
           test -f .nojekyll
+          python3 scripts/validate_site.py
           test "$(grep -o '<script type="importmap">' index.html | wc -l)" -eq 1
           python3 - <<'PY'
           import json,re
@@ -47,6 +49,21 @@ jobs:
         run: |
           node --input-type=module --check < src/main.js
           node --input-type=module --check < src/armor.js
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          class InlineScriptExtractor(HTMLParser):
+            def __init__(self): super().__init__(); self.active=False; self.parts=[]
+            def handle_starttag(self, tag, attrs):
+              attrs=dict(attrs)
+              if tag=='script' and not attrs.get('src') and attrs.get('type','').lower()!='importmap': self.active=True
+            def handle_endtag(self, tag):
+              if tag=='script' and self.active: self.active=False
+            def handle_data(self, data):
+              if self.active: self.parts.append(data)
+          parser=InlineScriptExtractor(); parser.feed(Path('index.html').read_text()); Path('$RUNNER_TEMP/inline-script.js').write_text('\\n'.join(parser.parts))
+          PY
+          node --check < "$RUNNER_TEMP/inline-script.js"
           python3 - <<'PY'
           from pathlib import Path
           css=Path('styles/cinematic.css').read_text()
@@ -77,9 +94,9 @@ jobs:
           cp src/armor.js "$RUNNER_TEMP/armor-parse.js"
           npx --yes prettier@3.5.3 --parser babel --write "$RUNNER_TEMP/main-parse.js" "$RUNNER_TEMP/armor-parse.js"
       - name: Configure Pages
-        uses: actions/configure-pages@v6
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d
       - name: Upload site artifact
-        uses: actions/upload-pages-artifact@v5
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           name: cinematic-pages-${{ github.run_id }}-${{ github.run_attempt }}
           path: .
@@ -88,7 +105,7 @@ jobs:
         run: sleep 10
       - name: Deploy
         id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346
         with:
           artifact_name: cinematic-pages-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Verify live deployment matches source

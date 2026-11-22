@@ -1,37 +1,29 @@
-# JARVIS PRO — Interactive Product Storefront
+# JARVIS PRO — Cinematic Phase 1
 
-A mobile-first single-file product showcase for the experimental JARVIS Android AI companion.
+The active GitHub Pages site is a scene-first WebGL prototype, not the product storefront. It demonstrates a scroll-driven armor reveal, modular fracture, camera flight, and reactor close-up.
 
-## Experience
-- Procedural interactive 3D core rendered with Canvas (drag/touch to rotate, click to pulse/change mode)
-- Cinematic responsive hero and animated reveal-on-scroll sections
-- Interactive feature cards with expanded explanations and setup/use-case notes
-- Scenario tabs for voice, AI providers, local tooling and connected integrations (website simulation only)
-- Feature-card tilt interactions on pointer devices
-- FAQ accordion
-- Reduced-motion accessibility support
-- Mobile-responsive layouts and adaptive visual canvas
-- No downloaded 3D model or image assets required
+## Current experience
+- Fixed full-page Three.js canvas with a procedural hangar, armor, fog, lighting, particles, bloom and film effects.
+- Five scroll chapters: Awaken, Approach, Fracture, Flight, Reactor.
+- Procedural armor is a placeholder; no photoreal suit or cinematic video asset is included.
+- Custom GLB/GLTF models can be loaded from a same-origin file through the `?model=` parameter or the browser console API.
+- Audio is synthesized only after the visitor enables it; it defaults off.
+- Mobile rendering is capped and reduced-motion preferences are supported.
+- A fallback is shown if WebGL initialization or the graphics context fails.
 
-## Product claims
-Content is based on the Android project documentation:
-- Chat, voice input and text-to-speech
-- Configurable hosted AI providers and local model endpoints
-- Optional Termux worker
-- User-driven Android app/screen workflows
-- Local task history, settings and optional indexing
-- Optional Telegram and Home Assistant integrations
+## Files
+- `index.html`: minimal HUD, fixed canvas and scroll chapters.
+- `styles/cinematic.css`: overlay, responsive and reduced-motion styles.
+- `src/main.js`: Three.js scene, scroll choreography, audio and context handling.
+- `src/armor.js`: procedural armor geometry and fracture vectors.
+- `CINEMATIC_PHASE1.md`: scene and architecture notes.
+- `archive/storefront-v1.html`: the older product storefront, retained for reference and not deployed.
+- `scripts/validate_site.py`: static HTML, asset, accessibility and scene-integrity checks.
 
-Feature availability depends on device, Android version, permissions and configuration. The app is experimental; the documented public build is a test build and its release signing/readiness must be verified before distribution.
+## Release status
+Deployment and source-integrity checks can pass while the visual design is still pending review. The requested realistic cinematic, video-like full-page environment is **not yet accepted**: the current environment is procedural shader/3D artwork, not an actual cinematic video or photoreal scene asset. A supplied visual reference or recording should guide the next art pass.
 
-## Pricing presentation
-The page displays ₹49 standard price and ₹19 first-week launch offer. Checkout is a presentation-only CTA; no payment processing or automatic APK delivery is active. A trusted adult should manage payment setup, and a secure checkout/payment-verification flow must be implemented before sales.
+The storefront product copy, price, setup guide, payment checkout and APK delivery are not present in this Phase 1 page. The archived storefront is reference material only.
 
 ## Deploy
-GitHub Pages workflow: `.github/workflows/pages.yml`.
-Set repository **Settings → Pages → Build and deployment → Source** to **GitHub Actions** if Pages is not enabled, then check the Actions run.
-
-## Source APK and documentation
-- [Android repository](https://github.com/mokshith7777/Jarvis-android-)
-- [Releases](https://github.com/mokshith7777/Jarvis-android-/releases)
-- [Security notes](https://github.com/mokshith7777/Jarvis-android-/blob/main/SECURITY.md)
+GitHub Pages is deployed by `.github/workflows/pages.yml`. The workflow runs actionlint, site integrity checks, JavaScript/CSS parsing, Prettier checks on temporary copies, uploads the site artifact, deploys it, then requires HTTP 200 and an exact SHA-256 match of the live page to the checked-out `index.html`.
