@@ -48,9 +48,9 @@ jobs:
           from pathlib import Path
           import re
           html=Path("index.html").read_text(encoding="utf-8")
-          ids=re.findall(r'\\bid="([^"]+)"',html)
+          ids=re.findall('id="([^"]+)"',html)
           duplicates=sorted({x for x in ids if ids.count(x)>1})
-          required=["<html lang=","<main>","<canvas id=","<title>","name="viewport"","./styles/cinematic.css","./src/main.js"]
+          required=["<html lang=","<main>","<canvas id=","<title>","viewport","./styles/cinematic.css","./src/main.js"]
           missing=[item for item in required if item not in html]
           if duplicates or missing:
             raise SystemExit("HTML checks failed; duplicate IDs="+str(duplicates)+" missing="+str(missing))
