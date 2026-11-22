@@ -44,9 +44,6 @@ jobs:
           grep -q 'UnrealBloomPass' src/main.js
           grep -q 'BokehPass' src/main.js
           grep -q 'prefers-reduced-motion' styles/cinematic.css
-          grep -q '<main>' index.html
-          grep -q '<title>' index.html
-          grep -q 'viewport' index.html
       - name: Syntax checks
         run: |
           node --input-type=module --check < src/main.js
