@@ -71,8 +71,8 @@ jobs:
           PY
       - name: Syntax checks
         run: |
-          node --check src/main.js
-          node --check src/armor.js
+          node --input-type=module --check < src/main.js
+          node --input-type=module --check < src/armor.js
           python3 - <<'PY'
           from pathlib import Path
           css=Path('styles/cinematic.css').read_text()
@@ -95,9 +95,13 @@ jobs:
           if depth or quote or comment:raise SystemExit('CSS balance invalid')
           print('CSS structural check passed')
           PY
-          npx --yes prettier@3.5.3 --parser html --check index.html
-          npx --yes prettier@3.5.3 --parser css --check styles/cinematic.css
-          npx --yes prettier@3.5.3 --parser babel --check src/main.js src/armor.js
+          cp index.html "$RUNNER_TEMP/index-parse.html"
+          npx --yes prettier@3.5.3 --parser html --write "$RUNNER_TEMP/index-parse.html"
+          cp styles/cinematic.css "$RUNNER_TEMP/css-parse.css"
+          npx --yes prettier@3.5.3 --parser css --write "$RUNNER_TEMP/css-parse.css"
+          cp src/main.js "$RUNNER_TEMP/main-parse.js"
+          cp src/armor.js "$RUNNER_TEMP/armor-parse.js"
+          npx --yes prettier@3.5.3 --parser babel --write "$RUNNER_TEMP/main-parse.js" "$RUNNER_TEMP/armor-parse.js"
       - name: Configure Pages
         uses: actions/configure-pages@v6
       - name: Upload site artifact
