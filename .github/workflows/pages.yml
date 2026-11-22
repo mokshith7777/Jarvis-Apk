@@ -111,18 +111,25 @@ jobs:
       - name: Browser smoke for staged Pages artifact
         run: |
           set -euo pipefail
-          npm install --prefix "$RUNNER_TEMP/jarvis-browser" --no-save --no-package-lock playwright@1.65.0
+          npm install --prefix "$RUNNER_TEMP/jarvis-browser" --no-save --no-package-lock playwright@1.65.0 three@0.170.0 gsap@3.12.7 lenis@1.1.16
           "$RUNNER_TEMP/jarvis-browser/node_modules/.bin/playwright" install --with-deps chromium
           python3 -m http.server 4173 --bind 127.0.0.1 --directory "$RUNNER_TEMP/pages" > "$RUNNER_TEMP/pages-server.log" 2>&1 &
           server_pid=$!
           trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          server_ready=false
           for attempt in 1 2 3 4 5; do
-            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
+            if curl --fail --silent --show-error --max-time 3 http://127.0.0.1:4173/ >/dev/null; then
               echo "Artifact server ready after probe $attempt"
+              server_ready=true
               break
             fi
-            sleep 1
+            sleep 2
           done
+          if [ "$server_ready" != true ]; then
+            cat "$RUNNER_TEMP/pages-server.log"
+            echo "Artifact HTTP server did not become ready."
+            exit 1
+          fi
           node scripts/runtime_smoke.cjs http://127.0.0.1:4173/ "$RUNNER_TEMP/jarvis-browser/node_modules" full
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
