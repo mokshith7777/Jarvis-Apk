@@ -1,4 +1,4 @@
-name: Deploy JARVIS Cinematic Phase 1
+name: Deploy JARVIS PRO Storefront
 on:
   push:
     branches: [main]
@@ -24,82 +24,49 @@ jobs:
           curl -fsSL https://github.com/rhysd/actionlint/releases/download/v1.7.7/actionlint_1.7.7_linux_amd64.tar.gz -o "$RUNNER_TEMP/actionlint.tar.gz"
           tar -xzf "$RUNNER_TEMP/actionlint.tar.gz" -C "$RUNNER_TEMP" actionlint
           "$RUNNER_TEMP/actionlint" .github/workflows/pages.yml
-      - name: Validate Phase 1 files and HTML references
+      - name: Validate storefront and references
         run: |
           test -s index.html
-          test -s styles/cinematic.css
-          test -s src/main.js
-          test -s src/armor.js
-          test -f scripts/validate_site.py
+          test -s scripts/validate_site.py
+          test -s archive/storefront-v1.html
           test -f .nojekyll
           python3 scripts/validate_site.py
-          test "$(grep -o '<script type="importmap">' index.html | wc -l)" -eq 1
-          python3 - <<'PY'
-          import json,re
-          from pathlib import Path
-          html=Path('index.html').read_text()
-          maps=re.findall(r'<script type="importmap">([\s\S]*?)</script>',html)
-          if len(maps)!=1: raise SystemExit(f'Expected one import map, found {len(maps)}')
-          data=json.loads(maps[0])
-          imports=data.get('imports',{})
-          if not imports.get('three') or not imports.get('three/addons/'): raise SystemExit('Three.js import map incomplete')
-          print('Pinned Three.js import map validated.')
-          PY
-      - name: Syntax checks
+      - name: Syntax and structure checks
         run: |
-          node --input-type=module --check < src/main.js
-          node --input-type=module --check < src/armor.js
           python3 - <<'PY'
           from html.parser import HTMLParser
           from pathlib import Path
           import os
-          class InlineScriptExtractor(HTMLParser):
-            def __init__(self): super().__init__(); self.active=False; self.parts=[]
-            def handle_starttag(self, tag, attrs):
-              attrs=dict(attrs)
-              if tag=='script' and not attrs.get('src') and attrs.get('type','').lower()!='importmap': self.active=True
-            def handle_endtag(self, tag):
-              if tag=='script' and self.active: self.active=False
-            def handle_data(self, data):
-              if self.active: self.parts.append(data)
-          parser=InlineScriptExtractor(); parser.feed(Path('index.html').read_text()); Path(os.environ['RUNNER_TEMP'], 'inline-script.js').write_text('\n'.join(parser.parts))
+          class Extractor(HTMLParser):
+            def __init__(self):
+              super().__init__(); self.active=False; self.parts=[]
+            def handle_starttag(self,tag,attrs):
+              a=dict(attrs)
+              if tag=='script' and not a.get('src') and a.get('type','').lower()!='importmap': self.active=True
+            def handle_endtag(self,tag):
+              if tag=='script' and self.active:self.active=False
+            def handle_data(self,data):
+              if self.active:self.parts.append(data)
+          p=Extractor();p.feed(Path('index.html').read_text())
+          Path(os.environ['RUNNER_TEMP'],'inline-script.js').write_text('\n'.join(p.parts))
           PY
           node --check < "$RUNNER_TEMP/inline-script.js"
           python3 - <<'PY'
           from pathlib import Path
-          css=Path('styles/cinematic.css').read_text()
-          depth=0; quote=None; comment=False; i=0
-          while i<len(css):
-            if comment:
-              if css.startswith('*/',i):comment=False;i+=2;continue
-              i+=1;continue
-            if quote:
-              if css[i]=='\\':i+=2;continue
-              if css[i]==quote:quote=None
-              i+=1;continue
-            if css.startswith('/*',i):comment=True;i+=2;continue
-            if css[i] in ('"',"'"):quote=css[i];i+=1;continue
-            if css[i]=='{':depth+=1
-            elif css[i]=='}':
-              depth-=1
-              if depth<0:raise SystemExit('CSS unmatched closing brace')
-            i+=1
-          if depth or quote or comment:raise SystemExit('CSS balance invalid')
-          print('CSS structural check passed')
+          css=Path('index.html').read_text()
+          if '<style' not in css: raise SystemExit('Inline styles missing')
+          print('HTML style presence validated')
           PY
           cp index.html "$RUNNER_TEMP/index-parse.html"
           npx --yes prettier@3.5.3 --parser html --write "$RUNNER_TEMP/index-parse.html"
-          cp styles/cinematic.css "$RUNNER_TEMP/css-parse.css"
-          npx --yes prettier@3.5.3 --parser css --write "$RUNNER_TEMP/css-parse.css"
-          cp src/main.js "$RUNNER_TEMP/main-parse.js"
-          cp src/armor.js "$RUNNER_TEMP/armor-parse.js"
-          npx --yes prettier@3.5.3 --parser babel --write "$RUNNER_TEMP/main-parse.js" "$RUNNER_TEMP/armor-parse.js"
+          cp scripts/validate_site.py "$RUNNER_TEMP/validator.py"
+          python3 -m py_compile "$RUNNER_TEMP/validator.py"
       - name: Configure Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
-          name: cinematic-pages-${{ github.run_id }}-${{ github.run_attempt }}
+          name: jarvis-storefront-${{ github.run_id }}-${{ github.run_attempt }}
           path: .
           include-hidden-files: true
       - name: Wait for Pages artifact metadata propagation
@@ -108,7 +75,7 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346
         with:
-          artifact_name: cinematic-pages-${{ github.run_id }}-${{ github.run_attempt }}
+          artifact_name: jarvis-storefront-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Verify live deployment matches source
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
