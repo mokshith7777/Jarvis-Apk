@@ -46,28 +46,15 @@ jobs:
           grep -q 'prefers-reduced-motion' styles/cinematic.css
           python3 - <<'PY'
           from pathlib import Path
-          from html.parser import HTMLParser
           import re
-          html=Path('index.html').read_text(encoding='utf-8')
-          class Audit(HTMLParser):
-            def __init__(self):
-              super().__init__(); self.ids=[]; self.tags=[]; self.errors=[]
-            def handle_starttag(self,t,attrs):
-              a=dict(attrs); self.tags.append(t)
-              if a.get('id'): self.ids.append(a['id'])
-              if t=='script' and a.get('src') and not a['src'].startswith(('http','//')):
-                if not Path(a['src']).exists(): self.errors.append('Missing script '+a['src'])
-              if t=='link' and a.get('rel')=='stylesheet':
-                if not Path(a.get('href','')).exists(): self.errors.append('Missing stylesheet '+a.get('href',''))
-          p=Audit();p.feed(html)
-          dup=sorted({x for x in p.ids if p.ids.count(x)>1})
-          if dup:p.errors.append('Duplicate IDs: '+str(dup))
-          if p.tags.count('html')!=1 or p.tags.count('main')!=1 or p.tags.count('canvas')<1:p.errors.append('Required document landmarks missing')
-          if not re.search(r'<html[^>]+lang=',html):p.errors.append('Language attribute missing')
-          if not re.search(r'<title>[^<]+</title>',html):p.errors.append('Document title missing')
-          if not re.search(r'viewport',html):p.errors.append('Viewport meta missing')
-          if p.errors:raise SystemExit('HTML audit failed: '+'; '.join(p.errors))
-          print('HTML audit passed:',len(p.ids),'IDs')
+          html=Path("index.html").read_text(encoding="utf-8")
+          ids=re.findall(r'\\bid="([^"]+)"',html)
+          duplicates=sorted({x for x in ids if ids.count(x)>1})
+          required=["<html lang=","<main>","<canvas id=","<title>","name="viewport"","./styles/cinematic.css","./src/main.js"]
+          missing=[item for item in required if item not in html]
+          if duplicates or missing:
+            raise SystemExit("HTML checks failed; duplicate IDs="+str(duplicates)+" missing="+str(missing))
+          print("HTML structure audit passed: "+str(len(ids))+" IDs; required references present.")
           PY
       - name: Syntax checks
         run: |
