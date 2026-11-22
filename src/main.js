@@ -128,8 +128,8 @@ function applyCinematic(p){
 const lenis=new Lenis({duration:reduceMotion?0.8:mobile?1.05:1.22,smoothWheel:!reduceMotion,smoothTouch:false,lerp:reduceMotion?1:mobile?.085:.07,gestureOrientation:'vertical',wheelMultiplier:1});lenis.on('scroll',ScrollTrigger.update);gsap.ticker.add(t=>lenis.raf(t*1000));gsap.ticker.lagSmoothing(0);
 const heroJourney=document.querySelector('#armor-intro');
 ScrollTrigger.create({trigger:heroJourney,start:'top top',end:'bottom bottom',scrub:reduceMotion?0:1.15,onUpdate:s=>{state.target=s.progress}});const entryGate=document.querySelector('#entry-gate'),enterButton=document.querySelector('#enter-experience'),sceneCopy=document.querySelector('#scene-copy');
-document.body.classList.add('entry-locked');lenis.stop();
-enterButton?.addEventListener('click',()=>{entryGate?.classList.add('dismissed');document.body.classList.remove('entry-locked');lenis.start();state.entered=true;if(sceneCopy)gsap.fromTo(sceneCopy,{x:-18,opacity:0},{x:0,opacity:1,duration:1.15,ease:'power3.out'});});
+/* No invisible entry gate: scrolling is available immediately. */
+enterButton?.addEventListener('click',()=>{entryGate?.classList.add('dismissed');state.entered=true;if(sceneCopy)gsap.fromTo(sceneCopy,{x:-18,opacity:0},{x:0,opacity:1,duration:1.15,ease:'power3.out'});});
 
 document.querySelectorAll('.story-spacer').forEach((s,i)=>ScrollTrigger.create({trigger:s,start:'top center',end:'bottom center',onEnter:()=>setChapter(i),onEnterBack:()=>setChapter(i)}));
 function setChapter(i){chapterNum.textContent=String(i+1).padStart(2,'0');chapterName.textContent=chapters[i].label;hudPhase.textContent=chapters[i].phase}
@@ -143,4 +143,5 @@ audioButton.addEventListener('click',()=>{const enabled=audioButton.getAttribute
 const modelParam=new URLSearchParams(location.search).get('model');if(modelParam){const modelUrl=new URL(modelParam,location.href);if(modelUrl.origin!==location.origin||!(/\.(glb|gltf)$/i.test(modelUrl.pathname)))console.warn('Custom model rejected: use a same-origin GLB/GLTF file');else loadArmor(modelUrl.href).catch(err=>console.warn('Custom model failed; procedural armor remains',err))}
 renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();state.paused=true;fallback.hidden=false;fallback.querySelector('p').textContent='Graphics context lost. Reload to restore the scene.'});renderer.domElement.addEventListener('webglcontextrestored',()=>{state.paused=false;fallback.hidden=true;ScrollTrigger.refresh()});
 let raf;function render(){raf=requestAnimationFrame(render);if(state.paused)return;clock.getDelta();if(reduceMotion){state.progress=state.target;state.mouseX=0;state.mouseY=0}else{state.progress+=(state.target-state.progress)*.075;state.mouseX+=(state.mouseTargetX-state.mouseX)*.045;state.mouseY+=(state.mouseTargetY-state.mouseY)*.045}applyCinematic(state.progress);composer.render()}
+document.body.classList.add('cinematic-3d-ready');
 render();document.querySelector('#load-progress').textContent='100%';clearTimeout(window.__jarvisReadyTimer);setTimeout(()=>load.classList.add('done'),450);window.addEventListener('load',()=>ScrollTrigger.refresh());
