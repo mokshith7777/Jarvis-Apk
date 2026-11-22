@@ -245,7 +245,7 @@ SMOKE = ROOT / "scripts/runtime_smoke.cjs"
 check(SMOKE.is_file(), "Browser runtime smoke script missing")
 if SMOKE.is_file():
     SMOKE_TEXT = SMOKE.read_text(encoding="utf-8")
-    check("WEBGL_lose_context" in SMOKE_TEXT and "contextRestorations" in SMOKE_TEXT, "Browser smoke does not verify context recovery")
+    check("WEBGL_lose_context" in SMOKE_TEXT and "contextRestorations" in SMOKE_TEXT and "framesAtLoss" in SMOKE_TEXT and "?.frames>frames" in SMOKE_TEXT, "Browser smoke must verify WebGL context recovery and resumed rendering frames")
     check("demo-tab" in SMOKE_TEXT and "devicefamily" in SMOKE_TEXT and "setup-reset" in SMOKE_TEXT, "Browser smoke misses core interactions")
     check('async function revealBeforeInteraction(page,locator,label)' in SMOKE_TEXT and 'revealBeforeInteraction(desktop,demo' in SMOKE_TEXT and 'revealBeforeInteraction(desktop,faq' in SMOKE_TEXT and 'revealBeforeInteraction(desktop,expand' in SMOKE_TEXT and 'revealBeforeInteraction(desktop,hosted' in SMOKE_TEXT and 'revealBeforeInteraction(desktop,deviceFamily' in SMOKE_TEXT and 'revealBeforeInteraction(desktop,checklist' in SMOKE_TEXT and 'revealBeforeInteraction(mobile,localChip' in SMOKE_TEXT, 'Browser smoke must wait for cinematic reveal visibility before interacting with desktop and mobile controls')
     check('window.scrollY<100' in SMOKE_TEXT and "cs.visibility==='hidden'" in SMOKE_TEXT, 'Browser smoke must verify reveal reversibility')
