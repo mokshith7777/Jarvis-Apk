@@ -243,6 +243,12 @@ body.cinematic-fallback{background:radial-gradient(ellipse at 50% 20%,#172d40,#0
 section{min-height:55vh}
 @media(max-width:800px){.hero{grid-template-columns:1fr!important;padding:118px 6vw 65px}.hero .copy{width:100%;max-width:600px}.hero .lead{max-width:480px}}
 @media(max-width:560px){.hero{padding-top:110px}.hero .copy{max-width:100%}.hero h1{font-size:clamp(40px,13vw,66px)}}
+</style><style id="fallback-fix">
+#cinematic-fallback-canvas{position:fixed;inset:0;z-index:0;display:block;pointer-events:none}
+body.cinematic-fallback #cinematic-world{display:none!important}
+body.cinematic-fallback #cinematic-fallback-canvas{display:block!important}
+body.cinematic-ready #cinematic-fallback-canvas{display:none!important}
+body:not(.cinematic-ready) #cinematic-fallback-canvas{display:block!important}
 </style></head>
 <body><canvas id="cinematic-world" aria-hidden="true"></canvas>
 <div class="cinematic-atmosphere" aria-hidden="true"><div class="atmo-glow atmo-red"></div><div class="atmo-glow atmo-blue"></div><div class="atmo-glow atmo-violet"></div><div class="atmo-grid"></div><div class="atmo-specks"></div><div class="atmo-vignette"></div></div>
@@ -383,7 +389,59 @@ function updateScene(){let max=document.documentElement.scrollHeight-innerHeight
 function initAudio(){try{const AudioCtor=window.AudioContext||window.webkitAudioContext;if(!AudioCtor)return false;if(!audio)audio=new AudioCtor();if(audio.state==='suspended')audio.resume();return true}catch(err){return false}}function tone(freq,duration,type='sine',gain=.05,slide=0){if(!enabled||!initAudio())return;try{let osc=audio.createOscillator(),g=audio.createGain();osc.type=type;osc.frequency.setValueAtTime(freq,audio.currentTime);if(slide)osc.frequency.exponentialRampToValueAtTime(Math.max(30,freq+slide),audio.currentTime+duration);g.gain.setValueAtTime(.0001,audio.currentTime);g.gain.exponentialRampToValueAtTime(gain,audio.currentTime+.018);g.gain.exponentialRampToValueAtTime(.0001,audio.currentTime+duration);osc.connect(g);g.connect(audio.destination);osc.start();osc.stop(audio.currentTime+duration+.03)}catch(err){/* sound is optional; visual interaction remains available */}}function fx(kind){if(!enabled)return;if(kind==='ignite'){tone(110,.4,'sawtooth',.035,-65);setTimeout(()=>tone(440,.22,'sine',.035,180),120);setTimeout(()=>tone(760,.32,'triangle',.025,-220),240)}else if(kind==='transition'){tone(250,.18,'sine',.02,350);setTimeout(()=>tone(580,.24,'triangle',.018,-180),90)}else tone(520,.09,'sine',.018,110)}
 toggle.addEventListener('click',()=>{if(!enabled&&!initAudio()){toggle.title='Sound effects are unavailable in this browser';toggle.querySelector('span').textContent='UNAVAILABLE';return}enabled=!enabled;toggle.classList.toggle('enabled',enabled);toggle.setAttribute('aria-pressed',String(enabled));toggle.querySelector('span').textContent=enabled?'ON':'OFF';toggle.title=enabled?'Sound effects enabled':'Sound effects disabled';if(enabled)fx('ignite')});document.querySelectorAll('.btn,.navbuy,.demo-tab,.faqitem button,.expand,.chip').forEach(el=>el.addEventListener('click',()=>fx('pulse')));})();
 </script>
-<script type="module">
+<script>
+(function(){
+  const canvas=document.createElement('canvas');canvas.id='cinematic-fallback-canvas';canvas.setAttribute('aria-hidden','true');document.body.appendChild(canvas);
+  const ctx=canvas.getContext('2d');if(!ctx)return;
+  let w=0,h=0,dpr=1,p=0,px=0,py=0,raf=0;
+  const dust=Array.from({length:140},()=>({x:Math.random(),y:Math.random(),r:.3+Math.random()*1.7,s:.15+Math.random()*.7}));
+  function resize(){dpr=Math.min(devicePixelRatio||1,1.5);w=innerWidth;h=innerHeight;canvas.width=w*dpr;canvas.height=h*dpr;canvas.style.width=w+'px';canvas.style.height=h+'px';ctx.setTransform(dpr,0,0,dpr,0,0)}
+  function smooth(a,b,v){v=Math.max(0,Math.min(1,(v-a)/(b-a)));return v*v*(3-2*v)}
+  function draw(){
+    p=Math.max(0,Math.min(1,scrollY/Math.max(1,document.documentElement.scrollHeight-innerHeight)));
+    ctx.clearRect(0,0,w,h);
+    const bg=ctx.createLinearGradient(0,0,0,h);bg.addColorStop(0,'#07111b');bg.addColorStop(.5,'#090c13');bg.addColorStop(1,'#020306');ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
+    // cinematic hangar atmosphere and converging architecture
+    const glow=ctx.createRadialGradient(w*.5,h*.42,4,w*.5,h*.42,w*.7);glow.addColorStop(0,'#243b55aa');glow.addColorStop(.42,'#0c1828aa');glow.addColorStop(1,'#02030600');ctx.fillStyle=glow;ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle='#66839b24';ctx.lineWidth=1;for(let i=0;i<12;i++){let x=(i/11-.5)*w;ctx.beginPath();ctx.moveTo(w*.5,h*.28);ctx.lineTo(x,h);ctx.stroke()}
+    for(let i=0;i<8;i++){const y=h*.2+i*i*h*.012;ctx.strokeStyle='#728ba41a';ctx.beginPath();ctx.ellipse(w*.5,y,w*(.12+i*.07),h*(.025+i*.025),0,0,Math.PI*2);ctx.stroke()}
+    dust.forEach(a=>{a.y+=a.s*.0007;if(a.y>1)a.y=0;ctx.fillStyle='rgba(170,210,238,.5)';ctx.beginPath();ctx.arc(a.x*w,a.y*h,a.r,0,Math.PI*2);ctx.fill()});
+    const zoom=smooth(0,.22,p),explode=smooth(.23,.44,p)*(1-smooth(.5,.62,p)),rebuild=smooth(.7,.87,p),macro=smooth(.4,.58,p);
+    const cx=w*.5+px*w*.025,cy=h*.48+py*h*.02,scale=Math.min(w/600,h/800)*(.72+zoom*.25);
+    ctx.save();ctx.translate(cx,cy);ctx.scale(scale*(1+macro*.3),scale*(1+macro*.3));
+    // silhouette and armor, painted in layers with metallic gradients
+    const red=ctx.createLinearGradient(-190,0,190,0);red.addColorStop(0,'#280b12');red.addColorStop(.25,'#a52b39');red.addColorStop(.48,'#e15a61');red.addColorStop(.7,'#741724');red.addColorStop(1,'#16070b');
+    const gold=ctx.createLinearGradient(-80,0,80,0);gold.addColorStop(0,'#4c3213');gold.addColorStop(.5,'#f1c66b');gold.addColorStop(1,'#5b3d17');
+    function armorShape(points,fill,stroke='#d7a75b55'){ctx.beginPath();points.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.closePath();ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke()}
+    // helmet
+    ctx.save();ctx.translate(0,-160);ctx.rotate(explode*.14);ctx.beginPath();ctx.ellipse(0,0,57,72,0,0,Math.PI*2);ctx.fillStyle=red;ctx.fill();ctx.strokeStyle='#e0b75c';ctx.lineWidth=3;ctx.stroke();armorShape([[-40,-15],[-25,-42],[0,-50],[25,-42],[40,-15],[26,30],[0,45],[-26,30]],gold);ctx.fillStyle='#06111a';ctx.fillRect(-29,-12,20,7);ctx.fillRect(9,-12,20,7);ctx.restore();
+    // torso chest and shoulders
+    armorShape([[-100,-80],[-155,-58],[-138,12],[-104,50],[-83,20],[-65,100],[65,100],[83,20],[104,50],[138,12],[155,-58],[100,-80],[55,-48],[-55,-48]],red);
+    armorShape([[-60,-58],[0,-42],[60,-58],[74,22],[45,60],[-45,60],[-74,22]],'#18212b');
+    // reactor ring with glow
+    const reactorX=0,reactorY=8,reactorR=38;
+    const coreGlow=ctx.createRadialGradient(reactorX,reactorY,2,reactorX,reactorY,reactorR*2.2);coreGlow.addColorStop(0,'#efffff');coreGlow.addColorStop(.18,'#69eaff');coreGlow.addColorStop(.4,'#08a9efaa');coreGlow.addColorStop(1,'#04a5e900');
+    ctx.fillStyle=coreGlow;ctx.beginPath();ctx.arc(0,8,reactorR*2,0,Math.PI*2);ctx.fill();
+    for(let r=28;r<=39;r+=5){ctx.strokeStyle=r%2?'#7ceeff':'#c0a65f';ctx.lineWidth=4;ctx.beginPath();ctx.arc(0,8,r,0,Math.PI*2);ctx.stroke()}
+    ctx.fillStyle='#efffff';ctx.beginPath();ctx.arc(0,8,18,0,Math.PI*2);ctx.fill();
+    // Arms/gauntlets
+    for(const side of [-1,1]){ctx.save();ctx.translate(side*150,-4);ctx.rotate(side*(.16+explode*.45));armorShape([[-34,-58],[-62,-40],[-54,40],[-30,62],[30,62],[54,40],[62,-40],[34,-58]],red);armorShape([[-26,-18],[26,-18],[34,36],[-34,36]],gold);ctx.restore()}
+    // abdomen, pelvis and legs
+    armorShape([[-60,70],[-78,110],[-50,145],[50,145],[78,110],[60,70]],red);
+    for(const side of [-1,1]){ctx.save();ctx.translate(side*48,155);ctx.rotate(side*explode*.32);armorShape([[-38,0],[-48,28],[-40,112],[-26,145],[26,145],[40,112],[48,28],[38,0]],red);armorShape([[-25,30],[25,30],[28,78],[-28,78]],gold);armorShape([[-27,140],[-36,172],[-15,190],[38,190],[45,166],[30,140]],red);ctx.restore()}
+    // explode component separation and motion rays
+    if(explode>.02){ctx.strokeStyle='#6ce7ff66';ctx.lineWidth=1;for(let i=0;i<18;i++){const a=i*Math.PI/9;ctx.beginPath();ctx.moveTo(Math.cos(a)*50,Math.sin(a)*50);ctx.lineTo(Math.cos(a)*240*explode,Math.sin(a)*240*explode);ctx.stroke()}}
+    ctx.restore();
+    // scene light shafts
+    ctx.globalCompositeOperation='screen';for(let i=0;i<3;i++){const x=w*(.2+i*.3);const beam=ctx.createLinearGradient(x,0,x+80,h);beam.addColorStop(0,'#6cb7e512');beam.addColorStop(1,'#6cb7e500');ctx.fillStyle=beam;ctx.beginPath();ctx.moveTo(x-25,0);ctx.lineTo(x+25,0);ctx.lineTo(x+120,h);ctx.lineTo(x-120,h);ctx.fill()}ctx.globalCompositeOperation='source-over';
+    // cinematic vignette
+    const v=ctx.createRadialGradient(w*.5,h*.45,h*.18,w*.5,h*.45,h*.75);v.addColorStop(0,'#00000000');v.addColorStop(1,'#000000a8');ctx.fillStyle=v;ctx.fillRect(0,0,w,h);
+    raf=requestAnimationFrame(draw);
+  }
+  resize();addEventListener('resize',resize);addEventListener('pointermove',e=>{px=(e.clientX/w-.5)*2;py=(e.clientY/h-.5)*2},{passive:true});draw();
+  window.__jarvisFallbackReady=true;
+})();
+</script><script type="module">
 /* JARVIS continuous cinematic suit sequence — scroll is the film timeline. */
 try {
   const THREE=await import('https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js');
