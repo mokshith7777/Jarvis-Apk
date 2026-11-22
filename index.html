@@ -211,7 +211,7 @@ section:not(.hero){background:linear-gradient(180deg,#03060a36,#03060a20 48%,#03
 }
 @media(prefers-reduced-motion:reduce){#background-canvas{opacity:.72!important}}
 </style><style id="cinematic-clean">
-#cinematic-world{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;display:block;pointer-events:none;background:#030508}
+#cinematic-world{position:fixed;inset:0;width:100vw;height:100vh;z-index:1;display:block;pointer-events:none;background:transparent}
 .cinematic-vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 35%,#020408aa 100%),linear-gradient(180deg,#02040866,transparent 30%,#02040870 100%);mix-blend-mode:multiply}
 body:before,body:after,.cinematic-techfield,.progressline,.chapterrail,.floatingnote{display:none!important}
 body{background:transparent!important}
@@ -247,7 +247,7 @@ section{min-height:55vh}
 #cinematic-fallback-canvas{position:fixed;inset:0;z-index:0;display:block;pointer-events:none}
 body.cinematic-fallback #cinematic-world{display:none!important}
 body.cinematic-fallback #cinematic-fallback-canvas{display:block!important}
-body.cinematic-ready #cinematic-fallback-canvas{display:none!important}
+body.cinematic-ready #cinematic-fallback-canvas{display:block!important}
 body:not(.cinematic-ready) #cinematic-fallback-canvas{display:block!important}
 </style></head>
 <body><canvas id="cinematic-world" aria-hidden="true"></canvas>
@@ -447,18 +447,18 @@ try {
   const THREE=await import('https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js');
   const canvas=document.getElementById('cinematic-world');
   if(!canvas) throw new Error('cinematic canvas missing');
-  const renderer=new THREE.WebGLRenderer({canvas,alpha:false,antialias:true,powerPreference:'high-performance'});
+  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:'high-performance'});
   renderer.setPixelRatio(Math.min(devicePixelRatio||1,innerWidth<720?1:1.5));
   renderer.setSize(innerWidth,innerHeight,false);
   renderer.outputColorSpace=THREE.SRGBColorSpace;
   renderer.toneMapping=THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure=1.15;
   const scene=new THREE.Scene();
-  scene.background=new THREE.Color(0x030508);
+  scene.background=null;renderer.setClearColor(0x000000,0);
   scene.fog=new THREE.FogExp2(0x080d14,.023);
   const camera=new THREE.PerspectiveCamera(38,innerWidth/innerHeight,.1,160);
   camera.position.set(0,1.1,9);
-  const ambient=new THREE.HemisphereLight(0xb6d5f0,0x08040a,1.2);scene.add(ambient);
+  const ambient=new THREE.HemisphereLight(0xb6d5f0,0x08040a,2.6);scene.add(ambient);const fill=new THREE.DirectionalLight(0xffffff,3.2);fill.position.set(3,4,8);scene.add(fill);
   const key=new THREE.SpotLight(0xe7f3ff,190,60,Math.PI/5,.6,1.4);key.position.set(-5,9,7);key.target.position.set(0,0,-8);scene.add(key,key.target);
   const rim=new THREE.PointLight(0xff263c,80,45,2);rim.position.set(5,4,-10);scene.add(rim);
   const cold=new THREE.PointLight(0x52bfff,100,55,2);cold.position.set(-4,2,-14);scene.add(cold);
