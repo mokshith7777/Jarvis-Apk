@@ -185,10 +185,14 @@ for impmap in audit.importmaps:
     except json.JSONDecodeError as exc:
         check(False, "Invalid import map JSON: " + str(exc))
 
-check("iron-man-2020-suit-xf-1440x2560.jpg" in HTML, "Supplied Iron Man reference image source not present")
+check('id="armor-image"' in HTML and "iron-man-2020-suit-xf-1440x2560.jpg" in HTML, "Current externally hosted armor image markup/source missing")
 check("armor-image" in HTML and "reactor-transition" in HTML, "Scroll zoom / reactor transition markup missing")
 check("requestAnimationFrame(render)" in HTML and "armor-scroll" in HTML, "Scroll-driven animation code missing")
 check("prefers-reduced-motion" in HTML, "Reduced motion handling missing")
+check('.atmo-grid{display:none!important}' in HTML, 'Abstract background grid overlay must remain disabled')
+check('body.cinematic-motion-ready .reveal{opacity:0}' in HTML, 'GSAP reveal CSS readiness gate missing')
+check("document.querySelectorAll('.revealline').forEach(el=>observer.observe(el))" in HTML, 'Legacy observer must not animate GSAP reveal elements')
+check('.reveal.visible' not in HTML and '.setup-station .reveal.visible' not in HTML, 'Legacy CSS reveal animation conflicts with GSAP')
 check("JARVIS PRO" in HTML and "₹19" in HTML and "PRODUCT DETAILS" in HTML, "Storefront product/pricing content missing")
 check("cinematic-final-pass" in HTML and "#cinematic-world" in HTML, "Cinematic background visibility layer missing")
 check('referrerpolicy="no-referrer"' in HTML, "Armor image referrer policy missing")
@@ -209,6 +213,8 @@ check("scrollTrigger:{start:0,end:()=>Math.max(1,ScrollTrigger.maxScroll(window)
 check("lerp:reduceMotion?1:mobile?.14:.12" in MAIN, "Lenis scroll interpolation must be tuned for responsive smoothness")
 check("1-Math.exp(-24*delta)" in MAIN, "Cinematic camera progress must use frame-rate-independent damping")
 check("scrub:reduceMotion?false:.25" in MAIN, "ScrollTrigger scrub should remain responsive without excessive lag")
+check("document.body.classList.add('cinematic-motion-ready')" in MAIN and "gsap.utils.toArray('.reveal')" in MAIN, 'GSAP reveal owner must initialize only after runtime readiness')
+check("gsap.utils.toArray('#features .feature, #experience .demo" not in MAIN, 'Duplicate GSAP reveal tweens must not animate the same elements')
 check("document.body.classList.add('entry-locked')" not in MAIN, "Dead entry lock must not prevent scrolling")
 check("reactorObject.visible=reactorReveal>.015" in MAIN, "3D reactor reveal visibility choreography missing")
 check("webglcontextlost" in MAIN and "webglcontextrestored" in MAIN, "Three.js context loss/recovery handlers missing")
@@ -240,12 +246,14 @@ if SMOKE.is_file():
     SMOKE_TEXT = SMOKE.read_text(encoding="utf-8")
     check("WEBGL_lose_context" in SMOKE_TEXT and "contextRestorations" in SMOKE_TEXT, "Browser smoke does not verify context recovery")
     check("demo-tab" in SMOKE_TEXT and "devicefamily" in SMOKE_TEXT and "setup-reset" in SMOKE_TEXT, "Browser smoke misses core interactions")
+    check('deviceFamily.scrollIntoViewIfNeeded()' in SMOKE_TEXT and 'firstReveal.scrollIntoViewIfNeeded()' in SMOKE_TEXT, 'Browser smoke must wait for scroll-reveal content before interacting')
+    check('window.scrollY<100' in SMOKE_TEXT and "cs.visibility==='hidden'" in SMOKE_TEXT, 'Browser smoke must verify reveal reversibility')
 check("Browser smoke for staged Pages artifact" in WORKFLOW and "runtime_smoke.cjs" in WORKFLOW, "Staged browser runtime smoke is not a CI gate")
 check("Browser smoke for live Pages deployment" in WORKFLOW, "Live browser runtime smoke is not a CI gate")
 
 # This is a warning, not a release-blocking test: cinematic realism requires human visual approval.
 if not re.search(r"<video\b|\.(?:mp4|webm|mov)(?:[?#]|$)", HTML, re.I):
-    print("VISUAL ACCEPTANCE PENDING: current page has procedural canvas/shader motion, not a cinematic video asset.")
+    print("VISUAL ACCEPTANCE PENDING: active scene is still procedural armor/hangar; a realistic full-page nature environment and exact reference matching require visual review.")
 
 if errors:
     print("SITE AUDIT FAILED")
