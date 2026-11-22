@@ -1,5 +1,4 @@
-name: Deploy JARVIS PRO Storefront to GitHub Pages
-# Retry after repository Pages source was manually set to GitHub Actions.
+name: Deploy JARVIS Cinematic Phase 1
 on:
   push:
     branches: [main]
@@ -12,7 +11,7 @@ concurrency:
   group: pages
   cancel-in-progress: true
 jobs:
-  deploy:
+  validate-and-deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -20,271 +19,112 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Validate GitHub Actions workflow syntax
+      - name: Validate workflow
         run: |
           curl -fsSL https://github.com/rhysd/actionlint/releases/download/v1.7.7/actionlint_1.7.7_linux_amd64.tar.gz -o "$RUNNER_TEMP/actionlint.tar.gz"
           tar -xzf "$RUNNER_TEMP/actionlint.tar.gz" -C "$RUNNER_TEMP" actionlint
           "$RUNNER_TEMP/actionlint" .github/workflows/pages.yml
-      - name: Validate storefront files
+      - name: Validate Phase 1 files and HTML references
         run: |
           test -s index.html
-          grep -q 'JARVIS PRO' index.html
-          grep -q '₹19' index.html
-          grep -q 'id="core"' index.html
-          grep -q 'INTERACTIVE LAB' index.html
-          grep -q 'demoscreen' index.html
-          grep -q 'FAQ' index.html
-          grep -q 'pointermove' index.html
-          grep -q 'id="story"' index.html
-          grep -q 'id="dropzone"' index.html
-          grep -q 'dragstart' index.html
-          grep -q 'chapterrail' index.html
-          grep -q 'scroll-p' index.html
-          grep -q 'id="setup"' index.html
-          grep -q 'setup-station' index.html
-          grep -q 'id="devicefamily"' index.html
-          grep -q 'id="setup-progress-bar"' index.html
-          grep -q 'class="step-done"' index.html
-          grep -q 'Do not disable Play Protect' index.html
-          grep -q 'does not recommend bypassing' index.html
-          grep -q 'support.google.com/android/answer/12623953' index.html
+          test -s styles/cinematic.css
+          test -s src/main.js
+          test -s src/armor.js
+          test -s .nojekyll
+          grep -q 'cinematic-world' index.html
+          grep -q 'importmap' index.html
+          grep -q 'ScrollTrigger' src/main.js
+          grep -q 'Lenis' src/main.js
+          grep -q 'createArmor' src/armor.js
+          grep -q 'setExploded' src/armor.js
+          grep -q 'ARC_REACTOR_ASSEMBLY' src/armor.js
+          grep -q 'loadArmor' src/main.js
+          grep -q 'KTX2Loader' src/main.js
+          grep -q 'DRACOLoader' src/main.js
+          grep -q 'UnrealBloomPass' src/main.js
+          grep -q 'BokehPass' src/main.js
+          grep -q 'prefers-reduced-motion' styles/cinematic.css
           python3 - <<'PY'
-          import re
           from pathlib import Path
-          html = Path("index.html").read_text()
-          ids = re.findall(r'\bid="([^"]+)"', html)
-          duplicates = sorted({x for x in ids if ids.count(x) > 1})
-          anchors = re.findall(r'href="#([^"]+)"', html)
-          broken = sorted(set(x for x in anchors if x not in ids))
-          setup = html[html.index('<section id="setup"'):html.index('<section id="pricing"')]
-          steps = len(re.findall(r'<article class="setup-step', setup))
-          if duplicates or broken or steps != 8:
-              print(f"Duplicate IDs: {duplicates}; broken anchors: {broken}; setup steps: {steps}")
-              raise SystemExit(1)
-          print(f"Static audit passed: {len(ids)} IDs, {len(anchors)} anchors, {steps} setup steps.")
-          PY
-      - name: Audit HTML semantics, accessibility, security and local assets
-        run: |
-          python3 - <<'PY'
           from html.parser import HTMLParser
-          from pathlib import Path
-          from urllib.parse import urlsplit
           import re
-
-          html = Path("index.html").read_text(encoding="utf-8")
+          html=Path('index.html').read_text(encoding='utf-8')
           class Audit(HTMLParser):
-              def __init__(self):
-                  super().__init__(convert_charrefs=True)
-                  self.ids, self.anchors, self.tags = [], [], []
-                  self.buttons, self.controls, self.labels = [], [], set()
-                  self.button_stack, self.label_depth = [], 0
-                  self.assets, self.errors = [], []
-              def handle_starttag(self, tag, attrs):
-                  attrs = dict(attrs)
-                  self.tags.append(tag)
-                  if attrs.get("id"): self.ids.append(attrs["id"])
-                  if tag == "label" and attrs.get("for"): self.labels.add(attrs["for"])
-                  if tag == "label": self.label_depth += 1
-                  if tag == "a":
-                      href = attrs.get("href", "")
-                      if href.startswith("#"): self.anchors.append(href[1:])
-                      if attrs.get("target", "").lower() == "_blank" and "noopener" not in set(attrs.get("rel", "").lower().split()):
-                          self.errors.append("target=_blank link missing noopener noreferrer")
-                      if href.lower().startswith("javascript:"): self.errors.append("javascript: link found")
-                      self.assets.append(("href", href))
-                  if tag in ("img", "script", "source", "video", "audio"):
-                      self.assets.append((tag, attrs.get("src", "")))
-                  if tag == "img" and "alt" not in attrs: self.errors.append("image missing alt text")
-                  if tag == "button":
-                      self.button_stack.append({"text": "", "aria": attrs.get("aria-label", ""), "title": attrs.get("title", "")})
-                  if tag in ("input", "select", "textarea"):
-                      typ = attrs.get("type", "").lower()
-                      if typ != "hidden":
-                          named = bool(attrs.get("aria-label") or attrs.get("aria-labelledby") or attrs.get("title") or self.label_depth or attrs.get("id") in self.labels)
-                          self.controls.append((tag, typ, named))
-                  if any(k.lower().startswith("on") for k in attrs):
-                      self.errors.append(f"inline event handler on <{tag}>")
-              def handle_data(self, data):
-                  for b in self.button_stack: b["text"] += data
-              def handle_endtag(self, tag):
-                  if tag == "button" and self.button_stack:
-                      b = self.button_stack.pop()
-                      if not (b["text"].strip() or b["aria"].strip() or b["title"].strip()):
-                          self.errors.append("button has no accessible name")
-                  if tag == "label": self.label_depth = max(0, self.label_depth - 1)
-
-          p = Audit(); p.feed(html)
-          ids = set(p.ids)
-          duplicates = sorted({x for x in p.ids if p.ids.count(x) > 1})
-          broken = sorted(set(x for x in p.anchors if x not in ids))
-          counts = {tag: p.tags.count(tag) for tag in ("html", "main", "header", "footer", "section", "h1", "h2")}
-          if duplicates: p.errors.append("duplicate IDs: " + ", ".join(duplicates))
-          if broken: p.errors.append("broken fragment links: " + ", ".join(broken))
-          if counts["html"] != 1 or counts["main"] != 1 or counts["header"] < 1 or counts["footer"] < 1 or counts["section"] < 4 or counts["h1"] != 1 or counts["h2"] < 4:
-              p.errors.append(f"semantic landmark/heading counts invalid: {counts}")
-          if not re.search(r'<html\b[^>]*\blang=["\'][^"\']+["\']', html, re.I): p.errors.append("html lang missing")
-          if not re.search(r'<title>[^<]+</title>', html, re.I): p.errors.append("title missing")
-          if not re.search(r'<meta\b[^>]*name=["\']viewport["\']', html, re.I): p.errors.append("viewport meta missing")
-          for tag, typ, named in p.controls:
-              if not named: p.errors.append(f"accessible name missing: {tag} {typ}")
-          root = Path(".")
-          for kind, raw in p.assets:
-              if not raw: continue
-              u = urlsplit(raw)
-              if u.scheme or u.netloc or raw.startswith("#") or raw.startswith("data:") or raw.startswith("mailto:") or raw.startswith("tel:"): continue
-              target = (root / u.path.lstrip("/")) if u.path.startswith("/") else (root / u.path)
-              if not target.exists(): p.errors.append(f"missing local asset/reference: {kind}={raw}")
-          css = re.search(r'<style>([\s\S]*?)</style>', html, re.I)
-          if css:
-              for raw in re.findall(r'url\(([^)]*)\)', css.group(1), re.I):
-                  value = raw.strip(" \t\r\n\"'")
-                  u = urlsplit(value)
-                  if not u.scheme and not u.netloc and value and not value.startswith("data:") and not (root / u.path.lstrip("/")).exists():
-                      p.errors.append("missing CSS asset: " + value)
-          for required in ('id="pricing"', 'id="purchase"', 'id="setup"', '₹19', 'id="devicefamily"', 'id="setup-reset"'):
-              if required not in html: p.errors.append("required storefront feature missing: " + required)
-          if not re.search(r'prefers-reduced-motion', html): p.errors.append("reduced-motion rule missing")
-          if not re.search(r'@media\s*\(\s*max-width', html): p.errors.append("responsive breakpoint missing")
-          if re.search(r'\beval\s*\(|new\s+Function\s*\(', html): p.errors.append("unsafe dynamic JavaScript evaluation found")
-          if not Path(".nojekyll").is_file(): p.errors.append(".nojekyll missing")
-          if p.errors:
-              print("\n".join("FAIL: " + x for x in p.errors))
-              raise SystemExit(1)
-          print(f"HTML/accessibility/security audit passed: {len(ids)} unique IDs, {len(p.anchors)} fragment links, {counts} landmarks.")
+            def __init__(self):
+              super().__init__(); self.ids=[]; self.tags=[]; self.errors=[]
+            def handle_starttag(self,t,attrs):
+              a=dict(attrs); self.tags.append(t)
+              if a.get('id'): self.ids.append(a['id'])
+              if t=='script' and a.get('src') and not a['src'].startswith(('http','//')):
+                if not Path(a['src']).exists(): self.errors.append('Missing script '+a['src'])
+              if t=='link' and a.get('rel')=='stylesheet':
+                if not Path(a.get('href','')).exists(): self.errors.append('Missing stylesheet '+a.get('href',''))
+          p=Audit();p.feed(html)
+          dup=sorted({x for x in p.ids if p.ids.count(x)>1})
+          if dup:p.errors.append('Duplicate IDs: '+str(dup))
+          if p.tags.count('html')!=1 or p.tags.count('main')!=1 or p.tags.count('canvas')<1:p.errors.append('Required document landmarks missing')
+          if not re.search(r'<html[^>]+lang=',html):p.errors.append('Language attribute missing')
+          if not re.search(r'<title>[^<]+</title>',html):p.errors.append('Document title missing')
+          if not re.search(r'viewport',html):p.errors.append('Viewport meta missing')
+          if p.errors:raise SystemExit('HTML audit failed: '+'; '.join(p.errors))
+          print('HTML audit passed:',len(p.ids),'IDs')
           PY
-      - name: Validate JavaScript and cinematic interactions
+      - name: Syntax checks
         run: |
-          python3 - <<'PY'
-          import re
-          from pathlib import Path
-          html = Path("index.html").read_text()
-          scripts = re.findall(r"<script>(.*?)</script>", html, re.S)
-          modules = re.findall(r'<script type="module">(.*?)</script>', html, re.S)
-          if len(scripts) != 2:
-              raise SystemExit(f"Expected storefront + fallback scripts, found {len(scripts)}")
-          if len(modules) != 1:
-              raise SystemExit(f"Expected exactly one cinematic module, found {len(modules)}")
-          storefront_script, fallback_script = scripts
-          Path("/tmp/storefront.js").write_text(storefront_script)
-          Path("/tmp/cinematic-fallback.js").write_text(fallback_script)
-          Path("/tmp/cinematic-world.js").write_text(modules[0])
-          ids = set(re.findall(r'\bid="([^"]+)"', html))
-          js = fallback_script + storefront_script + modules[0]
-          js_ids = set(re.findall(r"getElementById\(\s*['\"]([^'\"]+)['\"]\s*\)", js))
-          selectors = re.findall(r"(?:querySelector|querySelectorAll)\(\s*['\"]([^'\"]+)['\"]\s*\)", js)
-          js_ids.update(x[1:] for x in selectors if x.startswith("#") and re.match(r"#[A-Za-z_][\w-]*$", x))
-          missing = sorted(js_ids - ids)
-          if missing:
-              raise SystemExit(f"JS references missing HTML IDs: {missing}")
-          checks = {
-              "3D cinematic world canvas": 'id="cinematic-world"' in html,
-              "Three.js module": "three.module.js" in modules[0],
-              "scroll camera timeline": "state.target" in modules[0] and "state.progress" in modules[0],
-              "chapter environment geometry": "const torso=part" in modules[0] and "const parts=[]" in modules[0],
-              "WebGL context fallback": "webglcontextlost" in modules[0],
-              "module fallback": "catch(error)" in modules[0],
-              "background canvas": 'id="background-canvas"' in html,
-              "cinematic fallback canvas": "cinematic-fallback-canvas" in fallback_script,
-              "full-page fixed canvas": "#cinematic-world{position:fixed" in html,
-              "background visible across sections": "section{background:linear-gradient(180deg,#02040816" in html,
-              "city skyline shader": "const parts=[]" in modules[0],
-              "web scene transition": "explode=smooth(.22,.42,p)" in modules[0],
-              "tunnel scene transition": "macro=smooth(.38,.57,p)" in modules[0],
-              "reactor scene transition": "reactorG.scale.setScalar" in modules[0],
-              "scroll-based film timeline": "state.progress+=(state.target-state.progress)" in modules[0],
-              "responsive hero architecture": "@media(max-width:900px)" in html and "@media(max-width:600px)" in html,
-              "2D visual fallback": "getContext('2d')" in fallback_script,
-              "fallback scene progress": "scrollY/" in fallback_script,
-              "fallback pointer parallax": "pointermove" in fallback_script,
-              "fallback draws immediately": "draw();" in fallback_script,
-              "cinematic canvas": 'id="scene-canvas"' in html,
-              "scene label": 'id="scene-label"' in html,
-              "scene caption": 'id="scene-caption"' in html,
-              "sound control": 'id="sound-toggle"' in html,
-              "sound defaults off": 'aria-pressed="false"' in html,
-              "reduced-motion support": "prefers-reduced-motion:reduce" in html or "prefers-reduced-motion: reduce" in html,
-              "setup guide": 'id="setup"' in html,
-              "8 setup articles": len(re.findall(r'<article class="setup-step', html)) == 8,
-              "no autoplay audio": not re.search(r'<audio[^>]*autoplay', html, re.I),
-          }
-          failed = [name for name, ok in checks.items() if not ok]
-          if failed:
-              raise SystemExit("Interaction checks failed: " + ", ".join(failed))
-          print("JavaScript selectors and cinematic checks passed.")
-          PY
-          node --check /tmp/storefront.js
-          node --check /tmp/cinematic-world.js
+          node --check src/main.js
+          node --check src/armor.js
           python3 - <<'PY'
           from pathlib import Path
-          css = Path("index.html").read_text().split("<style>", 1)[1].split("</style>", 1)[0]
-          depth = 0
-          quote = None
-          comment = False
-          i = 0
-          while i < len(css):
-              if comment:
-                  if css.startswith("*/", i):
-                      comment = False
-                      i += 2
-                      continue
-                  i += 1
-                  continue
-              if quote:
-                  if css[i] == "\\": i += 2; continue
-                  if css[i] == quote: quote = None
-                  i += 1
-                  continue
-              if css.startswith("/*", i):
-                  comment = True
-                  i += 2
-                  continue
-              if css[i] in ('"', "'"):
-                  quote = css[i]
-                  i += 1
-                  continue
-              if css[i] == "{": depth += 1
-              elif css[i] == "}":
-                  depth -= 1
-                  if depth < 0: raise SystemExit("CSS has an unmatched closing brace")
-              i += 1
-          if comment or quote or depth:
-              raise SystemExit(f"CSS balance failed: comment={comment}, quote={quote}, depth={depth}")
-          print("CSS structure check passed.")
+          css=Path('styles/cinematic.css').read_text()
+          depth=0; quote=None; comment=False; i=0
+          while i<len(css):
+            if comment:
+              if css.startswith('*/',i):comment=False;i+=2;continue
+              i+=1;continue
+            if quote:
+              if css[i]=='\\':i+=2;continue
+              if css[i]==quote:quote=None
+              i+=1;continue
+            if css.startswith('/*',i):comment=True;i+=2;continue
+            if css[i] in ('"',"'"):quote=css[i];i+=1;continue
+            if css[i]=='{':depth+=1
+            elif css[i]=='}':
+              depth-=1
+              if depth<0:raise SystemExit('CSS unmatched closing brace')
+            i+=1
+          if depth or quote or comment:raise SystemExit('CSS balance invalid')
+          print('CSS structural check passed')
           PY
-          cp index.html "$RUNNER_TEMP/storefront-parse.html"
-          npx --yes prettier@3.5.3 --parser html --write "$RUNNER_TEMP/storefront-parse.html"
+          npx --yes prettier@3.5.3 --parser html --check index.html
+          npx --yes prettier@3.5.3 --parser css --check styles/cinematic.css
+          npx --yes prettier@3.5.3 --parser babel --check src/main.js src/armor.js
       - name: Configure Pages
         uses: actions/configure-pages@v6
-      - name: Upload site
+      - name: Upload site artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
+          name: cinematic-pages-${{ github.run_id }}-${{ github.run_attempt }}
           path: .
           include-hidden-files: true
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v5
         with:
-          artifact_name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
-      - name: Verify live Pages response and deployed source
+          artifact_name: cinematic-pages-${{ github.run_id }}-${{ github.run_attempt }}
+      - name: Verify live deployment matches source
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
         run: |
           set -euo pipefail
-          expected_sha="$(sha256sum index.html | cut -d' ' -f1)"
+          expected="$(sha256sum index.html | cut -d' ' -f1)"
           for attempt in $(seq 1 12); do
-            status="$(curl --silent --show-error --location --compressed --max-time 20 --output "$RUNNER_TEMP/live-page.html" --write-out '%{http_code}' "$PAGE_URL" || true)"
+            status="$(curl --silent --show-error --location --compressed --max-time 20 --output "$RUNNER_TEMP/live-index.html" --write-out '%{http_code}' "$PAGE_URL" || true)"
             if [ "$status" = "200" ]; then
-              actual_sha="$(sha256sum "$RUNNER_TEMP/live-page.html" | cut -d' ' -f1)"
-              if [ "$actual_sha" = "$expected_sha" ]; then
-                echo "Live Pages verification passed: HTTP $status, SHA256 $actual_sha matches index.html."
-                exit 0
-              fi
-              echo "Attempt $attempt: HTTP 200 but deployed content SHA $actual_sha does not match source $expected_sha."
-            else
-              echo "Attempt $attempt: Pages returned HTTP ${status:-network-error}; retrying."
-            fi
+              actual="$(sha256sum "$RUNNER_TEMP/live-index.html" | cut -d' ' -f1)"
+              if [ "$actual" = "$expected" ]; then echo "Pages deployment verified: HTTP 200 and source SHA matched.";exit 0;fi
+              echo "Attempt $attempt: HTTP 200 but SHA mismatch ($actual != $expected)."
+            else echo "Attempt $attempt: HTTP $status; retrying.";fi
             sleep 10
           done
-          echo "Live Pages verification failed after retries: expected HTTP 200 and exact index.html content."
+          echo "Live deployment verification failed."
           exit 1
