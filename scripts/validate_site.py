@@ -228,6 +228,7 @@ check('id="loading"' in HTML and 'id="fallback"' in HTML and 'id="load-progress"
 check("webglcontextrestored" in MAIN and "composer.setSize" in MAIN, "WebGL restoration does not resize postprocessing")
 check("renderer.resetState()" in MAIN, "WebGL restoration does not reset renderer state")
 check("window.__JARVIS_RUNTIME__" in MAIN and "status:'active'" in MAIN and "frames" in MAIN, "runtime execution marker/frame telemetry missing")
+check('reducedMotion:reduceMotion' in MAIN, 'runtime motion telemetry references an undefined identifier')
 check("contextRestorations" in MAIN and "status='context-lost'" in MAIN, "context loss/restoration runtime telemetry missing")
 check("window.__JARVIS_RUNTIME__" in HTML and "module-load-timeout" in HTML, "module-load watchdog fallback telemetry missing")
 SMOKE = ROOT / "scripts/runtime_smoke.cjs"
