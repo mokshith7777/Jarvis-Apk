@@ -49,7 +49,7 @@ jobs:
           grep -q 'viewport' index.html
           grep -q './styles/cinematic.css' index.html
           grep -q './src/main.js' index.html
-     - name: Syntax checks
+      - name: Syntax checks
         run: |
           node --input-type=module --check < src/main.js
           node --input-type=module --check < src/armor.js
