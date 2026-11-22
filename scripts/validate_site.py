@@ -246,7 +246,7 @@ if SMOKE.is_file():
     SMOKE_TEXT = SMOKE.read_text(encoding="utf-8")
     check("WEBGL_lose_context" in SMOKE_TEXT and "contextRestorations" in SMOKE_TEXT, "Browser smoke does not verify context recovery")
     check("demo-tab" in SMOKE_TEXT and "devicefamily" in SMOKE_TEXT and "setup-reset" in SMOKE_TEXT, "Browser smoke misses core interactions")
-    check('deviceFamily.scrollIntoViewIfNeeded()' in SMOKE_TEXT and 'firstReveal.scrollIntoViewIfNeeded()' in SMOKE_TEXT, 'Browser smoke must wait for scroll-reveal content before interacting')
+    check('async function revealBeforeInteraction(page,locator,label)' in SMOKE_TEXT and 'revealBeforeInteraction(desktop,demo' in SMOKE_TEXT and 'revealBeforeInteraction(desktop,faq' in SMOKE_TEXT and 'revealBeforeInteraction(desktop,expand' in SMOKE_TEXT and 'revealBeforeInteraction(desktop,hosted' in SMOKE_TEXT and 'revealBeforeInteraction(desktop,deviceFamily' in SMOKE_TEXT and 'revealBeforeInteraction(desktop,checklist' in SMOKE_TEXT and 'revealBeforeInteraction(mobile,localChip' in SMOKE_TEXT, 'Browser smoke must wait for cinematic reveal visibility before interacting with desktop and mobile controls')
     check('window.scrollY<100' in SMOKE_TEXT and "cs.visibility==='hidden'" in SMOKE_TEXT, 'Browser smoke must verify reveal reversibility')
 check("Browser smoke for staged Pages artifact" in WORKFLOW and "runtime_smoke.cjs" in WORKFLOW, "Staged browser runtime smoke is not a CI gate")
 check("Browser smoke for live Pages deployment" in WORKFLOW, "Live browser runtime smoke is not a CI gate")
