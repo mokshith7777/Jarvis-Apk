@@ -72,6 +72,17 @@ check("requestAnimationFrame(render)" in HTML and "armor-scroll" in HTML,"Scroll
 check("prefers-reduced-motion" in HTML,"Reduced motion handling missing")
 check(not re.search(r"<video\b",HTML,re.I),"Unexpected video element; image-based reveal is intended")
 check("JARVIS PRO" in HTML and "₹19" in HTML and "PRODUCT DETAILS" in HTML,"Storefront product/pricing content missing")
+check("cinematic-final-pass" in HTML and "#cinematic-world" in HTML,"Cinematic background visibility layer missing")
+check('referrerpolicy="no-referrer"' in HTML,"Armor image referrer policy missing")
+coil_block=HTML.split('data-part="coils">',1)[1].split("</div>",1)[0] if 'data-part="coils">' in HTML else ""
+check(coil_block.count("<i></i>")==10,"Expected ten copper coil modules in reactor markup")
+check('data-part="cage"' in HTML and 'class="cage-spoke s10"' in HTML,"Ten-spoke reactor cage markup missing")
+MAIN=(ROOT/"src/main.js").read_text(encoding="utf-8")
+check("const heroJourney=document.querySelector('#armor-intro')" in MAIN,"Cinematic scroll progress must be tied to the hero")
+check("document.body.classList.add('entry-locked')" not in MAIN,"Dead entry lock must not prevent scrolling")
+check("reactorObject.visible=reactorReveal>.015" in MAIN,"3D reactor reveal visibility choreography missing")
+ARMOR=(ROOT/"src/armor.js").read_text(encoding="utf-8")
+check("for(let i=0;i<10;i++" in ARMOR and "copper-winding-" in ARMOR,"Ten-coil reactor detail missing")
 check("Questions, answered." in HTML and "Bring JARVIS online." in HTML,"FAQ or setup guide content missing")
 if errors:
     print("SITE AUDIT FAILED")
