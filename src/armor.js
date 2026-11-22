@@ -1,11 +1,11 @@
 import * as THREE from 'three';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
 
-const gold=new THREE.MeshStandardMaterial({color:0x9d351f,metalness:.88,roughness:.23});
-const red=new THREE.MeshStandardMaterial({color:0x7e171d,metalness:.9,roughness:.28});
-const goldBright=new THREE.MeshStandardMaterial({color:0xc98537,metalness:.86,roughness:.2});
+const gold=new THREE.MeshStandardMaterial({color:0x6f1018,metalness:.92,roughness:.22});
+const red=new THREE.MeshStandardMaterial({color:0x9f1724,metalness:.9,roughness:.24});
+const goldBright=new THREE.MeshStandardMaterial({color:0xd7a24b,metalness:.9,roughness:.18});
 const dark=new THREE.MeshStandardMaterial({color:0x151e27,metalness:.78,roughness:.3});
-const graphite=new THREE.MeshStandardMaterial({color:0x303b47,metalness:.82,roughness:.27});
+const graphite=new THREE.MeshStandardMaterial({color:0x687582,metalness:.88,roughness:.24});
 const glow=new THREE.MeshStandardMaterial({color:0x8cecff,metalness:.45,roughness:.18,emissive:0x21b9f7,emissiveIntensity:2.4});
 const redGlow=new THREE.MeshStandardMaterial({color:0xff4668,emissive:0x740e23,emissiveIntensity:1.2,metalness:.4,roughness:.22});
 const jointMat=new THREE.MeshStandardMaterial({color:0x05080d,metalness:.65,roughness:.45});
@@ -15,13 +15,21 @@ function sphere(parent,name,scale,pos,mat){const mesh=new THREE.Mesh(new THREE.S
 function tube(parent,name,points,radius,mat){const curve=new THREE.CatmullRomCurve3(points.map(p=>new THREE.Vector3(...p)));const mesh=new THREE.Mesh(new THREE.TubeGeometry(curve,32,radius,8,false),mat);mesh.name=name;parent.add(mesh);return mesh}
 function ring(parent,name,r,t,pos,mat){const mesh=new THREE.Mesh(new THREE.TorusGeometry(r,t,12,72),mat);mesh.name=name;mesh.position.set(...pos);mesh.castShadow=true;parent.add(mesh);return mesh}
 function addPart(root,name,position,explode,make){const group=new THREE.Group();group.name=name;group.position.set(...position);group.userData.home=group.position.clone();group.userData.explode=new THREE.Vector3(...explode);make(group);root.add(group);parts.push(group);return group}
-function reactor(parent){const g=new THREE.Group();g.name='ARC_REACTOR_ASSEMBLY';g.position.set(0,1.52,.47);parent.add(g);const back= new THREE.Mesh(new THREE.CylinderGeometry(.32,.36,.12,64),dark);back.rotation.x=Math.PI/2;g.add(back);
-for(let i=0;i<4;i++){const tor=ring(g,'reactor-ring-'+i,.28-i*.045,.018,[0,0,.08+i*.028],i%2?goldBright:glow);tor.rotation.z=i*.28}
-const lens=new THREE.Mesh(new THREE.CylinderGeometry(.17,.22,.08,48),glow);lens.rotation.x=Math.PI/2;lens.position.z=.14;g.add(lens);
-const core=sphere(g,'reactor-core',[.13,.13,.075],[0,0,.2],new THREE.MeshStandardMaterial({color:0xc9faff,emissive:0x72dcff,emissiveIntensity:5,metalness:.2,roughness:.1}));
-for(let i=0;i<12;i++){const a=i*Math.PI/6;const spoke=rounded(g,'radial-inductor-'+i,[.025,.095,.025],[Math.cos(a)*.235,Math.sin(a)*.235,.14],goldBright,.012);spoke.rotation.z=a}
-const inner=ring(g,'inner-energy-ring',.105,.012,[0,0,.21],glow);inner.rotation.z=.2;
-return g}
+function reactor(parent){
+ const assembly=new THREE.Group();assembly.name='ARC_REACTOR_ASSEMBLY';assembly.position.set(0,1.52,.48);parent.add(assembly);
+ const exploded=[];const component=(name,z,vector,build)=>{const g=new THREE.Group();g.name=name;g.position.z=z;g.userData.home=g.position.clone();g.userData.explode=new THREE.Vector3(...vector);build(g);assembly.add(g);exploded.push(g);return g};
+ const cyl=(g,name,r1,r2,d,mat,z=0)=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,d,72),mat);m.rotation.x=Math.PI/2;m.position.z=z;m.name=name;m.castShadow=true;g.add(m)};
+ const darkRing=new THREE.MeshStandardMaterial({color:0x111821,metalness:.95,roughness:.24}),titanium=new THREE.MeshStandardMaterial({color:0x9aa8b8,metalness:.92,roughness:.18}),ceramic=new THREE.MeshStandardMaterial({color:0xd9f7ff,metalness:.42,roughness:.16,emissive:0x59cfff,emissiveIntensity:.75}),copper=new THREE.MeshStandardMaterial({color:0xb45c31,metalness:.9,roughness:.25}),glass=new THREE.MeshPhysicalMaterial({color:0x77dfff,metalness:.15,roughness:.08,transmission:.22,thickness:.35,emissive:0x087fb9,emissiveIntensity:.65,clearcoat:1});
+ component('rear-housing',-.16,[0,0,-.58],g=>{cyl(g,'rear-casing',.38,.42,.1,darkRing);for(let i=0;i<16;i++){let q=i*Math.PI/8,p=rounded(g,'rear-vent-'+i,[.08,.16,.12],[Math.cos(q)*.34,Math.sin(q)*.34,0],graphite,.025);p.rotation.z=q}});
+ component('outer-titanium-ring',-.08,[0,0,-.4],g=>{ring(g,'outer-frame',.39,.035,[0,0,0],titanium);for(let i=0;i<12;i++){let q=i*Math.PI/6;sphere(g,'mount-bolt-'+i,[.035,.035,.03],[Math.cos(q)*.37,Math.sin(q)*.37,.02],titanium)}});
+ component('ceramic-energy-diffuser',-.015,[0,0,-.28],g=>{ring(g,'white-light-diffuser',.32,.075,[0,0,0],ceramic);for(let i=0;i<16;i++){let q=i*Math.PI/8,p=rounded(g,'diffuser-segment-'+i,[.07,.13,.035],[Math.cos(q)*.32,Math.sin(q)*.32,.025],ceramic,.015);p.rotation.z=q}});
+ component('coil-array',.06,[0,0,.28],g=>{for(let i=0;i<8;i++){let q=i*Math.PI/4,b=new THREE.Group();b.position.set(Math.cos(q)*.28,Math.sin(q)*.28,0);b.rotation.z=q;g.add(b);rounded(b,'coil-core',[.1,.16,.08],[0,0,0],darkRing,.02);for(let j=0;j<7;j++)rounded(b,'copper-winding-'+j,[.11,.018,.09],[0,-.065+j*.02,.025],copper,.006)}});
+ component('confinement-ring',.12,[0,0,.46],g=>{ring(g,'black-confinement',.23,.028,[0,0,0],darkRing);for(let i=0;i<20;i++){let q=i*Math.PI/10,p=rounded(g,'confinement-tooth-'+i,[.035,.08,.04],[Math.cos(q)*.23,Math.sin(q)*.23,.015],titanium,.008);p.rotation.z=q}});
+ component('inner-optical-ring',.18,[0,0,.65],g=>{for(let i=0;i<3;i++)ring(g,'optical-ring-'+i,.17-i*.035,.012,[0,0,i*.02],glow)});
+ component('core-lens',.24,[0,0,.82],g=>{cyl(g,'luminous-core-lens',.15,.18,.06,glass);sphere(g,'white-hot-core',[.105,.105,.06],[0,0,.05],new THREE.MeshStandardMaterial({color:0xe7ffff,emissive:0x8beaff,emissiveIntensity:8,roughness:.08}));for(let i=0;i<6;i++){let q=i*Math.PI/3,p=rounded(g,'core-brace-'+i,[.035,.09,.035],[Math.cos(q)*.14,Math.sin(q)*.14,.03],titanium,.01);p.rotation.z=q}});
+ assembly.userData.explodedParts=exploded;return assembly;
+}
+export function setReactorExploded(reactor,amount){if(!reactor?.userData.explodedParts)return;for(const part of reactor.userData.explodedParts){part.position.copy(part.userData.home).addScaledVector(part.userData.explode,amount);part.rotation.z=amount*part.userData.explode.x*.35;part.rotation.x=amount*part.userData.explode.y*.25}}
 export function createArmor(){
 const root=new THREE.Group();root.name='JARVIS_ARMOR_PROCEDURAL';const body=new THREE.Group();body.name='armor-rig';root.add(body);
 const core= new THREE.Group();core.name='core-frame';body.add(core);
@@ -31,10 +39,10 @@ rounded(core,'abdominal-frame',[.44,.48,.22],[0,.98,.04],dark,.06);
 for(let i=0;i<3;i++)rounded(core,'abdomen-segment-'+i,[.42-i*.035,.11,.24],[0,1.22-i*.14,.12],graphite,.035);
 reactor(core);
 addPart(body,'chest-armor',[0,1.55,.18],[0,.18,.58],g=>{
-const chest=rounded(g,'upper-chest',[1.18,.65,.26],[0,.08,0],gold,.12);chest.rotation.z=0;
-rounded(g,'sternum-ridge',[.18,.43,.12],[0,-.02,.17],goldBright,.04);
-rounded(g,'left-chest-plate',[.48,.38,.12],[-.33,.06,.14],goldBright,.08).rotation.z=.16;
-rounded(g,'right-chest-plate',[.48,.38,.12],[.33,.06,.14],goldBright,.08).rotation.z=-.16;
+const chest=rounded(g,'upper-chest',[1.18,.65,.26],[0,.08,0],red,.12);chest.rotation.z=0;
+rounded(g,'sternum-ridge',[.18,.43,.12],[0,-.02,.17],graphite,.04);
+rounded(g,'left-chest-plate',[.48,.38,.12],[-.33,.06,.14],red,.08).rotation.z=.16;
+rounded(g,'right-chest-plate',[.48,.38,.12],[.33,.06,.14],red,.08).rotation.z=-.16;
 tube(g,'chest-edge-left',[[-.55,.25,.17],[-.4,.34,.16],[-.12,.27,.16]],.018,graphite);
 tube(g,'chest-edge-right',[[.55,.25,.17],[.4,.34,.16],[.12,.27,.16]],.018,graphite);
 });
@@ -95,14 +103,14 @@ rounded(g,label+'-sole',[.4,.07,.43],[0,-.29,.1],dark,.025);
 });
 }
 addPart(body,'helmet',[0,2.28,.08],[0,.2,.55],g=>{
-sphere(g,'helmet-shell',[.31,.38,.3],[0,.02,0],goldBright);
-rounded(g,'helmet-faceplate',[.43,.32,.28],[0,-.11,.15],red,.1);
-rounded(g,'face-mask',[.32,.21,.1],[0,-.19,.23],gold,.06);
+sphere(g,'helmet-shell',[.31,.38,.3],[0,.02,0],red);
+rounded(g,'helmet-faceplate',[.43,.32,.28],[0,-.11,.15],goldBright,.1);
+rounded(g,'face-mask',[.32,.21,.1],[0,-.19,.23],goldBright,.06);
 rounded(g,'chin-plate',[.22,.09,.1],[0,-.27,.22],goldBright,.035);
 const eyeMat=new THREE.MeshStandardMaterial({color:0xcdfbff,emissive:0x63dfff,emissiveIntensity:4,roughness:.1});
 for(const s of [-1,1]){const eye=rounded(g,'eye-'+s,[.13,.035,.035],[s*.11,-.08,.25],eyeMat,.015);eye.rotation.z=s*.1}
-rounded(g,'helmet-crown',[.32,.12,.24],[0,.25,.04],gold,.05);
-for(const s of [-1,1])rounded(g,'temple-panel-'+s,[.12,.24,.19],[s*.27,.02,.02],red,.04);
+rounded(g,'helmet-crown',[.32,.12,.24],[0,.25,.04],red,.05;
+for(const s of [-1,1])rounded(g,'temple-panel-'+s,[.12,.24,.19],[s*.27,.02,.02],goldBright,.04);
 });
 const rear=addPart(body,'backpack-reactor',[0,1.45,-.25],[0,.18,-.5],g=>{
 rounded(g,'backplate',[.55,.75,.18],[0,0,0],dark,.08);
