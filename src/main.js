@@ -47,6 +47,10 @@ const dustGeo=new THREE.BufferGeometry();dustGeo.setAttribute('position',new THR
 const dustMat=new THREE.PointsMaterial({color:0x83dfff,size:mobile?.018:.026,transparent:true,opacity:.42,depthWrite:false,blending:THREE.AdditiveBlending});const dust=new THREE.Points(dustGeo,dustMat);scene.add(dust);
 const armor=createArmor();world.add(armor);let activeArmor=armor;
 armor.traverse(o=>{if(o.isMesh){o.material=o.material.clone();o.castShadow=!mobile;o.receiveShadow=!mobile}});
+// The procedural armor is deliberately hidden: the hero is the supplied cinematic reference image.
+// Detach the detailed reactor assembly so the camera can reveal it as a separate 3D object.
+const reactorObject=armor.userData.reactor;
+if(reactorObject){reactorObject.parent?.remove(reactorObject);world.add(reactorObject);reactorObject.scale.setScalar(2.35);reactorObject.visible=false;}
 const assetPipeline={draco:new DRACOLoader(),ktx2:new KTX2Loader().setTranscoderPath('https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/basis/').detectSupport(renderer),gltf:new GLTFLoader()};
 assetPipeline.draco.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/');assetPipeline.gltf.setDRACOLoader(assetPipeline.draco);assetPipeline.gltf.setKTX2Loader(assetPipeline.ktx2);
 function disposeLoaded(root){root.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){const mats=Array.isArray(o.material)?o.material:[o.material];mats.forEach(m=>{for(const k of ['map','normalMap','roughnessMap','metalnessMap','aoMap','emissiveMap'])if(m[k])m[k].dispose();m.dispose()})}})}
@@ -96,10 +100,10 @@ function applyCinematic(p){
    activeArmor.position.copy(home).add(new THREE.Vector3(0,-suitFracture*.08,0));
    fractureTrails.visible=false;
  }
- const reactorObject=armor.userData.reactor;
  if(reactorObject){
+   reactorObject.visible=reactorReveal>.015;
    reactorObject.rotation.z=motionTime*.18;
-   reactorObject.scale.setScalar(1+reactorReveal*.14);
+   reactorObject.scale.setScalar(2.35+reactorReveal*.32);
    setReactorExploded(reactorObject,reactorExplode);
  }
  reactorLight.intensity=4+reactorReveal*12+reactorExplode*8+reactorClose*12;
@@ -122,7 +126,8 @@ function applyCinematic(p){
  progressFill.style.width=(p*100).toFixed(2)+'%';if(sceneCopy)sceneCopy.style.opacity=1-smooth(.16,.34,p);
 }
 const lenis=new Lenis({duration:reduceMotion?0.8:mobile?1.05:1.22,smoothWheel:!reduceMotion,smoothTouch:false,lerp:reduceMotion?1:mobile?.085:.07,gestureOrientation:'vertical',wheelMultiplier:1});lenis.on('scroll',ScrollTrigger.update);gsap.ticker.add(t=>lenis.raf(t*1000));gsap.ticker.lagSmoothing(0);
-ScrollTrigger.create({trigger:document.querySelector('main'),start:'top top',end:'bottom bottom',scrub:reduceMotion?0:1.15,onUpdate:s=>{state.target=s.progress}});const entryGate=document.querySelector('#entry-gate'),enterButton=document.querySelector('#enter-experience'),sceneCopy=document.querySelector('#scene-copy');
+const heroJourney=document.querySelector('#armor-intro');
+ScrollTrigger.create({trigger:heroJourney,start:'top top',end:'bottom bottom',scrub:reduceMotion?0:1.15,onUpdate:s=>{state.target=s.progress}});const entryGate=document.querySelector('#entry-gate'),enterButton=document.querySelector('#enter-experience'),sceneCopy=document.querySelector('#scene-copy');
 document.body.classList.add('entry-locked');lenis.stop();
 enterButton?.addEventListener('click',()=>{entryGate?.classList.add('dismissed');document.body.classList.remove('entry-locked');lenis.start();state.entered=true;if(sceneCopy)gsap.fromTo(sceneCopy,{x:-18,opacity:0},{x:0,opacity:1,duration:1.15,ease:'power3.out'});});
 
