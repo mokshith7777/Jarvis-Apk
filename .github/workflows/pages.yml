@@ -62,7 +62,7 @@ jobs:
               if tag=='script' and self.active: self.active=False
             def handle_data(self, data):
               if self.active: self.parts.append(data)
-          parser=InlineScriptExtractor(); parser.feed(Path('index.html').read_text()); Path(os.environ['RUNNER_TEMP']) / 'inline-script.js'; (Path(os.environ['RUNNER_TEMP']) / 'inline-script.js').write_text('\n'.join(parser.parts))
+          parser=InlineScriptExtractor(); parser.feed(Path('index.html').read_text()); Path(os.environ['RUNNER_TEMP'], 'inline-script.js').write_text('\n'.join(parser.parts))
           PY
           node --check < "$RUNNER_TEMP/inline-script.js"
           python3 - <<'PY'
