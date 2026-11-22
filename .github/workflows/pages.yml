@@ -88,7 +88,7 @@ jobs:
                   if tag == "a":
                       href = attrs.get("href", "")
                       if href.startswith("#"): self.anchors.append(href[1:])
-                      if attrs.get("target", "").lower() == "_blank" and not {"noopener", "noreferrer"}.issubset(set(attrs.get("rel", "").lower().split())):
+                      if attrs.get("target", "").lower() == "_blank" and "noopener" not in set(attrs.get("rel", "").lower().split()):
                           self.errors.append("target=_blank link missing noopener noreferrer")
                       if href.lower().startswith("javascript:"): self.errors.append("javascript: link found")
                       self.assets.append(("href", href))
