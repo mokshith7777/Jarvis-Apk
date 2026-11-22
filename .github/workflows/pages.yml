@@ -88,6 +88,19 @@ jobs:
           cmp -s index.html "$RUNNER_TEMP/pages/index.html"
           test -s "$RUNNER_TEMP/pages/src/main.js"\n          test -s "$RUNNER_TEMP/pages/src/armor.js"\n          test -s "$RUNNER_TEMP/pages/styles/cinematic.css"\n          test "$(find "$RUNNER_TEMP/pages" -mindepth 1 -maxdepth 1 | wc -l)" -eq 4
           echo "Pages artifact allowlist: index.html, .nojekyll, src/, styles/."
+
+# Runtime artifact exact allowlist: no hidden files except Pages' .nojekyll.
+      - name: Verify runtime artifact allowlist
+        run: |
+          set -euo pipefail
+          expected="$RUNNER_TEMP/expected-artifact-files"
+          actual="$RUNNER_TEMP/actual-artifact-files"
+          printf '%s\n' .nojekyll index.html src/armor.js src/main.js styles/cinematic.css | sort > "$expected"
+          find "$RUNNER_TEMP/pages" -type f -printf '%P\n' | sort > "$actual"
+          diff -u "$expected" "$actual"
+          test ! -e "$RUNNER_TEMP/pages/src/.hidden"
+          test ! -e "$RUNNER_TEMP/pages/styles/.hidden"
+
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
