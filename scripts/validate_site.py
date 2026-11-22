@@ -218,8 +218,8 @@ check("import './armor.js'" not in MAIN and "from './armor.js'" in MAIN, "Local 
 
 # Runtime coverage warnings: source modules are audited but not necessarily deployed.
 WORKFLOW = (ROOT / ".github/workflows/pages.yml").read_text(encoding="utf-8")
-main_runtime_loaded = bool(re.search(r"<script[^>]+src=[\"'][^\"']*src/main\\.js", HTML, re.I) or "src/main.js" in HTML)
-single_file_artifact = bool(re.search(r"cp index\\.html \\.nojekyll", WORKFLOW))
+main_runtime_loaded = bool(re.search(r"<script[^>]+src=[\"'][^\"']*src/main\.js", HTML, re.I) or "src/main.js" in HTML)
+single_file_artifact = bool(re.search(r"cp index\.html \.nojekyll", WORKFLOW))
 if not main_runtime_loaded and single_file_artifact:
     print("THREE.JS RUNTIME NOT DEPLOYED: src/main.js and src/armor.js are source-audited only; the Pages artifact ships index.html and .nojekyll. Three.js fallback/HUD/context-recovery checks do not prove active runtime behavior.")
 if "webglcontextlost" in HTML and "webglcontextrestored" not in HTML:
