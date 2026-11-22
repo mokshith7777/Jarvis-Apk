@@ -205,7 +205,7 @@ check("Questions, answered." in HTML and "Bring JARVIS online." in HTML, "FAQ or
 MAIN = (ROOT / "src/main.js").read_text(encoding="utf-8")
 ARMOR = (ROOT / "src/armor.js").read_text(encoding="utf-8")
 CSS = (ROOT / "styles/cinematic.css").read_text(encoding="utf-8")
-check("ScrollTrigger.create({start:0,end:()=>Math.max(1,ScrollTrigger.maxScroll(window))" in MAIN, "Cinematic progress must track the full document scroll")
+check("scrollTrigger:{start:0,end:()=>Math.max(1,ScrollTrigger.maxScroll(window))" in MAIN, "Cinematic progress must track the full document scroll")
 check("lerp:reduceMotion?1:mobile?.14:.12" in MAIN, "Lenis scroll interpolation must be tuned for responsive smoothness")
 check("1-Math.exp(-13*delta)" in MAIN, "Cinematic camera progress must use frame-rate-independent damping")
 check("scrub:reduceMotion?false:0.25" in MAIN, "ScrollTrigger scrub should remain responsive without excessive lag")
