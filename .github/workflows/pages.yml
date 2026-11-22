@@ -248,9 +248,9 @@ jobs:
           if comment or quote or depth:
               raise SystemExit(f"CSS balance failed: comment={comment}, quote={quote}, depth={depth}")
           print("CSS structure check passed.")
+          PY
           cp index.html "$RUNNER_TEMP/storefront-parse.html"
           npx --yes prettier@3.5.3 --parser html --write "$RUNNER_TEMP/storefront-parse.html"
-          PY
       - name: Configure Pages
         uses: actions/configure-pages@v6
       - name: Upload site
