@@ -8,19 +8,20 @@ const target=process.argv[2];
 if(!target||!packageRoot)throw new Error('Usage: runtime_smoke.cjs URL PLAYWRIGHT_NODE_MODULES [full|live]');
 const {chromium}=require(path.join(packageRoot,'playwright'));
 const browserArgs=['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader','--disable-gpu-sandbox','--enable-unsafe-swiftshader'];
+(async()=>{
 const browser=await chromium.launch({headless:true,args:browserArgs});
 async function openAndVerify(page,label){
  const pageErrors=[],failedModules=[];
  page.on('pageerror',e=>pageErrors.push(e.message));
  page.on('requestfailed',r=>{if(/three|gsap|lenis|main\.js|armor\.js/i.test(r.url()))failedModules.push(r.url()+': '+r.failure()?.errorText)});
  await page.goto(target,{waitUntil:'domcontentloaded',timeout:90000});
- await page.waitForFunction(()=>['active','fallback'].includes(window.__JARVIS_RUNTIME__?.status),{timeout:45000}).catch(()=>{});
+ await page.waitForFunction(()=>['active','fallback'].includes(window.__JARVIS_RUNTIME__?.status),null,{timeout:45000}).catch(()=>{});
  const runtime=await page.evaluate(()=>window.__JARVIS_RUNTIME__||null);
  assert(runtime&&runtime.status==='active',label+' runtime did not execute Three.js: '+JSON.stringify(runtime)+' pageErrors='+pageErrors.join(' | ')+' moduleRequests='+failedModules.join(' | '));
  assert.equal(runtime.renderer,'three',label+' renderer marker');
  assert(runtime.webglVersion>=1,label+' WebGL context version missing');
  assert.equal(runtime.canvasId,'cinematic-world',label+' renderer canvas marker');
- await page.waitForFunction(()=>window.__JARVIS_RUNTIME__?.frames>=3,{timeout:15000});
+ await page.waitForFunction(()=>window.__JARVIS_RUNTIME__?.frames>=3,null,{timeout:15000});
  assert.equal(pageErrors.length,0,label+' uncaught browser exceptions: '+pageErrors.join(' | '));
  return runtime;
 }
@@ -34,12 +35,12 @@ try{
  if(mode==='full'){
   assert(contextInfo.extension,'WEBGL_lose_context extension unavailable in CI browser');
   await desktop.evaluate(()=>{window.__smokeContext=document.querySelector('#cinematic-world').getContext('webgl2').getExtension('WEBGL_lose_context');window.__smokeContext.loseContext()});
-  await desktop.waitForFunction(()=>window.__JARVIS_RUNTIME__?.status==='context-lost',{timeout:10000});
+  await desktop.waitForFunction(()=>window.__JARVIS_RUNTIME__?.status==='context-lost',null,{timeout:10000});
   assert.equal(await desktop.locator('#fallback').isVisible(),true,'fallback must become visible on context loss');
   await desktop.evaluate(()=>window.__smokeContext.restoreContext());
-  await desktop.waitForFunction(()=>window.__JARVIS_RUNTIME__?.status==='active'&&window.__JARVIS_RUNTIME__?.contextRestorations>=1,{timeout:20000});
+  await desktop.waitForFunction(()=>window.__JARVIS_RUNTIME__?.status==='active'&&window.__JARVIS_RUNTIME__?.contextRestorations>=1,null,{timeout:20000});
   assert.equal(await desktop.locator('#fallback').isVisible(),false,'fallback must hide after successful context restoration');
-  await desktop.waitForFunction(()=>window.__JARVIS_RUNTIME__?.frames>=3,{timeout:15000});
+  await desktop.waitForFunction(()=>window.__JARVIS_RUNTIME__?.frames>=3,null,{timeout:15000});
   const demo=desktop.locator('.demo-tab[data-demo="providers"]');await demo.click();
   assert(await demo.evaluate(e=>e.classList.contains('active')),'demo tab should become active');
   assert((await desktop.locator('#demoscreen').innerText()).includes('Choose the engine.'),'demo tab content should update');
@@ -59,7 +60,7 @@ try{
   const sound=desktop.locator('#sound-toggle');assert.equal(await sound.getAttribute('aria-pressed'),'false','sound effects must start off');
   await sound.click();assert.equal(await sound.getAttribute('aria-pressed'),'true','sound toggle should enable');await sound.click();assert.equal(await sound.getAttribute('aria-pressed'),'false','sound toggle should disable');
   await desktop.mouse.move(420,360);await desktop.waitForTimeout(150);
-  const pointerX=await desktop.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--pointer-x'));
+  const pointerX=await desktop.evaluate(()=>getComputedStyle(document.body).getPropertyValue('--pointer-x'));
   assert(pointerX.trim(),'hero pointer parallax should respond to pointer movement');
   await desktop.locator('a[href="#pricing"]').first().click();assert.equal(new URL(desktop.url()).hash,'#pricing','hero CTA should navigate to pricing anchor');
   await desktop.locator('#story').scrollIntoViewIfNeeded();await desktop.waitForTimeout(600);
@@ -75,3 +76,4 @@ try{
  console.log('Visual acceptance is NOT assessed by this automated browser smoke; realistic cinematic media still requires human review.');
 }catch(error){console.error('BROWSER RUNTIME SMOKE FAILED:',error.stack||error);process.exitCode=1}
 finally{await browser.close()}
+})().catch(error=>{console.error('BROWSER SMOKE SETUP FAILED:',error.stack||error);process.exitCode=1});

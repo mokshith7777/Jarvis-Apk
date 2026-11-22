@@ -63,6 +63,9 @@ jobs:
           for js in "$RUNNER_TEMP"/parse/inline-*.js; do node --check --input-type=module < "$js"; done
           node --check --input-type=module < src/main.js
           node --check --input-type=module < src/armor.js
+          node --check scripts/runtime_smoke.cjs
+          cp scripts/runtime_smoke.cjs "$RUNNER_TEMP/runtime-smoke-parse.cjs"
+          npx --yes prettier@3.5.3 --parser babel --write "$RUNNER_TEMP/runtime-smoke-parse.cjs"
           cp index.html "$RUNNER_TEMP/index-parse.html"
           npx --yes prettier@3.5.3 --parser html --write "$RUNNER_TEMP/index-parse.html"
           for js in "$RUNNER_TEMP"/parse/inline-*.js src/main.js src/armor.js; do
