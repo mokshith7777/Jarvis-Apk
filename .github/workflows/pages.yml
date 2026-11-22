@@ -30,7 +30,7 @@ jobs:
           test -s styles/cinematic.css
           test -s src/main.js
           test -s src/armor.js
-          test -s .nojekyll
+          test -f .nojekyll
       - name: Syntax checks
         run: |
           node --input-type=module --check < src/main.js
