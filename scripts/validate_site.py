@@ -190,6 +190,7 @@ check("armor-image" in HTML and "reactor-transition" in HTML, "Scroll zoom / rea
 check("requestAnimationFrame(render)" in HTML and "armor-scroll" in HTML, "Scroll-driven animation code missing")
 check("prefers-reduced-motion" in HTML, "Reduced motion handling missing")
 check('.atmo-grid{display:none!important}' in HTML, 'Abstract background grid overlay must remain disabled')
+check('#background-canvas,#scene-canvas,#jarvis-world,.techfield-orb,.web-lattice,.cinematic-techfield{display:none!important}' in HTML, 'Legacy abstract techfield and canvases must remain hidden')
 check('body.cinematic-motion-ready .reveal{opacity:0}' in HTML, 'GSAP reveal CSS readiness gate missing')
 check("document.querySelectorAll('.revealline').forEach(el=>observer.observe(el))" in HTML, 'Legacy observer must not animate GSAP reveal elements')
 check('.reveal.visible' not in HTML and '.setup-station .reveal.visible' not in HTML, 'Legacy CSS reveal animation conflicts with GSAP')
