@@ -17,7 +17,7 @@ async function installPinnedDependencyRoute(page){
   const pathname=new URL(route.request().url()).pathname;
   let relative=null,packageName=null;
   if(pathname.startsWith('/npm/three@0.170.0/')){packageName='three';relative=pathname.slice('/npm/three@0.170.0/'.length);}
-  else if(pathname.startsWith('/npm/gsap@3.12.7/')){packageName='gsap';relative=pathname.slice('/npm/gsap@3.12.7/'.length);if(relative==='+esm')relative='index.js';else if(relative==='ScrollTrigger/+esm')relative='ScrollTrigger.js';}
+  else if(pathname.startsWith('/npm/gsap@3.12.7/')){packageName='gsap';relative=pathname.slice('/npm/gsap@3.12.7/'.length);if(relative==='+esm')relative='index.js';else if(relative==='ScrollTrigger/+esm')relative='ScrollTrigger.js';else if(relative==='ScrollTrigger/Observer.js')relative='Observer.js';}
   else if(pathname.startsWith('/npm/lenis@1.1.16/')){packageName='lenis';relative=pathname.slice('/npm/lenis@1.1.16/'.length);if(relative==='+esm')relative='dist/lenis.mjs';}
   if(!packageName||!relative){dependencyFailures.push('unmapped '+pathname);return route.abort();}
   const file=path.resolve(packageRoot,packageName,relative);
