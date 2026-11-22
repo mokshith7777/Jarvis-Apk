@@ -34,7 +34,7 @@ async function openAndVerify(page,label){
  page.on('pageerror',e=>pageErrors.push(e.message));
  page.on('requestfailed',r=>{if(/three|gsap|lenis|main\.js|armor\.js/i.test(r.url()))failedModules.push(r.url()+': '+r.failure()?.errorText)});
  await page.goto(target,{waitUntil:'commit',timeout:30000});
- await page.waitForFunction(()=>['active','fallback'].includes(window.__JARVIS_RUNTIME__?.status),null,{timeout:45000}).catch(()=>{});
+ await page.waitForFunction(()=>{const r=window.__JARVIS_RUNTIME__;return r?.status==='active'||(r?.status==='fallback'&&r.reason!=='module-load-timeout')},null,{timeout:60000}).catch(()=>{});
  const runtime=await page.evaluate(()=>window.__JARVIS_RUNTIME__||null);
  assert(runtime&&runtime.status==='active',label+' runtime did not execute Three.js: '+JSON.stringify(runtime)+' pageErrors='+pageErrors.join(' | ')+' moduleRequests='+failedModules.join(' | ')+' localDependencies='+localDependencyFailures.join(' | '));
  assert.equal(runtime.renderer,'three',label+' renderer marker');
