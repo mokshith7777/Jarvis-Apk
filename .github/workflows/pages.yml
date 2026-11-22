@@ -256,11 +256,14 @@ jobs:
       - name: Upload site
         uses: actions/upload-pages-artifact@v5
         with:
+          name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
           path: .
           include-hidden-files: true
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v5
+        with:
+          artifact_name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Verify live Pages response and deployed source
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
