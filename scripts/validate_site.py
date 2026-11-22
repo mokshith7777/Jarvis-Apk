@@ -174,7 +174,7 @@ if len(maps) == 1:
     try:
         importmap = json.loads(maps[0])
         imports = importmap.get("imports", {})
-        check("/0.170.0/" in imports.get("three", "") and "/0.170.0/" in imports.get("three/addons/", ""), "Three.js import map version must be pinned")
+        check("three@0.170.0/" in imports.get("three", "") and "three@0.170.0/" in imports.get("three/addons/", ""), "Three.js import map version must be pinned")
     except (ValueError, AttributeError):
         fail("Import map JSON is invalid")
 uses = re.findall(r"^\s*uses:\s*([^\s#]+)", WORKFLOW, re.M)
