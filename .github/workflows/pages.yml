@@ -20,6 +20,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+      - name: Validate GitHub Actions workflow syntax
+        run: |
+          curl -fsSL https://github.com/rhysd/actionlint/releases/download/v1.7.7/actionlint_1.7.7_linux_amd64.tar.gz -o "$RUNNER_TEMP/actionlint.tar.gz"
+          tar -xzf "$RUNNER_TEMP/actionlint.tar.gz" -C "$RUNNER_TEMP" actionlint
+          "$RUNNER_TEMP/actionlint" .github/workflows/pages.yml
       - name: Validate storefront files
         run: |
           test -s index.html
@@ -58,6 +63,95 @@ jobs:
               raise SystemExit(1)
           print(f"Static audit passed: {len(ids)} IDs, {len(anchors)} anchors, {steps} setup steps.")
           PY
+      - name: Audit HTML semantics, accessibility, security and local assets
+        run: |
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          from urllib.parse import urlsplit
+          import re
+
+          html = Path("index.html").read_text(encoding="utf-8")
+          class Audit(HTMLParser):
+              def __init__(self):
+                  super().__init__(convert_charrefs=True)
+                  self.ids, self.anchors, self.tags = [], [], []
+                  self.buttons, self.controls, self.labels = [], [], set()
+                  self.button_stack, self.label_depth = [], 0
+                  self.assets, self.errors = [], []
+              def handle_starttag(self, tag, attrs):
+                  attrs = dict(attrs)
+                  self.tags.append(tag)
+                  if attrs.get("id"): self.ids.append(attrs["id"])
+                  if tag == "label" and attrs.get("for"): self.labels.add(attrs["for"])
+                  if tag == "label": self.label_depth += 1
+                  if tag == "a":
+                      href = attrs.get("href", "")
+                      if href.startswith("#"): self.anchors.append(href[1:])
+                      if attrs.get("target", "").lower() == "_blank" and not {"noopener", "noreferrer"}.issubset(set(attrs.get("rel", "").lower().split())):
+                          self.errors.append("target=_blank link missing noopener noreferrer")
+                      if href.lower().startswith("javascript:"): self.errors.append("javascript: link found")
+                      self.assets.append(("href", href))
+                  if tag in ("img", "script", "source", "video", "audio"):
+                      self.assets.append((tag, attrs.get("src", "")))
+                  if tag == "img" and "alt" not in attrs: self.errors.append("image missing alt text")
+                  if tag == "button":
+                      self.button_stack.append({"text": "", "aria": attrs.get("aria-label", ""), "title": attrs.get("title", "")})
+                  if tag in ("input", "select", "textarea"):
+                      typ = attrs.get("type", "").lower()
+                      if typ != "hidden":
+                          named = bool(attrs.get("aria-label") or attrs.get("aria-labelledby") or attrs.get("title") or self.label_depth or attrs.get("id") in self.labels)
+                          self.controls.append((tag, typ, named))
+                  if any(k.lower().startswith("on") for k in attrs):
+                      self.errors.append(f"inline event handler on <{tag}>")
+              def handle_data(self, data):
+                  for b in self.button_stack: b["text"] += data
+              def handle_endtag(self, tag):
+                  if tag == "button" and self.button_stack:
+                      b = self.button_stack.pop()
+                      if not (b["text"].strip() or b["aria"].strip() or b["title"].strip()):
+                          self.errors.append("button has no accessible name")
+                  if tag == "label": self.label_depth = max(0, self.label_depth - 1)
+
+          p = Audit(); p.feed(html)
+          ids = set(p.ids)
+          duplicates = sorted({x for x in p.ids if p.ids.count(x) > 1})
+          broken = sorted(set(x for x in p.anchors if x not in ids))
+          counts = {tag: p.tags.count(tag) for tag in ("html", "main", "header", "footer", "section", "h1", "h2")}
+          if duplicates: p.errors.append("duplicate IDs: " + ", ".join(duplicates))
+          if broken: p.errors.append("broken fragment links: " + ", ".join(broken))
+          if counts["html"] != 1 or counts["main"] != 1 or counts["header"] < 1 or counts["footer"] < 1 or counts["section"] < 4 or counts["h1"] != 1 or counts["h2"] < 4:
+              p.errors.append(f"semantic landmark/heading counts invalid: {counts}")
+          if not re.search(r'<html\b[^>]*\blang=["\'][^"\']+["\']', html, re.I): p.errors.append("html lang missing")
+          if not re.search(r'<title>[^<]+</title>', html, re.I): p.errors.append("title missing")
+          if not re.search(r'<meta\b[^>]*name=["\']viewport["\']', html, re.I): p.errors.append("viewport meta missing")
+          for tag, typ, named in p.controls:
+              if not named: p.errors.append(f"accessible name missing: {tag} {typ}")
+          root = Path(".")
+          for kind, raw in p.assets:
+              if not raw: continue
+              u = urlsplit(raw)
+              if u.scheme or u.netloc or raw.startswith("#") or raw.startswith("data:") or raw.startswith("mailto:") or raw.startswith("tel:"): continue
+              target = (root / u.path.lstrip("/")) if u.path.startswith("/") else (root / u.path)
+              if not target.exists(): p.errors.append(f"missing local asset/reference: {kind}={raw}")
+          css = re.search(r'<style>([\s\S]*?)</style>', html, re.I)
+          if css:
+              for raw in re.findall(r'url\(([^)]*)\)', css.group(1), re.I):
+                  value = raw.strip(" \t\r\n\"'")
+                  u = urlsplit(value)
+                  if not u.scheme and not u.netloc and value and not value.startswith("data:") and not (root / u.path.lstrip("/")).exists():
+                      p.errors.append("missing CSS asset: " + value)
+          for required in ('id="pricing"', 'id="purchase"', 'id="setup"', '₹19', 'id="devicefamily"', 'id="setup-reset"'):
+              if required not in html: p.errors.append("required storefront feature missing: " + required)
+          if not re.search(r'prefers-reduced-motion', html): p.errors.append("reduced-motion rule missing")
+          if not re.search(r'@media\s*\(\s*max-width', html): p.errors.append("responsive breakpoint missing")
+          if re.search(r'\beval\s*\(|new\s+Function\s*\(', html): p.errors.append("unsafe dynamic JavaScript evaluation found")
+          if not Path(".nojekyll").is_file(): p.errors.append(".nojekyll missing")
+          if p.errors:
+              print("\n".join("FAIL: " + x for x in p.errors))
+              raise SystemExit(1)
+          print(f"HTML/accessibility/security audit passed: {len(ids)} unique IDs, {len(p.anchors)} fragment links, {counts} landmarks.")
+          PY
       - name: Validate JavaScript and cinematic interactions
         run: |
           python3 - <<'PY'
@@ -73,7 +167,10 @@ jobs:
           Path("/tmp/storefront.js").write_text(scripts[0])
           Path("/tmp/cinematic-world.js").write_text(modules[0])
           ids = set(re.findall(r'\bid="([^"]+)"', html))
-          js_ids = set(re.findall(r"getElementById\('([^']+)'\)", scripts[0] + modules[0]))
+          js = scripts[0] + modules[0]
+          js_ids = set(re.findall(r"getElementById\(\s*['\"]([^'\"]+)['\"]\s*\)", js))
+          selectors = re.findall(r"(?:querySelector|querySelectorAll)\(\s*['\"]([^'\"]+)['\"]\s*\)", js)
+          js_ids.update(x[1:] for x in selectors if x.startswith("#") and re.match(r"#[A-Za-z_][\w-]*$", x))
           missing = sorted(js_ids - ids)
           if missing:
               raise SystemExit(f"JS references missing HTML IDs: {missing}")
@@ -151,6 +248,8 @@ jobs:
           if comment or quote or depth:
               raise SystemExit(f"CSS balance failed: comment={comment}, quote={quote}, depth={depth}")
           print("CSS structure check passed.")
+          cp index.html "$RUNNER_TEMP/storefront-parse.html"
+          npx --yes prettier@3.5.3 --parser html --write "$RUNNER_TEMP/storefront-parse.html"
           PY
       - name: Configure Pages
         uses: actions/configure-pages@v6
