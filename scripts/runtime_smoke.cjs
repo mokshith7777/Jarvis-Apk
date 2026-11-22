@@ -30,7 +30,7 @@ async function installPinnedDependencyRoute(page){
 (async()=>{
 const browser=await chromium.launch({headless:true,args:browserArgs});
 async function revealBeforeInteraction(page,locator,label){
- await locator.scrollIntoViewIfNeeded();
+ await locator.evaluate(e=>e.scrollIntoView({block:'center',behavior:'instant'}));
  const reveal=await locator.evaluateHandle(e=>e.closest('.reveal')||e);
  await page.waitForFunction(el=>{const cs=getComputedStyle(el);return cs.visibility==='visible'&&Number(cs.opacity)>.95},reveal,{timeout:10000}).catch(async error=>{const details=await reveal.evaluate(el=>({tag:el.tagName,className:el.className,visibility:getComputedStyle(el).visibility,opacity:getComputedStyle(el).opacity,rect:el.getBoundingClientRect().toJSON()}));throw new Error(label+' reveal did not become visible: '+JSON.stringify(details)+'; '+error.message)});
 }
