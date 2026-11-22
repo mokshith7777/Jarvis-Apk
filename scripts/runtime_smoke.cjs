@@ -62,10 +62,12 @@ try{
   await desktop.evaluate(()=>{window.__smokeContext=document.querySelector('#cinematic-world').getContext('webgl2').getExtension('WEBGL_lose_context');window.__smokeContext.loseContext()});
   await desktop.waitForFunction(()=>window.__JARVIS_RUNTIME__?.status==='context-lost',null,{timeout:10000});
   assert.equal(await desktop.locator('#fallback').isVisible(),true,'fallback must become visible on context loss');
+  const framesAtLoss=await desktop.evaluate(()=>window.__JARVIS_RUNTIME__?.frames||0);
   await desktop.evaluate(()=>window.__smokeContext.restoreContext());
   await desktop.waitForFunction(()=>window.__JARVIS_RUNTIME__?.status==='active'&&window.__JARVIS_RUNTIME__?.contextRestorations>=1,null,{timeout:20000});
   assert.equal(await desktop.locator('#fallback').isVisible(),false,'fallback must hide after successful context restoration');
-  await desktop.waitForFunction(()=>window.__JARVIS_RUNTIME__?.frames>=3,null,{timeout:15000});
+  await desktop.waitForFunction(frames=>window.__JARVIS_RUNTIME__?.frames>frames,framesAtLoss,{timeout:15000});
+  assert((await desktop.evaluate(()=>window.__JARVIS_RUNTIME__?.frames||0))>framesAtLoss,'render frames must resume after WebGL context restoration');
   const demo=desktop.locator('.demo-tab[data-demo="providers"]');await revealBeforeInteraction(desktop,demo,'provider demo tab');await demo.click();
   assert(await demo.evaluate(e=>e.classList.contains('active')),'demo tab should become active');
   assert((await desktop.locator('#demoscreen').innerText()).includes('Choose the engine.'),'demo tab content should update');
