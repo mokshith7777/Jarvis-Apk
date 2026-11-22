@@ -8,7 +8,7 @@ import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
 import {ShaderPass} from 'three/addons/postprocessing/ShaderPass.js';
 import {BokehPass} from 'three/addons/postprocessing/BokehPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
-import {createArmor,setExploded,disposeArmor} from './armor.js';
+import {createArmor,setExploded,setReactorExploded,disposeArmor} from './armor.js';
 import Lenis from 'https://cdn.jsdelivr.net/npm/lenis@1.1.16/+esm';
 import {gsap} from 'https://cdn.jsdelivr.net/npm/gsap@3.12.7/+esm';
 import {ScrollTrigger} from 'https://cdn.jsdelivr.net/npm/gsap@3.12.7/ScrollTrigger/+esm';
@@ -59,12 +59,68 @@ function updateTrails(amount){const arr=trailGeo.attributes.position.array;armor
 const filmShader={uniforms:{tDiffuse:{value:null},uTime:{value:0},uAmount:{value:.0015},uAberration:{value:.0018}},vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',fragmentShader:'varying vec2 vUv;uniform sampler2D tDiffuse;uniform float uTime;uniform float uAmount;uniform float uAberration;float hash(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}void main(){vec2 d=vUv-.5;float r=length(d);vec2 off=d*uAberration*(1.0+r*2.0);vec3 c;c.r=texture2D(tDiffuse,vUv+off).r;c.g=texture2D(tDiffuse,vUv).g;c.b=texture2D(tDiffuse,vUv-off).b;float grain=(hash(vUv*vec2(1920.,1080.)+uTime)-.5)*uAmount;c+=grain;float vig=1.0-smoothstep(.42,.78,r)*.16;c*=vig;gl_FragColor=vec4(c,1.);}'};
 const composer=new EffectComposer(renderer);composer.addPass(new RenderPass(scene,camera));const bloom=new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight),mobile?.35:.72,.65,.22);composer.addPass(bloom);const film=new ShaderPass(filmShader);composer.addPass(film);let bokeh=null;if(!mobile&&!reduceMotion){try{bokeh=new BokehPass(scene,camera,{focus:4.6,aperture:.00009,maxblur:.008});composer.addPass(bokeh)}catch(e){console.warn('DOF unavailable, continuing',e)}}
 const chapters=[{label:'AWAKEN',phase:'01 / AWAKEN'},{label:'APPROACH',phase:'02 / APPROACH'},{label:'FRACTURE',phase:'03 / FRACTURE'},{label:'FLIGHT',phase:'04 / FLIGHT'},{label:'REACTOR',phase:'05 / REACTOR'}];
-const cameraCurve=new THREE.CatmullRomCurve3([new THREE.Vector3(0,1.65,8.6),new THREE.Vector3(.15,1.8,5.8),new THREE.Vector3(0,1.6,3.2),new THREE.Vector3(0,1.65,1.55),new THREE.Vector3(0,1.5,.58),new THREE.Vector3(0,1.5,.42)],false,'catmullrom',.45);
-const targetCurve=new THREE.CatmullRomCurve3([new THREE.Vector3(0,1.3,0),new THREE.Vector3(0,1.5,0),new THREE.Vector3(0,1.5,0),new THREE.Vector3(0,1.45,.1),new THREE.Vector3(0,1.52,.4),new THREE.Vector3(0,1.52,.4)],false,'catmullrom',.4);
+const cameraCurve=new THREE.CatmullRomCurve3([new THREE.Vector3(0,1.55,9.2),new THREE.Vector3(.12,1.7,7.2),new THREE.Vector3(0,1.58,5.25),new THREE.Vector3(0,1.52,3.45),new THREE.Vector3(0,1.52,2.05),new THREE.Vector3(0,1.52,1.2),new THREE.Vector3(0,1.52,.82)],false,'catmullrom',.42);
+const targetCurve=new THREE.CatmullRomCurve3([new THREE.Vector3(0,1.24,0),new THREE.Vector3(0,1.35,.08),new THREE.Vector3(0,1.48,.18),new THREE.Vector3(0,1.52,.28),new THREE.Vector3(0,1.52,.42),new THREE.Vector3(0,1.52,.48),new THREE.Vector3(0,1.52,.48)],false,'catmullrom',.4);
 function smooth(a,b,x){const t=THREE.MathUtils.clamp((x-a)/(b-a),0,1);return t*t*(3-2*t)}
-function phaseAt(p){if(p<.2)return 0;if(p<.42)return 1;if(p<.64)return 2;if(p<.84)return 3;return 4}
-function applyCinematic(p){const motionTime=reduceMotion?0:clock.elapsedTime,intro=reduceMotion?1:smooth(0,2.8,motionTime),approach=smooth(.16,.4,p),fracture=smooth(.4,.62,p),flight=smooth(.62,.84,p),reactor=smooth(.82,1,p);const cp=cameraCurve.getPoint(THREE.MathUtils.clamp(p,0,1)),target=targetCurve.getPoint(THREE.MathUtils.clamp(p,0,1));camera.position.copy(cp);camera.position.x+=state.mouseX*(1-approach)*.18;camera.position.y+=state.mouseY*(1-approach)*.12;camera.lookAt(target);key.position.set(-4+state.mouseX*2,7+state.mouseY*1.2,5+state.mouseY*2);rim.position.set(4+state.mouseX*2.8,5+state.mouseY*1.4,-3);world.position.y=-.04+Math.sin(smooth(0,.12,p)*Math.PI)*.03;world.scale.setScalar(.94+intro*.06-approach*.06);world.rotation.y=state.mouseX*.045*(1-fracture*.8);if(activeArmor===armor){setExploded(armor,fracture);updateTrails(fracture);armor.rotation.y=state.mouseX*.08*(1-fracture);armor.rotation.x=state.mouseY*.04} else {activeArmor.rotation.y=state.mouseX*.05;const parts=activeArmor.userData.explosionParts||[];parts.forEach(part=>{part.position.copy(part.userData.home).addScaledVector(part.userData.explode,fracture);part.rotation.y=fracture*.18});const home=activeArmor.userData.homePosition||new THREE.Vector3();activeArmor.position.copy(home).add(new THREE.Vector3(0,-fracture*.08,0));fractureTrails.visible=false}
-const reactorObject=armor.userData.reactor;if(reactorObject){reactorObject.rotation.z=p*2.2;reactorObject.scale.setScalar(1+reactor*.16)}reactorLight.intensity=5+reactor*22+fracture*4;redRim.intensity=18*(1-fracture*.4)+reactor*4;key.intensity=1.1+intro*3.1-approach*1.4+reactor*.5;rim.intensity=15+intro*40+fracture*25;ambient.intensity=.35+intro*.7-reactor*.25;env.hazeMat.uniforms.uTime.value=motionTime;dust.rotation.y=p*.08;dust.position.z=-flight*1.4;dust.material.opacity=.42+fracture*.15;env.ringLights.forEach((r,i)=>{r.rotation.z=p*(i%2?-.3:.25);r.material.opacity=.4+fracture*.25});beams.forEach((b,i)=>{b.rotation.z=Math.sin(motionTime*.13+i)*.09;b.material.opacity=.035+Math.sin(motionTime*.4+i)*.012+fracture*.025});bloom.strength=(mobile?.35:.72)+fracture*.25+reactor*.4;film.uniforms.uTime.value=motionTime;film.uniforms.uAberration=.0018+fracture*.002+reactor*.002;film.uniforms.uAmount=mobile?.001:.0017;if(bokeh){bokeh.uniforms.focus.value=4.8-approach*3.2+reactor*.5;bokeh.uniforms.aperture.value=.00007+approach*.000035}const ph=phaseAt(p);if(ph!==state.phase){state.phase=ph;chapterNum.textContent=String(ph+1).padStart(2,'0');chapterName.textContent=chapters[ph].label;hudPhase.textContent=chapters[ph].phase}progressFill.style.width=(p*100).toFixed(2)+'%'}
+function phaseAt(p){if(p<.18)return 0;if(p<.5)return 1;if(p<.69)return 2;if(p<.84)return 3;return 4}
+function applyCinematic(p){
+ const motionTime=reduceMotion?0:clock.elapsedTime;
+ const intro=reduceMotion?1:smooth(0,2.8,motionTime);
+ const approach=smooth(.12,.48,p);
+ const suitFracture=smooth(.54,.69,p);
+ const reactorReveal=smooth(.49,.66,p);
+ const reactorExplode=smooth(.66,.83,p);
+ const flight=smooth(.78,.92,p);
+ const reactorClose=smooth(.84,1,p);
+ const cp=cameraCurve.getPoint(THREE.MathUtils.clamp(p,0,1));
+ const target=targetCurve.getPoint(THREE.MathUtils.clamp(p,0,1));
+ camera.position.copy(cp);
+ camera.position.x+=state.mouseX*(1-approach)*.16;
+ camera.position.y+=state.mouseY*(1-approach)*.1;
+ camera.lookAt(target);
+ key.position.set(-4+state.mouseX*2,7+state.mouseY*1.2,5+state.mouseY*2);
+ rim.position.set(4+state.mouseX*2.8,5+state.mouseY*1.4,-3);
+ world.position.y=-.04+Math.sin(smooth(0,.12,p)*Math.PI)*.025;
+ world.scale.setScalar(.94+intro*.06-approach*.025);
+ world.rotation.y=state.mouseX*.045*(1-suitFracture*.8);
+ if(activeArmor===armor){
+   setExploded(armor,suitFracture);
+   updateTrails(suitFracture);
+   armor.rotation.y=state.mouseX*.08*(1-suitFracture);
+   armor.rotation.x=state.mouseY*.04;
+ }else{
+   activeArmor.rotation.y=state.mouseX*.05;
+   const parts=activeArmor.userData.explosionParts||[];
+   parts.forEach(part=>{part.position.copy(part.userData.home).addScaledVector(part.userData.explode,suitFracture);part.rotation.y=suitFracture*.18});
+   const home=activeArmor.userData.homePosition||new THREE.Vector3();
+   activeArmor.position.copy(home).add(new THREE.Vector3(0,-suitFracture*.08,0));
+   fractureTrails.visible=false;
+ }
+ const reactorObject=armor.userData.reactor;
+ if(reactorObject){
+   reactorObject.rotation.z=motionTime*.18;
+   reactorObject.scale.setScalar(1+reactorReveal*.14);
+   setReactorExploded(reactorObject,reactorExplode);
+ }
+ reactorLight.intensity=4+reactorReveal*12+reactorExplode*8+reactorClose*12;
+ redRim.intensity=16*(1-suitFracture*.55)+reactorReveal*3;
+ key.intensity=1.15+intro*3.1-approach*1.35+reactorReveal*.4;
+ rim.intensity=15+intro*40+suitFracture*24+reactorExplode*20;
+ ambient.intensity=.35+intro*.7-reactorReveal*.25;
+ env.hazeMat.uniforms.uTime.value=motionTime;
+ dust.rotation.y=p*.08;dust.position.z=-flight*1.4;
+ dust.material.opacity=.42+reactorExplode*.18;
+ env.ringLights.forEach((r,i)=>{r.rotation.z=p*(i%2?-.3:.25);r.material.opacity=.4+reactorExplode*.25});
+ beams.forEach((b,i)=>{b.rotation.z=Math.sin(motionTime*.13+i)*.09;b.material.opacity=.035+Math.sin(motionTime*.4+i)*.012+reactorExplode*.025});
+ bloom.strength=(mobile?.34:.68)+suitFracture*.2+reactorExplode*.35+reactorClose*.32;
+ film.uniforms.uTime.value=motionTime;
+ film.uniforms.uAberration=.0015+suitFracture*.0015+reactorExplode*.003+reactorClose*.002;
+ film.uniforms.uAmount=mobile?.001:.0016;
+ if(bokeh){bokeh.uniforms.focus.value=5.4-approach*3.4+reactorClose*.5;bokeh.uniforms.aperture.value=.00006+approach*.00003+reactorExplode*.000015}
+ const ph=phaseAt(p);
+ if(ph!==state.phase){state.phase=ph;chapterNum.textContent=String(ph+1).padStart(2,'0');chapterName.textContent=chapters[ph].label;hudPhase.textContent=chapters[ph].phase}
+ progressFill.style.width=(p*100).toFixed(2)+'%';
+}
 const lenis=new Lenis({duration:reduceMotion?0.8:mobile?1.05:1.22,smoothWheel:!reduceMotion,smoothTouch:false,lerp:reduceMotion?1:mobile?.085:.07,gestureOrientation:'vertical',wheelMultiplier:1});lenis.on('scroll',ScrollTrigger.update);gsap.ticker.add(t=>lenis.raf(t*1000));gsap.ticker.lagSmoothing(0);
 ScrollTrigger.create({trigger:document.querySelector('main'),start:'top top',end:'bottom bottom',scrub:reduceMotion?0:1.15,onUpdate:s=>{state.target=s.progress}});
 document.querySelectorAll('.story-spacer').forEach((s,i)=>ScrollTrigger.create({trigger:s,start:'top center',end:'bottom center',onEnter:()=>setChapter(i),onEnterBack:()=>setChapter(i)}));
