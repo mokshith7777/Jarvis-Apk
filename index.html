@@ -205,6 +205,17 @@ document.querySelectorAll('.feature .expand').forEach(button=>{
   button.textContent=expanded?'CLOSE FEATURE −':'EXPLORE FEATURE +';
  });
 });
+// Provider sandbox: tap-select, drag, keyboard activation, and core connection share one state path.
+(()=>{
+ const chips=[...document.querySelectorAll('.chip[data-provider]')],zone=document.getElementById('dropzone'),status=document.getElementById('dropstatus'),instructions=document.getElementById('dropinstructions'),help=document.getElementById('drophelp');
+ if(!zone||!status||!instructions)return;
+ let selected='';
+ function select(provider){selected=provider;chips.forEach(chip=>{const active=chip.dataset.provider===provider;chip.classList.toggle('selected',active);chip.setAttribute('aria-pressed',String(active));});if(help)help.textContent=provider+' selected. Tap the core to simulate connection.';instructions.textContent='Selected: '+provider+' · Tap to connect';}
+ function connect(provider){if(!provider){if(help)help.textContent='Choose a provider tile first.';instructions.textContent='Select a pathway, then tap here';return;}selected=provider;zone.classList.add('connected');status.textContent='SANDBOX CONNECTED / '+provider.toUpperCase();instructions.textContent='Demo connection simulated · '+provider;zone.setAttribute('aria-label','Sandbox connected to '+provider);}
+ chips.forEach(chip=>{chip.setAttribute('role','button');chip.setAttribute('tabindex','0');chip.setAttribute('aria-pressed','false');chip.addEventListener('click',()=>select(chip.dataset.provider));chip.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(chip.dataset.provider);}});chip.addEventListener('dragstart',e=>{selected=chip.dataset.provider;e.dataTransfer?.setData('text/plain',selected);if(e.dataTransfer)e.dataTransfer.effectAllowed='copy';});});
+ zone.addEventListener('click',()=>connect(selected));zone.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();connect(selected);}});
+ zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('dragover');});zone.addEventListener('dragleave',()=>zone.classList.remove('dragover'));zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('dragover');connect(e.dataTransfer?.getData('text/plain')||selected);});
+})();
 document.querySelectorAll('.demo-tab').forEach(tab=>tab.addEventListener('click',()=>{const scenario=demoScenarios[tab.dataset.demo];if(!scenario)return;document.querySelectorAll('.demo-tab').forEach(item=>{const active=item===tab;item.classList.toggle('active',active);item.setAttribute('aria-pressed',String(active))});const screen=document.getElementById('demoscreen');if(screen)screen.innerHTML='<div class="screenlabel">'+scenario.label+'</div><h3>'+scenario.title+'</h3><p>'+scenario.body+'</p>'+scenario.extra;}));
 </script>
 <script type="module" src="./src/main.js"></script>
