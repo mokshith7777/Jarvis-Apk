@@ -13,7 +13,7 @@ const stops=[
 ];
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),smooth=v=>v*v*(3-2*v);
 const M=(c,metal=0,rough=.5,em=0,ei=0)=>new THREE.MeshStandardMaterial({color:c,metalness:metal,roughness:rough,emissive:em,emissiveIntensity:ei});
-const black=M('#090e14',.7,.32),metal=M('#303a44',.82,.3),steel=M('#687884',.8,.25),cyan=M('#8cecff',.4,.2,0x28b8ed,2),redGlow=M('#ff3159',.35,.22,0x7d0b26,2),whiteGlow=M('#d9f8ff',.2,.15,0x6be5ff,1.2),glass=M('#091c2a',.5,.18,0x061b2c,.6);
+const black=M('#090e14',.7,.32),metal=M('#303a44',.82,.3),steel=M('#687884',.8,.25),red=M('#44131d',.75,.3,0x350611,.7),cyan=M('#8cecff',.4,.2,0x28b8ed,2),redGlow=M('#ff3159',.35,.22,0x7d0b26,2),whiteGlow=M('#d9f8ff',.2,.15,0x6be5ff,1.2),glass=M('#091c2a',.5,.18,0x061b2c,.6);
 function canvasTex(w,h,paint){const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');paint(g,w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t;}
 const floorTexture=canvasTex(1024,1024,(g,w,h)=>{g.fillStyle='#151b21';g.fillRect(0,0,w,h);for(let y=0;y<h;y+=128)for(let x=0;x<w;x+=128){g.fillStyle=((x+y)/128%2)?'#1b232b':'#121920';g.fillRect(x+2,y+2,124,124);g.strokeStyle='#394550';g.lineWidth=2;g.strokeRect(x+2,y+2,124,124);}});
 floorTexture.wrapS=floorTexture.wrapT=THREE.RepeatWrapping;floorTexture.repeat.set(3,3);
