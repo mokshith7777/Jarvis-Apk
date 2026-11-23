@@ -36,7 +36,7 @@ jobs:
           test -s index.html
           grep -q 'id="world"' index.html
           grep -q 'id="bottom-nav"' index.html
-          grep -q 'id="content-panel"' index.html
+          grep -q 'id="screen-modal"' index.html
           test -s favicon.svg
           test -s styles/room.css
           grep -q 'function buildRoom' src/room.js
