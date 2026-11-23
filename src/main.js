@@ -53,7 +53,7 @@ for(let i=0;i<dustCount;i++){dustPositions[i*3]=(Math.random()-.5)*22;dustPositi
 const dustGeo=new THREE.BufferGeometry();dustGeo.setAttribute('position',new THREE.BufferAttribute(dustPositions,3));dustGeo.setAttribute('aSize',new THREE.BufferAttribute(dustSizes,1));
 const dustMat=new THREE.PointsMaterial({color:0x83dfff,size:mobile?.018:.026,transparent:true,opacity:.42,depthWrite:false,blending:THREE.AdditiveBlending});const dust=new THREE.Points(dustGeo,dustMat);scene.add(dust);
 const armor=createArmor();world.add(armor);let activeArmor=armor;const armorMaterials=[];armor.visible=false;const reactorAssembly=armor.userData.reactor;
-armor.traverse(o=>{if(o.isMesh){const source=Array.isArray(o.material)?o.material:[o.material],cloned=source.map(m=>{const c=m.clone();if(!reactorAssembly?.contains(o)){c.transparent=true;c.opacity=0;c.depthWrite=false;armorMaterials.push(c)}return c});o.material=Array.isArray(o.material)?cloned:cloned[0];o.castShadow=!mobile;o.receiveShadow=!mobile}});
+armor.traverse(o=>{if(o.isMesh){const source=Array.isArray(o.material)?o.material:[o.material],cloned=source.map(m=>{const c=m.clone();if(!reactorAssembly?.getObjectById(o.id)){c.transparent=true;c.opacity=0;c.depthWrite=false;armorMaterials.push(c)}return c});o.material=Array.isArray(o.material)?cloned:cloned[0];o.castShadow=!mobile;o.receiveShadow=!mobile}});
 // The procedural armor is deliberately hidden: the hero is the supplied cinematic reference image.
 // Detach the detailed reactor assembly so the camera can reveal it as a separate 3D object.
 const reactorObject=armor.userData.reactor;
