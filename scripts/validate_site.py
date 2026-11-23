@@ -25,7 +25,7 @@ for req in ['entry','features','setup','pricing','faq','room-world','enter-room'
  if req not in p.ids:errors.append('missing required id: '+req)
 if p.h1!=1:errors.append('expected exactly one h1')
 if len(p.sections)!=5:errors.append('expected 5 chapter sections, found '+str(len(p.sections)))
-if not (root/'src/room.js').is_file():errors.append('room runtime missing')
+if not (root/'src/room.js').is_file():errors.append('room runtime missing')\nif not (root/'favicon.svg').is_file():errors.append('favicon missing')
 if not (root/'styles/room.css').is_file():errors.append('room CSS missing')
 if 'three@0.180.0' not in html:errors.append('Three.js import map missing')
 if errors:
