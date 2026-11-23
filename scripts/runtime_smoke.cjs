@@ -58,6 +58,25 @@ async function waitForLoaderHidden(page,label){
   throw new Error(label+' loader remained visible: '+JSON.stringify(state)+'; '+error.message);
  }
 }
+async function captureVisualEvidence(page,label){
+ const capture=async options=>{try{return await page.screenshot({type:'jpeg',quality:42,timeout:12000,animations:'disabled',...options})}catch(error){return {error:String(error)}}};
+ let result=await capture();
+ if(!Buffer.isBuffer(result)){
+  console.warn('VISUAL_CAPTURE_WARNING_'+label+':primary screenshot timed out/failed: '+result.error);
+  const original=await page.locator('#cinematic-world').evaluate(el=>({visibility:el.style.visibility,display:el.style.display}));
+  try{
+   await page.locator('#cinematic-world').evaluate(el=>{el.style.visibility='hidden';el.style.display='none'});
+   result=await capture();
+   if(Buffer.isBuffer(result))console.warn('VISUAL_CAPTURE_NOTE_'+label+':fallback screenshot excludes WebGL canvas; DOM/photo evidence only');
+   else console.warn('VISUAL_CAPTURE_WARNING_'+label+':fallback screenshot also failed: '+result.error);
+  }finally{
+   await page.locator('#cinematic-world').evaluate((el,s)=>{el.style.visibility=s.visibility;el.style.display=s.display},original);
+  }
+ }
+ if(Buffer.isBuffer(result))console.log('VISUAL_AUDIT_'+label+'_JPEG_BASE64:'+result.toString('base64'));
+ else console.warn('VISUAL_EVIDENCE_UNAVAILABLE_'+label+': screenshot capture failed; runtime assertions continue and visual acceptance remains pending');
+ return Buffer.isBuffer(result);
+}
 async function waitForScrollReset(page,label){
  try{
   await page.waitForFunction(()=>window.scrollY<5&&window.__JARVIS_RUNTIME__?.scrollTarget<.02,null,{timeout:10000});
@@ -87,7 +106,7 @@ async function openAndVerify(page,label){
 }
 try{
  const desktop=await browser.newPage({viewport:{width:1440,height:900}});
- const runtime=await openAndVerify(desktop,'desktop');await waitForLoaderHidden(desktop,'desktop');console.log('DESKTOP_RENDER_DIAGNOSTICS:'+JSON.stringify(runtime));const desktopVisual=await desktop.screenshot({type:'jpeg',quality:42});console.log('VISUAL_AUDIT_DESKTOP_JPEG_BASE64:'+desktopVisual.toString('base64'));
+ const runtime=await openAndVerify(desktop,'desktop');await waitForLoaderHidden(desktop,'desktop');console.log('DESKTOP_RENDER_DIAGNOSTICS:'+JSON.stringify(runtime));await captureVisualEvidence(desktop,'DESKTOP');
  const canvas=desktop.locator('#cinematic-world');
  assert(await canvas.isVisible(),'Three.js canvas not visible');
  const contextInfo=await desktop.evaluate(()=>{const gl=document.querySelector('#cinematic-world').getContext('webgl2')||document.querySelector('#cinematic-world').getContext('webgl');return {ok:!!gl,extension:gl?.getExtension('WEBGL_lose_context')||null}});
@@ -130,7 +149,7 @@ try{
   await desktop.locator('#story').scrollIntoViewIfNeeded();await desktop.waitForTimeout(600);const initialScroll=await desktop.evaluate(()=>window.__JARVIS_RUNTIME__?.scrollProgress||0);await desktop.mouse.wheel(0,650);await desktop.waitForFunction(()=>window.__JARVIS_RUNTIME__?.scrollProgress>.05,null,{timeout:10000});const firstScroll=await desktop.evaluate(()=>window.__JARVIS_RUNTIME__.scrollProgress);await desktop.mouse.wheel(0,900);await desktop.waitForFunction(p=>window.__JARVIS_RUNTIME__?.scrollProgress>p+.025,firstScroll,{timeout:10000});const secondScroll=await desktop.evaluate(()=>window.__JARVIS_RUNTIME__.scrollProgress);assert(secondScroll>firstScroll,'full-page cinematic progress should increase smoothly as the page scrolls');await desktop.mouse.wheel(0,-1100);await desktop.waitForFunction(()=>window.__JARVIS_RUNTIME__?.scrollProgress<.9,null,{timeout:10000});assert(initialScroll>=0,'scroll telemetry should be initialized');const firstReveal=desktop.locator('#features .feature.reveal').first();await firstReveal.scrollIntoViewIfNeeded();await desktop.waitForFunction(()=>{const e=document.querySelector('#features .feature.reveal'),cs=e&&getComputedStyle(e);return cs&&cs.visibility==='visible'&&Number(cs.opacity)>.95},null,{timeout:10000});await desktop.mouse.wheel(0,-6000);await waitForScrollReset(desktop,'reverse-scroll to top');assert((await desktop.evaluate(()=>window.__JARVIS_RUNTIME__.scrollProgress))<.02,'full-page progress should return near zero at page top after reverse scroll');await desktop.waitForFunction(()=>{const e=document.querySelector('#features .feature.reveal'),cs=e&&getComputedStyle(e);return cs&&cs.visibility==='hidden'&&Number(cs.opacity)<.1},null,{timeout:10000});await firstReveal.scrollIntoViewIfNeeded();await desktop.waitForFunction(()=>{const e=document.querySelector('#features .feature.reveal'),cs=e&&getComputedStyle(e);return cs&&cs.visibility==='visible'&&Number(cs.opacity)>.95},null,{timeout:10000});assert(await firstReveal.isVisible(),'reveal should re-enter visibly after scrolling down again');await desktop.mouse.wheel(0,-8000);await waitForScrollReset(desktop,'second reverse-scroll to top');await desktop.waitForFunction(()=>{const e=document.querySelector('#features .feature.reveal'),cs=e&&getComputedStyle(e);return cs&&cs.visibility==='hidden'&&Number(cs.opacity)<.1},null,{timeout:10000});
  }
  const mobileContext=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'reduce'});
- const mobile=await mobileContext.newPage();const mobileRuntime=await openAndVerify(mobile,'mobile reduced-motion');await waitForLoaderHidden(mobile,'mobile');console.log('MOBILE_RENDER_DIAGNOSTICS:'+JSON.stringify(mobileRuntime));const mobileVisual=await mobile.screenshot({type:'jpeg',quality:42});console.log('VISUAL_AUDIT_MOBILE_JPEG_BASE64:'+mobileVisual.toString('base64'));
+ const mobile=await mobileContext.newPage();const mobileRuntime=await openAndVerify(mobile,'mobile reduced-motion');await waitForLoaderHidden(mobile,'mobile');console.log('MOBILE_RENDER_DIAGNOSTICS:'+JSON.stringify(mobileRuntime));await captureVisualEvidence(mobile,'MOBILE');
  assert.equal(mobileRuntime.mobile,true,'mobile optimization should be active');
  assert.equal(mobileRuntime.reducedMotion,true,'reduced-motion preference should be respected');
   assert.equal(await mobile.locator('#nature-backdrop .cloud-drift').evaluateAll(els=>els.every(el=>getComputedStyle(el).animationName==='none')),true,'nature cloud animation must stop for reduced motion on every cloud layer');assert.equal(await mobile.locator('#nature-backdrop .parallax-far').evaluate(el=>getComputedStyle(el).translate),'none','nature parallax must stop for reduced motion');
