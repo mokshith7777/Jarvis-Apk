@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
  const page=await browser.newPage({viewport:{width:1440,height:900},reducedMotion:'reduce'});
  const errors=[];
  page.on('pageerror',e=>errors.push(e.message));
- page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+ page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});\n page.on('response',r=>{if(r.status()>=400)errors.push('HTTP '+r.status()+' '+r.url());});
  await page.goto(process.env.SITE_URL||'http://127.0.0.1:4173',{waitUntil:'domcontentloaded',timeout:60000});
  await page.waitForTimeout(3000);
  assert.equal(await page.title(),'JARVIS PRO · Enter the Room');
