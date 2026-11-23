@@ -209,7 +209,7 @@ check("mountainWorld" in MAIN and "ridge(" in MAIN and "env.mountainWorld.positi
 check("cinematic-techfield" not in CSS and "background-canvas" not in CSS and "web-lattice" not in CSS, "Legacy background selectors remain in the active stylesheet")
 check("scrollTrigger:{start:0,end:()=>Math.max(1,ScrollTrigger.maxScroll(window))" in MAIN, "Cinematic progress must track the full document scroll")
 check("smoothWheel:false,smoothTouch:false,lerp:1" in MAIN, "Native scrolling must be used to prevent double-smoothing and touch scroll jumps")
-check("1-Math.exp(-24*delta)" in MAIN, "Cinematic camera progress must use frame-rate-independent damping")
+check("1-Math.exp(-24*Math.max(rawDelta,0))" in MAIN, "Cinematic camera progress must use elapsed frame time rather than capped delta")
 check("scrub:reduceMotion?false:.25" in MAIN, "ScrollTrigger scrub should remain responsive without excessive lag")
 check("document.body.classList.add('cinematic-motion-ready')" in MAIN and "gsap.utils.toArray('.reveal')" in MAIN, 'GSAP reveal owner must initialize only after runtime readiness')
 check("gsap.utils.toArray('#features .feature, #experience .demo" not in MAIN, 'Duplicate GSAP reveal tweens must not animate the same elements')
