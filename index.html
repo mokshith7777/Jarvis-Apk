@@ -190,6 +190,21 @@ document.querySelectorAll('.faqitem > button').forEach(button=>{
   if(indicator)indicator.textContent=expanded?'−':'+';
  });
 });
+// Feature detail accordion: toggle details and maintain accessible state.
+document.querySelectorAll('.feature .expand').forEach(button=>{
+ const feature=button.closest('.feature');
+ const details=feature?.querySelector('.details');
+ if(!feature||!details)return;
+ button.setAttribute('aria-expanded','false');
+ details.setAttribute('aria-hidden','true');
+ button.addEventListener('click',()=>{
+  const expanded=!feature.classList.contains('open');
+  feature.classList.toggle('open',expanded);
+  button.setAttribute('aria-expanded',String(expanded));
+  details.setAttribute('aria-hidden',String(!expanded));
+  button.textContent=expanded?'CLOSE FEATURE −':'EXPLORE FEATURE +';
+ });
+});
 document.querySelectorAll('.demo-tab').forEach(tab=>tab.addEventListener('click',()=>{const scenario=demoScenarios[tab.dataset.demo];if(!scenario)return;document.querySelectorAll('.demo-tab').forEach(item=>{const active=item===tab;item.classList.toggle('active',active);item.setAttribute('aria-pressed',String(active))});const screen=document.getElementById('demoscreen');if(screen)screen.innerHTML='<div class="screenlabel">'+scenario.label+'</div><h3>'+scenario.title+'</h3><p>'+scenario.body+'</p>'+scenario.extra;}));
 </script>
 <script type="module" src="./src/main.js"></script>
