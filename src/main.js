@@ -130,7 +130,7 @@ function applyCinematic(p){
  if(bokeh){bokeh.uniforms.focus.value=5.4-approach*3.4+reactorClose*.5;bokeh.uniforms.aperture.value=.00006+approach*.00003+reactorExplode*.000015}
  const ph=phaseAt(p);
  if(ph!==state.phase){state.phase=ph;chapterNum.textContent=String(ph+1).padStart(2,'0');chapterName.textContent=chapters[ph].label;hudPhase.textContent=chapters[ph].phase}
- progressFill.style.width=(p*100).toFixed(2)+'%';if(sceneCopy)sceneCopy.style.opacity=1-smooth(.16,.34,p);
+ progressFill.style.width=(p*100).toFixed(2)+'%';document.documentElement.style.setProperty('--mountain-scroll',p.toFixed(3));if(sceneCopy)sceneCopy.style.opacity=1-smooth(.16,.34,p);
 }
 const lenis=new Lenis({smoothWheel:false,smoothTouch:false,lerp:1,gestureOrientation:'vertical',wheelMultiplier:1.0,prevent:node=>node?.closest?.('[data-native-scroll]')});
 // Read the document scroll position directly. GSAP scrub was competing with
