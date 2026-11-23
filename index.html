@@ -174,6 +174,22 @@ window.__jarvisReadyTimer=setTimeout(()=>{const loading=document.getElementById(
 document.getElementById('runtime-reload')?.addEventListener('click',()=>location.reload());
 // Functional scenario tabs with accessible active state.
 const demoScenarios={voice:{label:'VOICE INTERFACE / CONCEPT',title:'Listening is a workflow.',body:'Voice input and spoken output can make the assistant feel more natural. The actual experience depends on permissions, configured services and your device.',extra:'<div class="pulsebar" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="fakechat"><div class="bubble">USER · “Summarize my next task.”</div><div class="bubble jarvis">JARVIS · “Ready to help. Your configured AI provider will process the request.”</div></div>'},providers:{label:'AI PROVIDERS / CONCEPT',title:'Choose the engine.',body:'Select a configured provider based on privacy, availability, speed and model capability. This demo does not connect to an AI service.',extra:'<div class="bubble jarvis">LOCAL · On-device processing when supported</div><div class="bubble">CLOUD · Configured API provider</div><div class="bubble">CUSTOM · OpenAI-compatible endpoint</div>'},local:{label:'LOCAL TOOLS / CONCEPT',title:'Tools, under your control.',body:'Local integrations can provide device-aware actions when permissions and supported services are available.',extra:'<div class="bubble">SYSTEM · Permission-gated actions</div><div class="bubble jarvis">JARVIS · Tool access is configured by the user</div>'},connect:{label:'INTEGRATIONS / CONCEPT',title:'Connect your ecosystem.',body:'Integrations are optional and depend on the services and credentials you configure.',extra:'<div class="bubble">ANDROID · Device integrations</div><div class="bubble jarvis">SERVICES · Optional connected platforms</div>'}};
+// FAQ accordion: native button semantics plus synchronized state and icon.
+document.querySelectorAll('.faqitem > button').forEach(button=>{
+ const item=button.closest('.faqitem');
+ const answer=item?.querySelector('.faqanswer');
+ if(!item||!answer)return;
+ button.setAttribute('aria-expanded','false');
+ answer.setAttribute('aria-hidden','true');
+ button.addEventListener('click',()=>{
+  const expanded=!item.classList.contains('active');
+  item.classList.toggle('active',expanded);
+  button.setAttribute('aria-expanded',String(expanded));
+  answer.setAttribute('aria-hidden',String(!expanded));
+  const indicator=button.querySelector('span');
+  if(indicator)indicator.textContent=expanded?'−':'+';
+ });
+});
 document.querySelectorAll('.demo-tab').forEach(tab=>tab.addEventListener('click',()=>{const scenario=demoScenarios[tab.dataset.demo];if(!scenario)return;document.querySelectorAll('.demo-tab').forEach(item=>{const active=item===tab;item.classList.toggle('active',active);item.setAttribute('aria-pressed',String(active))});const screen=document.getElementById('demoscreen');if(screen)screen.innerHTML='<div class="screenlabel">'+scenario.label+'</div><h3>'+scenario.title+'</h3><p>'+scenario.body+'</p>'+scenario.extra;}));
 </script>
 <script type="module" src="./src/main.js"></script>
