@@ -30,7 +30,7 @@ const assert = require('node:assert/strict');
  await page.locator('#pricing').scrollIntoViewIfNeeded();
  assert.ok(await page.locator('#pricing').isVisible());
  await page.screenshot({path:'/tmp/jarvis-room-mobile.png'});
- if(errors.length)throw new Error('Browser console/page errors: '+errors.join('\n'));
+ if(errors.length) throw new Error('Browser console/page errors: '+errors.join('\n'));
  await browser.close();
  console.log('ROOM WEBSITE SMOKE PASSED: desktop/mobile, navigation, entry and FAQ.');
 })().catch(e=>{console.error(e);process.exit(1);});
