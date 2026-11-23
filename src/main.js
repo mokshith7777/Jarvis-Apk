@@ -136,7 +136,7 @@ const lenis=new Lenis({smoothWheel:!reduceMotion,smoothTouch:false,lerp:reduceMo
 // This keeps camera/armor/reactor chapters aligned with actual page scroll.
 gsap.to(state,{target:1,ease:'none',scrollTrigger:{start:0,end:()=>Math.max(1,ScrollTrigger.maxScroll(window)),invalidateOnRefresh:true,scrub:reduceMotion?false:.25,onUpdate:self=>{state.target=self.progress}}});
 // One reveal owner only: GSAP/ScrollTrigger. The CSS fallback keeps content visible if motion or WebGL fails.
-if(!reduceMotion){document.body.classList.add('cinematic-motion-ready');gsap.utils.toArray('.reveal').forEach(element=>{gsap.fromTo(element,{autoAlpha:0,y:28,filter:'blur(5px)'},{autoAlpha:1,y:0,filter:'blur(0px)',ease:'none',scrollTrigger:{trigger:element,start:'top 88%',end:'top 62%',scrub:.38}})})}const entryGate=document.querySelector('#entry-gate'),enterButton=document.querySelector('#enter-experience'),sceneCopy=document.querySelector('#scene-copy');
+if(!reduceMotion){document.body.classList.add('cinematic-motion-ready');gsap.utils.toArray('.reveal').forEach(element=>{gsap.fromTo(element,{autoAlpha:0,y:22,filter:'blur(3px)'},{autoAlpha:1,y:0,filter:'blur(0px)',duration:.65,ease:'power2.out',immediateRender:false,scrollTrigger:{trigger:element,start:'top 88%',toggleActions:'play none none reverse'}})})}const entryGate=document.querySelector('#entry-gate'),enterButton=document.querySelector('#enter-experience'),sceneCopy=document.querySelector('#scene-copy');
 /* No invisible entry gate: scrolling is available immediately. */
 enterButton?.addEventListener('click',()=>{entryGate?.classList.add('dismissed');state.entered=true;if(sceneCopy)gsap.fromTo(sceneCopy,{x:-18,opacity:0},{x:0,opacity:1,duration:1.15,ease:'power3.out'});});
 
