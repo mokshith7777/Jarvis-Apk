@@ -200,7 +200,8 @@ document.getElementById('runtime-reload')?.addEventListener('click',()=>location
   button.addEventListener('click',()=>{const open=!step.classList.contains('active');steps.forEach(other=>{if(other!==step){other.classList.remove('active');const otherButton=other.querySelector('.step-toggle'),otherBody=other.querySelector('.step-body'),otherState=other.querySelector('.step-state');if(otherButton)otherButton.setAttribute('aria-expanded','false');if(otherBody)otherBody.setAttribute('aria-hidden','true');if(otherState)otherState.textContent='CLOSED';}});step.classList.toggle('active',open);sync();});
   sync();
  });
- function updateProgress(){const done=checks.filter(check=>check.checked).length;progress.textContent=done+' / '+checks.length+' COMPLETE';bar.style.width=(checks.length?done/checks.length*100:0)+'%';bar.setAttribute('aria-valuenow',String(done));bar.setAttribute('aria-valuemax',String(checks.length));}
+ const track=bar.parentElement;
+ function updateProgress(){const done=checks.filter(check=>check.checked).length;progress.textContent=done+' / '+checks.length+' COMPLETE';bar.style.width=(checks.length?done/checks.length*100:0)+'%';if(track){track.setAttribute('aria-valuenow',String(done));track.setAttribute('aria-valuemax',String(checks.length));}}
  checks.forEach(check=>check.addEventListener('change',updateProgress));
  reset.addEventListener('click',()=>{checks.forEach(check=>{check.checked=false;});updateProgress();});
  updateProgress();
