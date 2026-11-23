@@ -12,7 +12,6 @@ main,header,section,footer{position:relative;z-index:2;background:transparent!im
 #fallback[hidden]{display:none}#fallback p{max-width:500px;line-height:1.6}
 #audio-toggle{position:fixed;z-index:32;top:84px;right:18px;background:#07100eaa;border:1px solid #b4d3dc55;padding:9px 12px;color:#d9f6ff;font:9px Orbitron,sans-serif;letter-spacing:.12em;backdrop-filter:blur(8px)}
 #audio-toggle[aria-pressed=true]{border-color:#8cecff}
-#background-canvas,#scene-canvas,#jarvis-world,.cinematic-atmosphere,.cinematic-techfield,.techfield-orb,.web-lattice,.tech-particles,.scene-flare,.scene-label,.scene-caption,#world-progress,.cinematic-vignette,.tech-vignette,.atmo-grid,.atmo-specks,.atmo-glow,.atmo-vignette,.progressline,.chapterrail,.floatingnote{display:none!important}
 .hero,section,.storybeat,.setup-station{background:transparent!important}.hero:after{display:none!important}
 .hero .copy,.storybeat .storycopy,.sectionhead,.grid,.experience-grid,.connect-grid,.integration-grid,.setup-grid,.pricing-grid,.faq-grid{position:relative;z-index:3}
 .feature,.demo,.visualbox,.pricecard,.included,.drop-lab,.setup-console{background-color:#07120ed9!important;backdrop-filter:blur(3px)}
