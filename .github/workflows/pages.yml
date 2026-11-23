@@ -43,10 +43,22 @@ jobs:
             sleep 1
           done
           SITE_URL=http://127.0.0.1:4173 node scripts/runtime_smoke.cjs
+      - name: Stage clean website artifact
+        run: |
+          rm -rf _site
+          mkdir -p _site/styles _site/src
+          cp index.html _site/
+          cp .nojekyll _site/
+          cp styles/room.css _site/styles/
+          cp src/room.js _site/src/
+          test -s _site/index.html
+          test -s _site/styles/room.css
+          test -s _site/src/room.js
+          find _site -type f -print
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
-          path: .
+          path: _site
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346
