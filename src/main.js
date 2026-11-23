@@ -132,10 +132,12 @@ function applyCinematic(p){
  if(ph!==state.phase){state.phase=ph;chapterNum.textContent=String(ph+1).padStart(2,'0');chapterName.textContent=chapters[ph].label;hudPhase.textContent=chapters[ph].phase}
  progressFill.style.width=(p*100).toFixed(2)+'%';if(sceneCopy)sceneCopy.style.opacity=1-smooth(.16,.34,p);
 }
-const lenis=new Lenis({smoothWheel:false,smoothTouch:false,lerp:1,gestureOrientation:'vertical',wheelMultiplier:1.0,prevent:node=>node?.closest?.('[data-native-scroll]')});lenis.on('scroll',()=>ScrollTrigger.update());gsap.ticker.add(t=>lenis.raf(t*1000));gsap.ticker.lagSmoothing(0);
-// Drive the cinematic journey from the entire document, not just the short hero.
-// This keeps camera/armor/reactor chapters aligned with actual page scroll.
-gsap.to(state,{target:1,ease:'none',scrollTrigger:{start:0,end:()=>Math.max(1,ScrollTrigger.maxScroll(window)),invalidateOnRefresh:true,scrub:reduceMotion?false:.25,onUpdate:self=>{state.target=self.progress}}});
+const lenis=new Lenis({smoothWheel:false,smoothTouch:false,lerp:1,gestureOrientation:'vertical',wheelMultiplier:1.0,prevent:node=>node?.closest?.('[data-native-scroll]')});
+// Read the document scroll position directly. GSAP scrub was competing with
+// the same state property and could leave the camera target stranded above zero
+// after an instant scroll-to-top, especially on low-frame-rate software renderers.
+function syncScrollTarget(){state.target=THREE.MathUtils.clamp(window.scrollY/Math.max(1,document.documentElement.scrollHeight-innerHeight),0,1)}
+lenis.on('scroll',()=>{syncScrollTarget();ScrollTrigger.update()});window.addEventListener('scroll',syncScrollTarget,{passive:true});window.addEventListener('resize',syncScrollTarget,{passive:true});syncScrollTarget();gsap.ticker.add(t=>lenis.raf(t*1000));gsap.ticker.lagSmoothing(0);
 // One reveal owner only: GSAP/ScrollTrigger. The CSS fallback keeps content visible if motion or WebGL fails.
 if(!reduceMotion){document.body.classList.add('cinematic-motion-ready');gsap.utils.toArray('.reveal').forEach(element=>{gsap.fromTo(element,{autoAlpha:0,y:22,filter:'blur(3px)'},{autoAlpha:1,y:0,filter:'blur(0px)',duration:.65,ease:'power2.out',immediateRender:false,scrollTrigger:{trigger:element,start:'top 88%',toggleActions:'play none none reverse'}})})}const entryGate=document.querySelector('#entry-gate'),enterButton=document.querySelector('#enter-experience'),sceneCopy=document.querySelector('#scene-copy');
 /* No invisible entry gate: scrolling is available immediately. */
