@@ -206,6 +206,28 @@ document.getElementById('runtime-reload')?.addEventListener('click',()=>location
  reset.addEventListener('click',()=>{checks.forEach(check=>{check.checked=false;});updateProgress();});
  updateProgress();
 })();
+// Optional sound effects use a quiet original UI tone and remain off by default.
+(()=>{
+ const button=document.getElementById('sound-toggle');if(!button)return;
+ let context=null;
+ function ping(){
+  const C=window.AudioContext||window.webkitAudioContext;if(!C)return;
+  try{
+   context=context||new C();if(context.state==='suspended')context.resume().catch(()=>{});
+   const osc=context.createOscillator(),gain=context.createGain(),now=context.currentTime;
+   osc.type='sine';osc.frequency.setValueAtTime(660,now);
+   gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(.012,now+.008);gain.gain.exponentialRampToValueAtTime(.0001,now+.075);
+   osc.connect(gain);gain.connect(context.destination);osc.start(now);osc.stop(now+.08);
+   osc.onended=()=>{osc.disconnect();gain.disconnect();};
+  }catch{}
+ }
+ button.addEventListener('click',()=>{
+  const enabled=button.getAttribute('aria-pressed')!=='true';
+  button.setAttribute('aria-pressed',String(enabled));
+  const label=button.querySelector('span');if(label)label.textContent=enabled?'ON':'OFF';
+  if(enabled)ping();
+ });
+})();
 // Functional scenario tabs with accessible active state.
 const demoScenarios={voice:{label:'VOICE INTERFACE / CONCEPT',title:'Listening is a workflow.',body:'Voice input and spoken output can make the assistant feel more natural. The actual experience depends on permissions, configured services and your device.',extra:'<div class="pulsebar" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="fakechat"><div class="bubble">USER · “Summarize my next task.”</div><div class="bubble jarvis">JARVIS · “Ready to help. Your configured AI provider will process the request.”</div></div>'},providers:{label:'AI PROVIDERS / CONCEPT',title:'Choose the engine.',body:'Select a configured provider based on privacy, availability, speed and model capability. This demo does not connect to an AI service.',extra:'<div class="bubble jarvis">LOCAL · On-device processing when supported</div><div class="bubble">CLOUD · Configured API provider</div><div class="bubble">CUSTOM · OpenAI-compatible endpoint</div>'},local:{label:'LOCAL TOOLS / CONCEPT',title:'Tools, under your control.',body:'Local integrations can provide device-aware actions when permissions and supported services are available.',extra:'<div class="bubble">SYSTEM · Permission-gated actions</div><div class="bubble jarvis">JARVIS · Tool access is configured by the user</div>'},connect:{label:'INTEGRATIONS / CONCEPT',title:'Connect your ecosystem.',body:'Integrations are optional and depend on the services and credentials you configure.',extra:'<div class="bubble">ANDROID · Device integrations</div><div class="bubble jarvis">SERVICES · Optional connected platforms</div>'}};
 // FAQ accordion: native button semantics plus synchronized state and icon.
