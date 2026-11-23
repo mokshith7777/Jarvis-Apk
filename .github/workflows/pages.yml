@@ -34,7 +34,7 @@ jobs:
       - name: Browser smoke
         run: |
           npm install --no-save playwright@1.55.0
-          npx playwright install --with-deps chromium
+          npx playwright install chromium
           python3 -m http.server 4173 --bind 127.0.0.1 > "$RUNNER_TEMP/server.log" 2>&1 &
           attempt=0
           until curl -fsS http://127.0.0.1:4173/ >/dev/null; do
@@ -42,7 +42,7 @@ jobs:
             if [ "$attempt" -ge 30 ]; then echo "Local server failed to start"; exit 1; fi
             sleep 1
           done
-          SITE_URL=http://127.0.0.1:4173 node scripts/runtime_smoke.cjs
+          timeout 180s env SITE_URL=http://127.0.0.1:4173 node scripts/runtime_smoke.cjs
       - name: Stage clean website artifact
         run: |
           rm -rf _site
