@@ -1,4 +1,4 @@
-name: Deploy JARVIS Room Storefront
+name: Deploy Immersive Room
 on:
   push:
     branches: [main]
@@ -35,12 +35,14 @@ jobs:
         run: |
           test -s index.html
           grep -q 'id="world"' index.html
-          grep -q 'ENTER' index.html
+          grep -q 'id="bottom-nav"' index.html
+          grep -q 'id="content-panel"' index.html
           test -s favicon.svg
           test -s styles/room.css
-          grep -q 'function buildArchitecture' src/room.js
-          echo "Static smoke passed: room HTML, UI, CSS, and runtime files are present."
-      - name: Stage clean website artifact
+          grep -q 'function buildRoom' src/room.js
+          grep -q 'function buildDesk' src/room.js
+          echo "Static smoke passed: immersive room assets and interaction framework are present."
+      - name: Stage website artifact
         run: |
           rm -rf _site
           mkdir -p _site/styles _site/src
@@ -63,7 +65,7 @@ jobs:
       - name: Verify live deployment
         run: |
           curl -fsSL "${{ steps.deployment.outputs.page_url }}" -o "$RUNNER_TEMP/live.html"
-          grep -q 'ENTER' "$RUNNER_TEMP/live.html"
+          grep -q 'bottom-nav' "$RUNNER_TEMP/live.html"
           grep -q 'src/room.js' "$RUNNER_TEMP/live.html"
           curl -fsSL "${{ steps.deployment.outputs.page_url }}src/room.js" -o "$RUNNER_TEMP/live-room.js"
           node --check "$RUNNER_TEMP/live-room.js"
