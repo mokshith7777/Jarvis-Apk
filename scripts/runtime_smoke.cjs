@@ -44,6 +44,17 @@ async function revealBeforeInteraction(page,locator,label){
  }));
  if(!state.ready)throw new Error(label+' reveal did not become visible: '+JSON.stringify(state.details));
 }
+async function waitForLoaderHidden(page,label){
+ try{
+  await page.waitForFunction(()=>{const e=document.querySelector('#loading');return e&&getComputedStyle(e).visibility==='hidden'},null,{timeout:15000});
+ }catch(error){
+  const state=await page.evaluate(()=>{const e=document.querySelector('#loading'),s=e&&getComputedStyle(e);return {exists:!!e,className:e?.className,visibility:s?.visibility,opacity:s?.opacity,display:s?.display,readyState:document.readyState,runtime:window.__JARVIS_RUNTIME__,bodyClasses:document.body.className}});
+  let screenshot='';try{screenshot=(await page.screenshot({type:'jpeg',quality:35})).toString('base64')}catch(captureError){screenshot='capture failed: '+String(captureError)}
+  console.error('LOADER_DIAGNOSTICS_'+label+':'+JSON.stringify(state));
+  console.error('LOADER_FAILURE_SCREENSHOT_'+label+':'+screenshot);
+  throw new Error(label+' loader remained visible: '+JSON.stringify(state)+'; '+error.message);
+ }
+}
 async function openAndVerify(page,label){
  const pageErrors=[],failedModules=[],localDependencyFailures=await installPinnedDependencyRoute(page)||[];
  page.on('pageerror',e=>pageErrors.push(e.message));
@@ -62,7 +73,7 @@ async function openAndVerify(page,label){
 }
 try{
  const desktop=await browser.newPage({viewport:{width:1440,height:900}});
- const runtime=await openAndVerify(desktop,'desktop');await desktop.waitForFunction(()=>{const e=document.querySelector('#loading');return e&&getComputedStyle(e).visibility==='hidden'},null,{timeout:10000});console.log('DESKTOP_RENDER_DIAGNOSTICS:'+JSON.stringify(runtime));const desktopVisual=await desktop.screenshot({type:'jpeg',quality:42});console.log('VISUAL_AUDIT_DESKTOP_JPEG_BASE64:'+desktopVisual.toString('base64'));
+ const runtime=await openAndVerify(desktop,'desktop');await waitForLoaderHidden(desktop,'desktop');console.log('DESKTOP_RENDER_DIAGNOSTICS:'+JSON.stringify(runtime));const desktopVisual=await desktop.screenshot({type:'jpeg',quality:42});console.log('VISUAL_AUDIT_DESKTOP_JPEG_BASE64:'+desktopVisual.toString('base64'));
  const canvas=desktop.locator('#cinematic-world');
  assert(await canvas.isVisible(),'Three.js canvas not visible');
  const contextInfo=await desktop.evaluate(()=>{const gl=document.querySelector('#cinematic-world').getContext('webgl2')||document.querySelector('#cinematic-world').getContext('webgl');return {ok:!!gl,extension:gl?.getExtension('WEBGL_lose_context')||null}});
@@ -105,7 +116,7 @@ try{
   await desktop.locator('#story').scrollIntoViewIfNeeded();await desktop.waitForTimeout(600);const initialScroll=await desktop.evaluate(()=>window.__JARVIS_RUNTIME__?.scrollProgress||0);await desktop.mouse.wheel(0,650);await desktop.waitForFunction(()=>window.__JARVIS_RUNTIME__?.scrollProgress>.05,null,{timeout:10000});const firstScroll=await desktop.evaluate(()=>window.__JARVIS_RUNTIME__.scrollProgress);await desktop.mouse.wheel(0,900);await desktop.waitForFunction(p=>window.__JARVIS_RUNTIME__?.scrollProgress>p+.025,firstScroll,{timeout:10000});const secondScroll=await desktop.evaluate(()=>window.__JARVIS_RUNTIME__.scrollProgress);assert(secondScroll>firstScroll,'full-page cinematic progress should increase smoothly as the page scrolls');await desktop.mouse.wheel(0,-1100);await desktop.waitForFunction(()=>window.__JARVIS_RUNTIME__?.scrollProgress<.9,null,{timeout:10000});assert(initialScroll>=0,'scroll telemetry should be initialized');const firstReveal=desktop.locator('#features .feature.reveal').first();await firstReveal.scrollIntoViewIfNeeded();await desktop.waitForFunction(()=>{const e=document.querySelector('#features .feature.reveal'),cs=e&&getComputedStyle(e);return cs&&cs.visibility==='visible'&&Number(cs.opacity)>.95},null,{timeout:10000});await desktop.mouse.wheel(0,-6000);await desktop.waitForFunction(()=>window.scrollY<100,null,{timeout:10000});await desktop.waitForFunction(()=>window.__JARVIS_RUNTIME__?.scrollProgress<.02,null,{timeout:15000});assert((await desktop.evaluate(()=>window.__JARVIS_RUNTIME__.scrollProgress))<.02,'full-page progress should return near zero at page top after reverse scroll');await desktop.waitForFunction(()=>{const e=document.querySelector('#features .feature.reveal'),cs=e&&getComputedStyle(e);return cs&&cs.visibility==='hidden'&&Number(cs.opacity)<.1},null,{timeout:10000});await firstReveal.scrollIntoViewIfNeeded();await desktop.waitForFunction(()=>{const e=document.querySelector('#features .feature.reveal'),cs=e&&getComputedStyle(e);return cs&&cs.visibility==='visible'&&Number(cs.opacity)>.95},null,{timeout:10000});assert(await firstReveal.isVisible(),'reveal should re-enter visibly after scrolling down again');await desktop.mouse.wheel(0,-8000);await desktop.waitForFunction(()=>window.scrollY<100,null,{timeout:10000});await desktop.waitForFunction(()=>window.__JARVIS_RUNTIME__?.scrollProgress<.02,null,{timeout:15000});await desktop.waitForFunction(()=>{const e=document.querySelector('#features .feature.reveal'),cs=e&&getComputedStyle(e);return cs&&cs.visibility==='hidden'&&Number(cs.opacity)<.1},null,{timeout:10000});
  }
  const mobileContext=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'reduce'});
- const mobile=await mobileContext.newPage();const mobileRuntime=await openAndVerify(mobile,'mobile reduced-motion');await mobile.waitForFunction(()=>{const e=document.querySelector('#loading');return e&&getComputedStyle(e).visibility==='hidden'},null,{timeout:10000});console.log('MOBILE_RENDER_DIAGNOSTICS:'+JSON.stringify(mobileRuntime));const mobileVisual=await mobile.screenshot({type:'jpeg',quality:42});console.log('VISUAL_AUDIT_MOBILE_JPEG_BASE64:'+mobileVisual.toString('base64'));
+ const mobile=await mobileContext.newPage();const mobileRuntime=await openAndVerify(mobile,'mobile reduced-motion');await waitForLoaderHidden(mobile,'mobile');console.log('MOBILE_RENDER_DIAGNOSTICS:'+JSON.stringify(mobileRuntime));const mobileVisual=await mobile.screenshot({type:'jpeg',quality:42});console.log('VISUAL_AUDIT_MOBILE_JPEG_BASE64:'+mobileVisual.toString('base64'));
  assert.equal(mobileRuntime.mobile,true,'mobile optimization should be active');
  assert.equal(mobileRuntime.reducedMotion,true,'reduced-motion preference should be respected');
  assert.equal(await mobile.locator('#audio-toggle').getAttribute('aria-pressed'),'false','mobile audio must default off');
