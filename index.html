@@ -155,86 +155,8 @@ body:before{opacity:.12;mask-image:linear-gradient(#000,transparent 70%)}
  .hero .copy,.hero .stage{transform:none!important}
 }
 
-/* CINEMATIC 3D JOURNEY — full-screen world, scroll-directed camera */
-#jarvis-world{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0;pointer-events:none;opacity:0;transition:opacity 1.2s}
-.cinematic-techfield{opacity:1!important}
-#background-canvas{opacity:.22!important}
-#scene-canvas{opacity:.18!important}
-body.three-ready #jarvis-world{opacity:1}
-body.three-ready #background-canvas,body.three-ready #scene-canvas{opacity:.08!important}
-body.three-ready .techfield-orb,body.three-ready .web-lattice,body.three-ready .tech-particles{opacity:.035!important}
-body.three-ready .scene-flare{opacity:.28}
-body.three-ready section:not(.hero){background:linear-gradient(180deg,#03060a45,#03060a18 45%,#03060a58)!important;backdrop-filter:none!important}
-body.three-ready .storybeat{background:linear-gradient(90deg,#03060a9e,#03060a45 65%,#03060a9e)!important}
-.hero{min-height:100svh;align-items:center;padding-top:clamp(112px,15vh,155px);padding-bottom:clamp(64px,9vh,90px)}
-.hero .copy{max-width:680px}
-.hero .eyebrow{background:#050a10d9;box-shadow:0 0 24px #65e8ff10}
-.hero h1{font-size:clamp(42px,6.4vw,90px);text-wrap:balance}
-.hero .lead{max-width:500px}
-.hero .stage{min-height:clamp(350px,58vh,580px)}
-.hero .corecanvas{height:clamp(350px,58vh,580px)}
-.cinematic-techfield .scene-label,.cinematic-techfield .scene-caption{z-index:5;text-shadow:0 2px 12px #000}
-#world-status{position:absolute;z-index:6;left:7vw;top:105px;color:#a7c5d8;font:8px var(--display);letter-spacing:.14em;opacity:.6}
-#world-progress{position:fixed;z-index:26;right:22px;bottom:26px;font:8px var(--display);letter-spacing:.15em;color:#a7c5d8;pointer-events:none}
-@media(max-width:900px){.hero{padding-top:118px;min-height:100svh}.hero .stage{min-height:clamp(280px,48vh,430px)}.hero .corecanvas{height:clamp(280px,48vh,430px)}}
-@media(max-width:600px){.hero{padding:112px 6vw 58px;min-height:100svh;gap:0}.hero .stage{min-height:260px;margin-top:-8px}.hero .corecanvas{height:260px}.hero h1{font-size:clamp(38px,11.4vw,62px)}#world-status{left:6vw;top:90px;font-size:7px}#world-progress{right:13px;bottom:18px;font-size:7px}}
-@media(prefers-reduced-motion:reduce){#jarvis-world{opacity:.75;transition:none}body.three-ready #background-canvas{opacity:.16!important}}
 
-/* FULL-PAGE CINEMATIC BACKGROUND: one continuous animated world behind every section */
-.cinematic-techfield{position:fixed!important;inset:0!important;z-index:0!important;opacity:1!important;pointer-events:none!important;overflow:hidden!important}
-#background-canvas{position:absolute!important;inset:0!important;width:100vw!important;height:100vh!important;opacity:1!important;z-index:0!important;display:block!important}
-#jarvis-world{position:absolute!important;inset:0!important;width:100vw!important;height:100vh!important;opacity:.20!important;z-index:1!important;mix-blend-mode:screen!important}
-#scene-canvas{position:absolute!important;inset:0!important;width:100vw!important;height:100vh!important;opacity:.035!important;z-index:2!important}
-.scene-flare{opacity:.14!important}
-.techfield-orb,.web-lattice,.tech-particles{opacity:.025!important}
-body.three-ready #background-canvas{opacity:1!important}
-body.three-ready #jarvis-world{opacity:.10!important}
-body.three-ready #scene-canvas{opacity:.025!important}
-body,main{background:transparent!important}
-body:before{opacity:.025!important}
-body:after{opacity:.05!important}
-.hero,section,.storybeat,.setup-station{background:transparent!important}
-section:not(.hero){background:linear-gradient(180deg,#03060a36,#03060a20 48%,#03060a45)!important;backdrop-filter:none!important}
-.storybeat{background:linear-gradient(90deg,#03060a52,#03060a20 64%,#03060a52)!important}
-.feature,.demo,.visualbox,.pricecard,.included,.drop-lab,.setup-console,.setup-device,.setup-station{background-color:#050b12b8!important;backdrop-filter:blur(4px)}
-.hero{background:linear-gradient(90deg,#02030758,transparent 80%)!important}
-.hero .copy{max-width:720px}
-.hero h1{font-size:clamp(38px,6vw,84px)!important}
-.hero .stage{min-height:clamp(270px,54vh,520px)!important}
-.hero .corecanvas{height:clamp(270px,54vh,520px)!important}
-#world-progress{opacity:.45}
-@media(max-width:700px){
- #background-canvas{width:100vw!important;height:100dvh!important}
- #jarvis-world,#scene-canvas{width:100vw!important;height:100dvh!important}
- section:not(.hero){background:linear-gradient(180deg,#02050a45,#02050a28 55%,#02050a52)!important}
- .feature,.demo,.visualbox,.pricecard,.included,.drop-lab,.setup-console{background-color:#050b12d0!important}
-}
-@media(prefers-reduced-motion:reduce){#background-canvas{opacity:.72!important}}
-</style><style id="cinematic-clean">
-#cinematic-world{position:fixed;inset:0;width:100vw;height:100vh;z-index:1;display:block;pointer-events:none;background:transparent}
-.cinematic-vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 35%,#020408aa 100%),linear-gradient(180deg,#02040866,transparent 30%,#02040870 100%);mix-blend-mode:multiply}
-body:before,body:after,.cinematic-techfield,.progressline,.chapterrail,.floatingnote{display:none!important}
-body{background:transparent!important}
-#background-canvas,#scene-canvas,#jarvis-world,.cinematic-techfield{display:none!important}
-nav,.hero,section,.footer{position:relative;z-index:2}
-.hero{background:linear-gradient(90deg,#020408dd 0%,#02040885 48%,transparent 100%);border:0!important}
-.hero:after{display:none}
-section{background:linear-gradient(180deg,#02040816,#02040852 55%,#02040822);border:0!important}
-.storybeat{border:0!important;background:linear-gradient(90deg,#02040865,transparent 80%)}
-.feature,.demo,.drop-lab,.setup-console,.pricecard,.included,.visualbox,.faqitem{border:0!important;background:linear-gradient(145deg,#0710199c,#02040865)!important;box-shadow:none!important}
-.feature:before{display:none}
-.demo,.drop-lab,.setup-console{background:transparent!important}
-.demonav,.setup-device{border:0!important;background:#04080b70!important}
-.visualbox{background:transparent!important}
-.pricecard:after{opacity:.4}
-.footer{border:0!important;background:#02040866}
-.nav{background:#02040888!important;border:0!important}
-html{scroll-behavior:smooth}
-@media(max-width:700px){#cinematic-world{opacity:.76}.hero{background:linear-gradient(180deg,#020408dd 0%,#02040865 56%,transparent 100%)}section{background:linear-gradient(180deg,#02040850,#02040875)}}
-@media(prefers-reduced-motion:reduce){#cinematic-world{opacity:.5}}
-body.cinematic-fallback #cinematic-world{display:none}
-body.cinematic-fallback{background:radial-gradient(ellipse at 50% 20%,#172d40,#030508 70%)!important}
-</style><style id="cinematic-layout">
+
 .stage{display:none!important}
 .hero{grid-template-columns:1fr!important;min-height:100svh;padding:140px 7vw 80px}
 .hero .copy{max-width:680px;width:58%;transform:none!important}
@@ -243,16 +165,11 @@ body.cinematic-fallback{background:radial-gradient(ellipse at 50% 20%,#172d40,#0
 section{min-height:55vh}
 @media(max-width:800px){.hero{grid-template-columns:1fr!important;padding:118px 6vw 65px}.hero .copy{width:100%;max-width:600px}.hero .lead{max-width:480px}}
 @media(max-width:560px){.hero{padding-top:110px}.hero .copy{max-width:100%}.hero h1{font-size:clamp(40px,13vw,66px)}}
-</style><style id="fallback-fix">
-#cinematic-fallback-canvas{position:fixed;inset:0;z-index:0;display:block;pointer-events:none}
-body.cinematic-fallback #cinematic-world{display:none!important}
-body.cinematic-fallback #cinematic-fallback-canvas{display:block!important}
-body.cinematic-ready #cinematic-fallback-canvas{display:block!important}
-body:not(.cinematic-ready) #cinematic-fallback-canvas{display:block!important}
-</style><style id="armor-image-scroll">
+
+
 :root{--armor-scroll:0}
 body{background:#020307!important;color:#f3f7fb}
-body:before,body:after{display:block!important}
+
 .hero.cinematic-hero{position:relative;min-height:215svh;height:auto;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);align-items:start;overflow:visible;padding:13vh 6vw 12vh;gap:4vw;background:radial-gradient(ellipse at 70% 26%,#190c18 0%,#08090d 44%,#020307 76%)}
 .hero.cinematic-hero:after{display:none}
 .hero.cinematic-hero .copy{position:sticky;top:26vh;align-self:start;margin-top:15vh;max-width:620px;z-index:4;transition:opacity .1s}
@@ -293,155 +210,14 @@ body:before,body:after{display:block!important}
 @media(max-width:900px){.hero.cinematic-hero{grid-template-columns:1fr;min-height:195svh;padding:10vh 6vw 8vh;gap:2vh}.hero.cinematic-hero .copy{position:sticky;top:12vh;margin-top:8vh;max-width:560px}.hero.cinematic-hero .stage.armor-stage{top:26vh;height:65vh;min-height:430px;margin-top:-4vh}.armor-image{height:125%;top:-12%;transform-origin:49% 37%}.reactor-transition{width:min(76vw,58vh);top:41%}.hero.cinematic-hero .copy h1{font-size:clamp(40px,10vw,74px)}.scrollhint{bottom:3vh}}
 @media(max-width:560px){.hero.cinematic-hero{min-height:195svh;padding:9vh 5vw 7vh}.hero.cinematic-hero .stage.armor-stage{height:66vh;min-height:420px;top:23vh}.armor-image{height:140%;top:-19%;max-height:none}.hero.cinematic-hero .copy{top:11vh;margin-top:5vh}.hero.cinematic-hero .copy .lead{font-size:14px;line-height:1.6}.hero.cinematic-hero .copy .fine{font-size:10px}.stagehud{font-size:8px}.reactor-transition{width:min(86vw,58vh);top:41%}.reactor-label{font-size:8px}}
 @media(prefers-reduced-motion:reduce){.armor-image{transform:none!important}}
-</style><style id="restore-background-layer">
-.cinematic-atmosphere{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;opacity:.8}
-.atmo-glow{position:absolute;width:70vw;height:70vw;border-radius:50%;filter:blur(100px);opacity:.1}
-.atmo-red{background:#ff174c;left:-35vw;top:10vh}.atmo-blue{background:#1678ff;right:-30vw;top:0}.atmo-violet{background:#6930a8;left:30vw;bottom:-50vh}
-.atmo-grid{position:absolute;inset:0;background-image:linear-gradient(#67e8ff07 1px,transparent 1px),linear-gradient(90deg,#67e8ff07 1px,transparent 1px);background-size:54px 54px;mask-image:linear-gradient(#000,transparent 80%)}
-.atmo-specks{position:absolute;inset:0;background-image:radial-gradient(circle,#d8f4ff65 1px,transparent 2px);background-size:190px 210px;opacity:.2;animation:particle-drift 40s linear infinite}
-.atmo-vignette{position:absolute;inset:0;background:radial-gradient(ellipse at 65% 30%,transparent 20%,#03060a70 75%),linear-gradient(180deg,#03060a10,#03060a85)}
-.cinematic-techfield{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;perspective:1200px;isolation:isolate;opacity:.72}
-#background-canvas,#scene-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
-#background-canvas{z-index:0}#scene-canvas{z-index:1;opacity:.6}
-.scene-flare{position:absolute;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse at 68% 45%,transparent 12%,#02030722 48%,#020307b8 92%),linear-gradient(90deg,#02030765 0%,transparent 42%,#02030715 72%,#02030766 100%)}
-.scene-label,.scene-caption{position:absolute;z-index:4;left:5.5vw;color:#8aa4ba;font:9px var(--display);letter-spacing:.2em;text-transform:uppercase;text-shadow:0 0 12px #000}
-.scene-label{top:96px}.scene-caption{bottom:28px;opacity:.55}
-#world-progress{position:absolute;z-index:4;right:5vw;bottom:25px;color:#8297a9;font:9px var(--display);letter-spacing:.18em}
-.techfield-orb{position:absolute;width:min(64vw,720px);aspect-ratio:1;right:-15vw;top:4vh;transform-style:preserve-3d;transform:translate3d(var(--field-x,0),var(--field-y,0),0) rotateX(62deg) rotateZ(-12deg);opacity:.16;filter:drop-shadow(0 0 40px #ff174c12)}
-.tech-ring{position:absolute;inset:8%;border-radius:50%;border:1px solid #ff174c38;box-shadow:inset 0 0 25px #ff174c09,0 0 35px #ff174c08}
-.ring-a{animation:techspin 32s linear infinite;border-top:2px solid #ff174c99;border-right:1px solid #4ba8ff65}.ring-b{inset:18%;border-color:#4ba8ff38;border-left:2px solid #4ba8ff88;animation:techspin 21s linear infinite reverse}.ring-c{inset:29%;border-style:dashed;border-color:#d5e8ff30;animation:techspin 42s linear infinite}
-.tech-core{position:absolute;inset:42%;border-radius:50%;background:radial-gradient(circle,#dffaff 0%,#4ba8ff 8%,#122e50 32%,#ff174c22 58%,transparent 72%);box-shadow:0 0 50px #4ba8ff33,0 0 90px #ff174c18;animation:techpulse 4s ease-in-out infinite}
-.tech-cross{position:absolute;inset:2%;background:linear-gradient(transparent 49.9%,#65e8ff15 50%,transparent 50.1%),linear-gradient(90deg,transparent 49.9%,#65e8ff15 50%,transparent 50.1%)}
-.web-lattice{position:absolute;inset:0;color:#4ba8ff12;opacity:.12;transform:scale(1.04);animation:lattice-drift 30s ease-in-out infinite alternate}
-.web-lattice svg{width:100%;height:100%;filter:drop-shadow(0 0 5px #4ba8ff12)}
-.tech-particles{position:absolute;inset:0;background-image:radial-gradient(circle,#ff174c50 1px,transparent 1.7px),radial-gradient(circle,#4ba8ff60 1px,transparent 1.8px),radial-gradient(circle,#d9f4ff45 1px,transparent 2px);background-size:120px 150px,180px 220px,270px 300px;background-position:20px 30px,70px 110px,0 0;animation:particle-drift 35s linear infinite;opacity:.25}
-.tech-vignette{position:absolute;inset:0;background:radial-gradient(ellipse at 65% 30%,transparent 20%,#03060a66 75%),linear-gradient(180deg,#03060a10,#03060a88)}
-@keyframes techspin{to{transform:rotate(360deg)}}@keyframes techpulse{50%{opacity:.55;transform:scale(.92)}}@keyframes lattice-drift{to{transform:translate3d(-1%,1%,0) scale(1.05)}}@keyframes particle-drift{to{background-position:40px -50px,120px 40px,-40px 80px}}
-#top,#story,#features,#experience,#connectlab,#integrations,#setup,#pricing,#faq{position:relative;z-index:1}
-.hero.cinematic-hero{background:transparent!important}
-.hero.cinematic-hero .stage.armor-stage{background:transparent!important}
-@media(max-width:650px){.techfield-orb{width:90vw;right:-30vw;top:12vh}.scene-label{top:88px;left:5vw}.scene-caption{left:5vw;bottom:15px}}
-</style><style id="actual-background-visibility-fix">
-/* Restore the fixed cinematic environment: previous overrides were hiding every background layer. */
-body{background:#020307!important;color:#f3f7fb!important}
-.cinematic-atmosphere{display:block!important;opacity:1!important;z-index:0!important}
-.cinematic-techfield{display:block!important;opacity:.72!important;z-index:0!important}
-#jarvis-world,#background-canvas,#scene-canvas{display:block!important;visibility:visible!important}
-#jarvis-world{position:absolute!important;inset:0!important;opacity:.52!important;z-index:0!important}
-#background-canvas{opacity:.54!important;z-index:1!important}
-#scene-canvas{opacity:.32!important;z-index:2!important}
-body.three-ready #jarvis-world{opacity:.6!important}
-body.three-ready #background-canvas{opacity:.48!important}
-body.three-ready #scene-canvas{opacity:.3!important}
-body.three-ready .techfield-orb,body.three-ready .web-lattice,body.three-ready .tech-particles{opacity:.13!important}
-body.three-ready .scene-flare{opacity:.3!important}
-.cinematic-vignette,.tech-vignette{display:block!important}
-.progressline,.chapterrail,.floatingnote{display:block!important}
-.hero.cinematic-hero{background:transparent!important}
-.hero.cinematic-hero .stage.armor-stage{background:radial-gradient(ellipse at center,#18232d88,transparent 70%)!important}
-.hero.cinematic-hero .copy{z-index:5!important}
-#story,.storybeat{min-height:55svh!important;background:linear-gradient(90deg,#03060a9a,#03060a45 65%,#03060a9a)!important}
-.storybeat .storyindex{color:#4b7b92!important;text-shadow:0 0 24px #65e8ff18}
-.storybeat h2,.storybeat p,.storybeat .micro{opacity:1!important;visibility:visible!important}
-section:not(.hero){background:linear-gradient(180deg,#03060a55,#03060a20 45%,#03060a70)!important}
-@media(max-width:700px){.cinematic-techfield{opacity:.88!important}.atmo-glow{opacity:.18!important}#background-canvas{opacity:.72!important}#jarvis-world{opacity:.72!important}.storybeat{min-height:42svh!important}}
-</style><style id="cinematic-final-pass">
-/* FINAL CINEMATIC LAYOUT: visible atmosphere, image-first armor, scroll-driven reactor. */
-html{scroll-behavior:auto}
-body{background:#020307!important;overflow-x:clip}
-body:before{opacity:.08!important;background-size:72px 72px!important}
-body:after{opacity:.07!important}
-.cinematic-atmosphere{display:block!important;position:fixed!important;inset:0!important;z-index:0!important;opacity:1!important;pointer-events:none!important}
-.atmo-glow{filter:blur(80px)!important;opacity:.16!important;animation:atmo-float 24s ease-in-out infinite alternate}
-.atmo-red{left:-30vw;top:8vh}.atmo-blue{right:-22vw;top:12vh}.atmo-violet{left:28vw;bottom:-48vh}
-.atmo-grid{opacity:.045!important;background-size:84px 84px!important}
-.atmo-specks{opacity:.22!important;background-size:145px 180px,230px 270px,300px 330px!important;animation:particle-drift 55s linear infinite}
-.cinematic-techfield{display:block!important;position:fixed!important;inset:0!important;z-index:0!important;opacity:.88!important;pointer-events:none!important;overflow:hidden!important}
-#cinematic-world{display:block!important;position:fixed!important;inset:0!important;width:100vw!important;height:100svh!important;z-index:0!important;opacity:.82!important}
-#jarvis-world,#background-canvas,#scene-canvas{display:block!important;visibility:visible!important;position:absolute!important;inset:0!important;width:100%!important;height:100%!important;pointer-events:none!important}
-#jarvis-world{z-index:0!important;opacity:.35!important}
-#background-canvas{z-index:1!important;opacity:.35!important}
-#scene-canvas{z-index:2!important;opacity:.24!important}
-.scene-flare{z-index:3!important;opacity:.18!important}
-.techfield-orb{opacity:.12!important;filter:drop-shadow(0 0 35px #65e8ff12)!important}
-.web-lattice{opacity:.035!important}
-.tech-particles{opacity:.24!important}
-.tech-vignette{opacity:.45!important}
-.screen-fx{opacity:.28!important}
-main#top{position:relative!important;z-index:4!important}
-.minimal-header,.hud,.chapter-indicator,.phase-footer,.progress-track{z-index:8!important}
-.hero.cinematic-hero{position:relative!important;display:grid!important;grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr)!important;min-height:210svh!important;height:auto!important;padding:12vh 5.5vw 8vh!important;gap:3vw!important;align-items:start!important;overflow:visible!important;background:radial-gradient(ellipse at 72% 28%,#3c142755 0%,#0a101855 44%,transparent 75%)!important}
-.hero.cinematic-hero .copy{position:sticky!important;top:18vh!important;align-self:start!important;margin:9vh 0 0!important;max-width:620px!important;z-index:7!important}
-.hero.cinematic-hero .stage.armor-stage{position:sticky!important;top:11vh!important;align-self:start!important;margin:0!important;height:78svh!important;min-height:480px!important;overflow:hidden!important;border:1px solid #b4e7ff13!important;background:radial-gradient(ellipse at 50% 42%,#4d1b2a45,transparent 68%)!important;box-shadow:0 24px 80px #0008!important;z-index:5!important}
-.armor-image{position:absolute!important;left:50%!important;top:-5%!important;height:110%!important;width:auto!important;max-width:none!important;object-fit:contain!important;object-position:center!important;transform:translateX(-50%) scale(1)!important;transform-origin:50% 37%!important;filter:saturate(1.08) contrast(1.04) brightness(.92)!important;z-index:1!important;will-change:transform,opacity!important}
-.armor-shade{z-index:2!important;background:linear-gradient(90deg,#02030730,transparent 35%,#02030728),linear-gradient(0deg,#0203078a,transparent 18%,transparent 80%,#02030740)!important}
-.hero.cinematic-hero .copy .eyebrow{color:#9eefff!important}
-.hero.cinematic-hero .copy h1{font-size:clamp(42px,6.2vw,90px)!important;line-height:.92!important;letter-spacing:-.055em!important}
-.hero.cinematic-hero .copy .lead{max-width:470px!important}
-.stagehud{opacity:.72!important}
-.reactor-transition{width:min(64vw,64vh)!important;filter:drop-shadow(0 0 14px #65dfff22)!important}
-.reactor-part{transition:none!important}
-.assembly-backplate{box-shadow:inset 0 0 28px #000,0 10px 35px #0009!important}
-.assembly-outer-ring{border-color:#8598a3!important;filter:drop-shadow(0 0 6px #b9edff1a)!important}
-.coil-pack i{width:10.5%!important;height:25%!important;border-width:2px!important;background:repeating-linear-gradient(0deg,#b65c31 0 2px,#25130e 2px 4px)!important;box-shadow:inset 0 0 8px #e68d4c20,0 0 5px #d37a4520!important}
-.coil-pack i:nth-child(1){transform:rotate(0deg)}.coil-pack i:nth-child(2){transform:rotate(36deg)}.coil-pack i:nth-child(3){transform:rotate(72deg)}.coil-pack i:nth-child(4){transform:rotate(108deg)}.coil-pack i:nth-child(5){transform:rotate(144deg)}.coil-pack i:nth-child(6){transform:rotate(180deg)}.coil-pack i:nth-child(7){transform:rotate(216deg)}.coil-pack i:nth-child(8){transform:rotate(252deg)}.coil-pack i:nth-child(9){transform:rotate(288deg)}.coil-pack i:nth-child(10){transform:rotate(324deg)}
-.outer-slot{height:18%!important;transform-origin:50% 250%!important}
-.slot1{transform:rotate(0)}.slot2{transform:rotate(36deg)}.slot3{transform:rotate(72deg)}.slot4{transform:rotate(108deg)}.slot5{transform:rotate(144deg)}.slot6{transform:rotate(180deg)}.slot7{transform:rotate(216deg)}.slot8{transform:rotate(252deg)}.slot9{transform:rotate(288deg)}.slot10{transform:rotate(324deg)}
-.cage-spoke{width:7%!important}.s1{transform:rotate(0)}.s2{transform:rotate(36deg)}.s3{transform:rotate(72deg)}.s4{transform:rotate(108deg)}.s5{transform:rotate(144deg)}.s6{transform:rotate(180deg)}.s7{transform:rotate(216deg)}.s8{transform:rotate(252deg)}.s9{transform:rotate(288deg)}.s10{transform:rotate(324deg)}
-.telemetry-orbit{position:absolute;inset:-9%;border:1px solid #62eaff30;border-radius:50%;transform:translateZ(-20px);pointer-events:none;box-shadow:0 0 12px #60dfff0b}
-.telemetry-a{inset:-12%;border-style:dashed;border-color:#68eaff35;animation:telemetry-spin 32s linear infinite}
-.telemetry-b{inset:-20%;border-color:#d99b5c22;transform:rotateX(70deg);animation:telemetry-spin 38s linear infinite reverse}
-.telemetry-c{inset:-26%;border-style:dotted;border-color:#69eaff20;transform:rotateY(60deg);animation:telemetry-pulse 5s ease-in-out infinite}
-body.cinematic-3d-ready .reactor-transition{display:none!important}
-#story,#features,#experience,#connectlab,#integrations,#setup,#pricing,#faq{z-index:4!important;position:relative!important;background:linear-gradient(180deg,#03060a60,#03060a15 45%,#03060a65)!important}
-.storybeat,.sectionhead,.grid,.experience-grid,.connect-grid,.integration-grid,.setup-grid,.pricing-grid,.faq-grid{position:relative;z-index:4}
-.storybeat{background:transparent!important}
-@keyframes atmo-float{to{transform:translate3d(2vw,-2vh,0) scale(1.12);opacity:.2}}
-@keyframes telemetry-spin{to{transform:rotate(360deg)}}
-@keyframes telemetry-pulse{50%{opacity:.4;scale:1.05}}
-@media(max-width:900px){
-.hero.cinematic-hero{grid-template-columns:1fr!important;min-height:205svh!important;padding:9vh 5vw 7vh!important;gap:2vh!important}
-.hero.cinematic-hero .copy{position:sticky!important;top:9vh!important;margin:4vh 0 0!important;max-width:100%!important}
-.hero.cinematic-hero .stage.armor-stage{top:25vh!important;height:64svh!important;min-height:380px!important;margin:0!important}
-.armor-image{height:125%!important;top:-12%!important;transform-origin:50% 36%!important}
-.hero.cinematic-hero .copy h1{font-size:clamp(38px,10vw,68px)!important}
-.reactor-transition{width:min(78vw,62svh)!important;top:43%!important}
-.storybeat{padding:8vh 5vw!important}
-}
-@media(max-width:560px){
-.hero.cinematic-hero{min-height:200svh!important;padding:8vh 5vw 6vh!important}
-.hero.cinematic-hero .copy{top:9vh!important;margin-top:2vh!important}
-.hero.cinematic-hero .stage.armor-stage{top:24vh!important;height:61svh!important;min-height:340px!important}
-.armor-image{height:138%!important;top:-18%!important;object-position:center 34%!important}
-.hero.cinematic-hero .copy .lead{max-width:38ch!important;font-size:15px!important}
-.actions{gap:10px!important;flex-wrap:wrap!important}
-.reactor-transition{width:min(86vw,60svh)!important}
-.hud,.phase-footer{display:none!important}
-}
-@media(prefers-reduced-motion:reduce){.atmo-glow,.atmo-specks,.telemetry-orbit{animation:none!important}.armor-image{transform:translateX(-50%) scale(1)!important}}
-
-/* Last cascade guard: legacy abstract overlays must not cover the active scene. */
-body:before,body:after,.cinematic-techfield,.progressline,.chapterrail,.floatingnote{display:none!important}
-#background-canvas,#scene-canvas,#jarvis-world,.cinematic-techfield{display:none!important}
-.atmo-grid,.web-lattice{display:none!important}
-#cinematic-world{display:block!important}
-#cinematic-world{visibility:visible!important;opacity:.82!important}
 </style><script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}
 </script>
 <link rel="stylesheet" href="./styles/cinematic.css">
-<style>
-#cinematic-world{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;display:block;opacity:.98}
-#cinematic-runtime-hud{position:fixed;z-index:6;left:18px;bottom:18px;display:flex;gap:9px;align-items:center;font:9px Orbitron,sans-serif;letter-spacing:.12em;color:#9ccbd8;pointer-events:none;text-shadow:0 1px 6px #000}
-#runtime-progress{position:fixed;z-index:8;left:0;right:0;top:0;height:2px;pointer-events:none;background:#ffffff08}#progress-fill{width:0;height:100%;background:linear-gradient(90deg,#ff355a,#8cecff);box-shadow:0 0 12px #8cecff}
-#loading{position:fixed;z-index:100;inset:0;background:#03050a;display:grid;place-content:center;text-align:center;color:#8cecff;font:10px Orbitron,sans-serif;letter-spacing:.15em;transition:opacity .5s,visibility .5s}#loading.done{opacity:0;visibility:hidden;pointer-events:none}#fallback{position:fixed;z-index:101;inset:0;background:#03050aee;color:#e8f4f8;display:grid;place-content:center;text-align:center;padding:24px;font-family:Space Grotesk,sans-serif}#fallback[hidden]{display:none}#fallback p{max-width:500px;line-height:1.6}#audio-toggle{position:fixed;z-index:32;top:84px;right:18px;background:#03060ad9;border:1px solid #527080;padding:9px 12px;color:#8cecff;font:9px Orbitron,sans-serif;letter-spacing:.12em}#audio-toggle[aria-pressed=true]{border-color:#8cecff}
-#background-canvas,#scene-canvas,#jarvis-world,.techfield-orb,.web-lattice,.cinematic-techfield{display:none!important}
-@media(prefers-reduced-motion:reduce){#cinematic-world{opacity:.55}}
-</style>
+
 </head>
 <body>
-<div class="cinematic-atmosphere" aria-hidden="true"><div class="atmo-glow atmo-red"></div><div class="atmo-glow atmo-blue"></div><div class="atmo-glow atmo-violet"></div><div class="atmo-grid"></div><div class="atmo-specks"></div><div class="atmo-vignette"></div></div>
-<div class="cinematic-techfield" aria-hidden="true"><canvas id="jarvis-world"></canvas><canvas id="background-canvas"></canvas><canvas id="scene-canvas"></canvas><div class="scene-flare"></div><div class="scene-label" id="scene-label">01 / CORE IGNITION</div><div class="scene-caption" id="scene-caption">ENERGY SYSTEM · INITIALIZING</div><div id="world-progress">000 / JOURNEY</div><div class="techfield-orb"><div class="tech-ring ring-a"></div><div class="tech-ring ring-b"></div><div class="tech-ring ring-c"></div><div class="tech-core"></div><div class="tech-cross"></div></div><div class="web-lattice"><svg viewBox="0 0 1000 700" preserveAspectRatio="none"><g fill="none" stroke="currentColor" stroke-width="1"><path d="M0 0L500 350L1000 0M0 700L500 350L1000 700M0 350H1000M500 0V700M0 0L1000 700M1000 0L0 700"/><circle cx="500" cy="350" r="90"/><circle cx="500" cy="350" r="180"/><circle cx="500" cy="350" r="270"/></g></svg></div><div class="tech-particles"></div><div class="tech-vignette"></div></div><div class="progressline" aria-hidden="true"></div>
+
 <div id="runtime-progress" aria-hidden="true"><div id="progress-fill"></div></div>
 <canvas id="cinematic-world" aria-hidden="true"></canvas>
 <div id="cinematic-runtime-hud" aria-hidden="true"><span id="chapter-number">01</span><span>·</span><span id="chapter-name">AWAKEN</span><span id="hud-phase">01 / AWAKEN</span></div>
