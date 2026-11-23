@@ -419,6 +419,13 @@ body.cinematic-3d-ready .reactor-transition{display:none!important}
 .hud,.phase-footer{display:none!important}
 }
 @media(prefers-reduced-motion:reduce){.atmo-glow,.atmo-specks,.telemetry-orbit{animation:none!important}.armor-image{transform:translateX(-50%) scale(1)!important}}
+
+/* Last cascade guard: legacy abstract overlays must not cover the active scene. */
+body:before,body:after,.cinematic-techfield,.progressline,.chapterrail,.floatingnote{display:none!important}
+#background-canvas,#scene-canvas,#jarvis-world,.cinematic-techfield{display:none!important}
+.atmo-grid,.web-lattice{display:none!important}
+#cinematic-world{display:block!important}
+#cinematic-world{visibility:visible!important;opacity:.82!important}
 </style><script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}
 </script>
