@@ -191,6 +191,12 @@ check("requestAnimationFrame(render)" in HTML and "armor-scroll" in HTML, "Scrol
 check("prefers-reduced-motion" in HTML, "Reduced motion handling missing")
 check('.atmo-grid{display:none!important}' in HTML, 'Abstract background grid overlay must remain disabled')
 check('#background-canvas,#scene-canvas,#jarvis-world,.techfield-orb,.web-lattice,.cinematic-techfield{display:none!important}' in HTML, 'Legacy abstract techfield and canvases must remain hidden')
+FINAL_PASS = HTML.split('<style id="cinematic-final-pass">', 1)[1].split('</style>', 1)[0] if '<style id="cinematic-final-pass">' in HTML else ""
+legacy_show = FINAL_PASS.find('.cinematic-techfield{display:block!important}')
+legacy_hide = FINAL_PASS.rfind('#background-canvas,#scene-canvas,#jarvis-world,.cinematic-techfield{display:none!important}')
+check(legacy_show >= 0 and legacy_hide > legacy_show, "Final-pass CSS must hide legacy abstract layers after any re-enable")
+check('body:before,body:after,.cinematic-techfield,.progressline,.chapterrail,.floatingnote{display:none!important}' in FINAL_PASS, "Final-pass CSS must disable abstract background pseudo-elements and overlays")
+check('#cinematic-world{display:block!important}' in FINAL_PASS, "Primary Three.js cinematic canvas must remain enabled")
 check('body.cinematic-motion-ready .reveal{opacity:0}' in HTML, 'GSAP reveal CSS readiness gate missing')
 check("document.querySelectorAll('.revealline').forEach(el=>observer.observe(el))" in HTML, 'Legacy observer must not animate GSAP reveal elements')
 check('.reveal.visible' not in HTML and '.setup-station .reveal.visible' not in HTML, 'Legacy CSS reveal animation conflicts with GSAP')
