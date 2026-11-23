@@ -18,3 +18,19 @@ main,header,section,footer{position:relative;z-index:2;background:transparent!im
 .storybeat{background:transparent!important}
 @media(max-width:700px){#cinematic-world{height:100dvh;width:100vw}#cinematic-runtime-hud{left:12px;bottom:12px;font-size:7px}}
 @media(prefers-reduced-motion:reduce){#cinematic-world{opacity:.65}}
+
+/* Layered nature backdrop beneath the transparent WebGL scene. */
+#nature-backdrop{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:#071322}
+#nature-backdrop svg{width:100%;height:100%;display:block}
+#nature-backdrop:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#02070cbb 0%,#02070c64 42%,#02070c08 72%,#02070c55 100%),linear-gradient(0deg,#02070cdd 0%,#02070c22 36%,transparent 74%);pointer-events:none}
+#nature-backdrop .parallax-far{translate:0 calc(var(--mountain-scroll,0)*-1.4vh)}
+#nature-backdrop .parallax-mid{translate:0 calc(var(--mountain-scroll,0)*-2.8vh)}
+#nature-backdrop .parallax-forest{translate:0 calc(var(--mountain-scroll,0)*-4.5vh)}
+#nature-backdrop .parallax-water{translate:0 calc(var(--mountain-scroll,0)*-1.1vh)}
+#nature-backdrop .cloud-drift{animation:natureCloudDrift 86s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:center}
+#nature-backdrop .fog-drift{animation:natureFogDrift 52s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:center}
+@keyframes natureCloudDrift{from{transform:translateX(-1.2%)}to{transform:translateX(1.2%)}}
+@keyframes natureFogDrift{from{transform:translate3d(-1%,1%,0);opacity:.13}to{transform:translate3d(1%,-1%,0);opacity:.24}}
+#cinematic-world{z-index:1;background:transparent}
+@media(max-width:700px){#nature-backdrop:after{background:linear-gradient(180deg,#02070c55 0%,#02070c10 38%,#02070c55 70%,#02070cdd 100%),linear-gradient(90deg,#02070c66,transparent 65%)} }
+@media(prefers-reduced-motion:reduce){#nature-backdrop .cloud-drift,#nature-backdrop .fog-drift{animation:none!important;transform:none!important}#nature-backdrop .parallax-far,#nature-backdrop .parallax-mid,#nature-backdrop .parallax-forest,#nature-backdrop .parallax-water{translate:none!important}}

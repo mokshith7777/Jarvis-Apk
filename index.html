@@ -129,6 +129,58 @@ body{background:#020307!important;color:#f3f7fb}
 <body>
 
 <div id="runtime-progress" aria-hidden="true"><div id="progress-fill"></div></div>
+<div id="nature-backdrop" aria-hidden="true"><svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" focusable="false" xmlns="http://www.w3.org/2000/svg">
+<defs>
+ <linearGradient id="nature-sky" x2="0" y2="1"><stop stop-color="#071322"/><stop offset=".43" stop-color="#27445a"/><stop offset=".7" stop-color="#b98b72"/><stop offset="1" stop-color="#182b38"/></linearGradient>
+ <radialGradient id="nature-sun"><stop stop-color="#fff7d4" stop-opacity=".95"/><stop offset=".16" stop-color="#ffdca0" stop-opacity=".62"/><stop offset=".48" stop-color="#ffbd8a" stop-opacity=".18"/><stop offset="1" stop-color="#ffbd8a" stop-opacity="0"/></radialGradient>
+ <linearGradient id="nature-cloud" x2="0" y2="1"><stop stop-color="#d9e6f0" stop-opacity=".38"/><stop offset="1" stop-color="#8ea9bb" stop-opacity=".02"/></linearGradient>
+ <linearGradient id="nature-far" x2="0" y2="1"><stop stop-color="#8fa9bc"/><stop offset="1" stop-color="#3d6276"/></linearGradient>
+ <linearGradient id="nature-mid" x2="0" y2="1"><stop stop-color="#66899b"/><stop offset="1" stop-color="#1d4353"/></linearGradient>
+ <linearGradient id="nature-near" x2="0" y2="1"><stop stop-color="#315e60"/><stop offset="1" stop-color="#0c2729"/></linearGradient>
+ <linearGradient id="nature-water" x2="0" y2="1"><stop stop-color="#365b67" stop-opacity=".72"/><stop offset=".35" stop-color="#1d4354" stop-opacity=".86"/><stop offset="1" stop-color="#071923"/></linearGradient>
+ <linearGradient id="nature-reflect" x2="0" y2="1"><stop stop-color="#f4c99b" stop-opacity=".62"/><stop offset="1" stop-color="#f4c99b" stop-opacity="0"/></linearGradient>
+ <linearGradient id="nature-shade" x2="1"><stop stop-color="#02070c" stop-opacity=".78"/><stop offset=".44" stop-color="#02070c" stop-opacity=".28"/><stop offset=".76" stop-color="#02070c" stop-opacity=".08"/><stop offset="1" stop-color="#02070c" stop-opacity=".42"/></linearGradient>
+ <filter id="nature-soft"><feGaussianBlur stdDeviation="24"/></filter>
+</defs>
+<rect width="1920" height="1080" fill="url(#nature-sky)"/>
+<ellipse cx="1210" cy="535" rx="500" ry="360" fill="url(#nature-sun)"/>
+<circle cx="1210" cy="535" r="46" fill="#ffe8bd" opacity=".72"/>
+<g class="cloud-drift" fill="url(#nature-cloud)" filter="url(#nature-soft)">
+ <path d="M-80 260 Q60 170 210 230 T490 240 T770 200 T1050 250 T1350 205 T1700 240 T2050 195 V420 H-80Z" opacity=".48"/>
+ <path d="M-60 385 Q130 290 340 365 T700 340 T1050 390 T1420 335 T1920 380 V520 H-60Z" opacity=".32"/>
+</g>
+<g class="parallax-far">
+ <path d="M0 640 L150 535 280 590 405 485 540 558 675 430 820 515 960 405 1110 505 1255 365 1390 470 1535 300 1695 445 1810 340 1920 425 V820 H0Z" fill="url(#nature-far)"/>
+ <path d="M330 545 L405 485 457 531 530 558 500 530 405 485 360 520Z M610 495 L675 430 735 475 820 515 760 470 675 430 650 468Z M875 466 L960 405 1030 462 1110 505 1048 452 960 405 915 443Z M1178 425 L1255 365 1325 425 1390 470 1328 412 1255 365 1215 400Z M1450 382 L1535 300 1625 390 1695 445 1630 370 1535 300 1490 350Z M1740 400 L1810 340 1880 390 1920 425 1850 370 1810 340 1770 365Z" fill="#d4e1e9" opacity=".52"/>
+ <path d="M0 660 Q220 575 410 650 T820 625 T1220 590 T1640 650 T1920 610 V840 H0Z" fill="#3e6475" opacity=".5"/>
+</g>
+<g class="parallax-mid">
+ <path d="M0 700 L140 615 265 680 390 580 520 675 665 560 820 670 965 545 1115 660 1265 520 1400 625 1545 500 1695 625 1810 540 1920 625 V930 H0Z" fill="url(#nature-mid)"/>
+ <path d="M0 740 Q180 665 340 720 T680 700 T1020 690 T1350 705 T1700 685 T1920 710 V960 H0Z" fill="#274e59" opacity=".72"/>
+</g>
+<g class="cloud-drift" opacity=".55" filter="url(#nature-soft)" fill="#d6e3e9">
+ <path d="M-120 540 Q90 410 280 510 T620 500 T930 460 T1260 500 T1620 460 T2040 520 V600 H-120Z" opacity=".34"/>
+</g>
+<path d="M0 755 Q240 680 450 745 T900 715 T1350 690 T1920 745 V1080 H0Z" fill="url(#nature-near)"/>
+<g class="parallax-forest" fill="#0a2426">
+ <path d="M0 760 Q180 680 360 765 T760 735 T1160 760 T1560 720 T1920 770 V1080 H0Z"/>
+ <path d="M-20 1030 L60 770 105 1030Z M45 1050 L130 700 210 1050Z M160 1060 L245 810 310 1060Z M285 1040 L380 740 460 1040Z M420 1060 L515 820 590 1060Z M585 1040 L675 760 750 1040Z M760 1050 L845 810 920 1050Z M930 1060 L1035 760 1120 1060Z M1120 1040 L1210 820 1290 1040Z M1300 1060 L1410 750 1490 1060Z M1500 1040 L1600 810 1680 1040Z M1690 1060 L1790 740 1870 1060Z M1850 1050 L1930 790 2000 1050Z" opacity=".76"/>
+ <path d="M20 1080 L95 835 170 1080Z M225 1080 L315 855 405 1080Z M510 1080 L600 860 690 1080Z M820 1080 L910 850 1000 1080Z M1120 1080 L1215 860 1305 1080Z M1450 1080 L1540 840 1630 1080Z M1730 1080 L1820 865 1910 1080Z" opacity=".52"/>
+</g>
+<path d="M930 705 C1040 770 1140 800 1220 845 C1330 905 1450 975 1600 1080 H1080 C990 990 935 930 865 875 C790 820 730 785 650 755Z" fill="url(#nature-water)" opacity=".94"/>
+<path d="M1005 720 C1100 790 1165 815 1240 850 C1340 905 1450 975 1540 1080" fill="none" stroke="url(#nature-reflect)" stroke-width="80" opacity=".34"/>
+<g class="parallax-water" fill="none" stroke-linecap="round">
+ <path d="M1030 752 Q1120 790 1210 840" stroke="#d4b69a" stroke-width="4" opacity=".36"/>
+ <path d="M1080 785 Q1180 825 1280 875" stroke="#c3d9dc" stroke-width="2" opacity=".32"/>
+ <path d="M1160 835 Q1280 875 1380 935" stroke="#f0d1a4" stroke-width="3" opacity=".2"/>
+ <path d="M1250 890 Q1370 930 1470 990" stroke="#c1d5d7" stroke-width="2" opacity=".23"/>
+ <path d="M1370 955 Q1480 990 1570 1035" stroke="#f0d1a4" stroke-width="2" opacity=".18"/>
+</g>
+<g class="fog-drift" filter="url(#nature-soft)" fill="#b9d2d9" opacity=".2">
+ <ellipse cx="470" cy="720" rx="500" ry="65"/><ellipse cx="1250" cy="710" rx="600" ry="70"/><ellipse cx="1000" cy="885" rx="720" ry="80"/>
+</g>
+<rect width="1920" height="1080" fill="url(#nature-shade)"/>
+</svg></div>
 <canvas id="cinematic-world" aria-hidden="true"></canvas>
 <div id="cinematic-runtime-hud" aria-hidden="true"><span id="chapter-number">01</span><span>·</span><span id="chapter-name">AWAKEN</span><span id="hud-phase">01 / AWAKEN</span></div>
 <div id="loading" role="status"><div>JARVIS / CINEMATIC SYSTEM INITIALIZING</div><div id="load-progress">0%</div></div>

@@ -4,14 +4,14 @@ The active GitHub Pages site is the full JARVIS PRO product storefront, restored
 
 ## Cinematic entry
 - The hero currently uses an externally hosted Iron Man 2020 suit image. Exact matching against the user's original reference set has not been verified.
-- Scroll choreography zooms toward the chest area and transitions to a layered Arc Reactor graphic. The current active Three.js scene remains a procedural hangar/armor prototype, not the requested realistic nature environment.
+- Scroll choreography zooms toward the chest area and transitions to a layered Arc Reactor graphic. A layered, animated SVG mountain-valley backdrop now sits behind the transparent WebGL scene; the foreground terrain/armor is still procedural. This is not a cinematic video or photoreal armor replacement.
 - No video/training-video asset or autoplay media is used.
 - Scroll reveal respects reduced-motion preferences.
 
 ## Visual acceptance status
 
-- The abstract background grid overlay is disabled and scroll reveals now have one GSAP owner; reduced-motion and runtime-fallback states keep content visible.
-- The requested realistic, full-page interactive 3D nature background is not yet integrated or visually verified. A separate Manus task is pending review; its output is not merged into this repository.
+- The abstract background grid overlay is disabled. The animated vector valley backdrop adds cloud/fog drift and scroll-linked parallax, with reduced-motion behavior; scroll reveals retain one GSAP owner.
+- The requested realistic full-page nature video / photoreal environment is still not integrated. The SVG backdrop is an illustrative improvement, not final visual acceptance; no external video or reference-matched GLB is merged.
 - The exact five armor/Arc Reactor reference images are not present in the accessible repository or Library files at audit time. Reattach them before claiming exact fidelity.
 - Checkout/APK delivery remains presentation-only; no live payment or download fulfillment is active.
 

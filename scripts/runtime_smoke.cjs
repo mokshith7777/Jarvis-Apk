@@ -75,6 +75,7 @@ async function openAndVerify(page,label){
  assert.equal(runtime.renderer,'three',label+' renderer marker');
  assert(runtime.webglVersion>=1,label+' WebGL context version missing');
  assert.equal(runtime.canvasId,'cinematic-world',label+' renderer canvas marker');
+  assert.equal(await page.locator('#nature-backdrop').count(),1,label+' layered nature backdrop missing');assert.equal(await page.locator('#nature-backdrop svg').count(),1,label+' nature SVG missing');assert.equal(await page.locator('#nature-backdrop').evaluate(el=>getComputedStyle(el).zIndex),'0',label+' nature backdrop must remain behind the scene');assert.equal(await page.locator('#cinematic-world').evaluate(el=>getComputedStyle(el).zIndex),'1',label+' transparent scene canvas must sit above the nature backdrop');
  assert.equal(await page.locator('.cinematic-techfield').count(),0,label+' legacy techfield markup must be removed');const abstractGrid=page.locator('.atmo-grid');if(await abstractGrid.count())assert.equal(await abstractGrid.first().evaluate(el=>getComputedStyle(el).display),'none',label+' abstract grid overlay must remain hidden');
  await page.waitForFunction(()=>window.__JARVIS_RUNTIME__?.frames>=3,null,{timeout:15000});
  assert.equal(pageErrors.length,0,label+' uncaught browser exceptions: '+pageErrors.join(' | '));
@@ -128,6 +129,7 @@ try{
  const mobile=await mobileContext.newPage();const mobileRuntime=await openAndVerify(mobile,'mobile reduced-motion');await waitForLoaderHidden(mobile,'mobile');console.log('MOBILE_RENDER_DIAGNOSTICS:'+JSON.stringify(mobileRuntime));const mobileVisual=await mobile.screenshot({type:'jpeg',quality:42});console.log('VISUAL_AUDIT_MOBILE_JPEG_BASE64:'+mobileVisual.toString('base64'));
  assert.equal(mobileRuntime.mobile,true,'mobile optimization should be active');
  assert.equal(mobileRuntime.reducedMotion,true,'reduced-motion preference should be respected');
+  assert.equal(await mobile.locator('#nature-backdrop .cloud-drift').evaluate(el=>getComputedStyle(el).animationName),'none','nature cloud animation must stop for reduced motion');assert.equal(await mobile.locator('#nature-backdrop .parallax-far').evaluate(el=>getComputedStyle(el).translate),'none','nature parallax must stop for reduced motion');
  assert.equal(await mobile.locator('#audio-toggle').getAttribute('aria-pressed'),'false','mobile audio must default off');
  if(mode==='full'){const localChip=mobile.locator('.chip[data-provider="Local endpoint"]');await revealBeforeInteraction(mobile,localChip,'mobile local provider chip');await localChip.tap();const mobileDrop=mobile.locator('#dropzone');await revealBeforeInteraction(mobile,mobileDrop,'mobile dropzone');await mobileDrop.tap();assert((await mobile.locator('#dropstatus').innerText()).includes('LOCAL ENDPOINT'),'mobile tap sandbox interaction should work')}
  await mobileContext.close();await desktop.close();
