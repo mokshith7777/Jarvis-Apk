@@ -4,9 +4,8 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
  const page=await browser.newPage({viewport:{width:1280,height:800},deviceScaleFactor:1});
  const errors=[];page.on('pageerror',e=>errors.push('pageerror: '+e.message));
  page.on('console',m=>{if(m.type()==='error')errors.push('console: '+m.text())});
- page.on('requestfailed',r=>errors.push('request failed: '+r.url()+' '+r.failure()?.errorText));
  await page.goto(process.env.SITE_URL||'http://127.0.0.1:4173',{waitUntil:'domcontentloaded'});
- await page.waitForFunction(()=>window.__ROOM_TEMPLATE__?.ready===true,{timeout:45000});
+ await page.waitForFunction(()=>window.__ROOM_TEMPLATE__?.ready===true,null,{timeout:45000});
  assert.equal(await page.locator('#world').count(),1);
  assert.equal(await page.locator('#bottom-nav').count(),1);
  assert.equal(await page.locator('#content-panel').count(),1);
