@@ -58,7 +58,7 @@ function init(){try{renderer=new THREE.WebGLRenderer({canvas,antialias:!mobile,a
 init();
 window.addEventListener('wheel',e=>{scrollTarget=THREE.MathUtils.clamp(scrollTarget+e.deltaY/innerHeight*.12,0,1);view=Math.min(4,Math.floor(scrollTarget*4));roomIndex.textContent='0'+(view+1)+' — 04';},{passive:true});
 window.addEventListener('pointerdown',e=>{drag=true;last={x:e.clientX,y:e.clientY};canvas.setPointerCapture?.(e.pointerId)});
-window.addEventListener('pointermove',e=>{if(drag){lookTarget.x+=-(e.clientX-last.x)/innerWidth*3;lookTarget.y+=(e.clientY-last.y)/innerHeight*2;last={x:e.clientX,y:e.clientY};}else{lookTarget.x=(e.clientX/innerWidth-.5)*1.2;lookTarget.y=(.5-e.clientY/innerHeight)*.35}});
+window.addEventListener('pointermove',e=>{if(drag){const dx=e.clientX-last.x,dy=e.clientY-last.y;if(mobile)scrollTarget=THREE.MathUtils.clamp(scrollTarget-dy/innerHeight*.7,0,1);lookTarget.x+=-dx/innerWidth*3;lookTarget.y+=dy/innerHeight*2;last={x:e.clientX,y:e.clientY};}else{lookTarget.x=(e.clientX/innerWidth-.5)*1.2;lookTarget.y=(.5-e.clientY/innerHeight)*.35}});
 window.addEventListener('pointerup',()=>drag=false);window.addEventListener('pointercancel',()=>drag=false);
 enter.addEventListener('click',()=>{scrollTarget=scrollTarget<.2?.48:0;status.textContent=scrollTarget>.2?'EXPLORING':'SYSTEM ONLINE';});
 window.addEventListener('resize',()=>{if(!renderer)return;camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio||1,mobile?1.1:1.5))});
