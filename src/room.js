@@ -1,4 +1,17 @@
-import * as THREE from 'three';
+let THREE;
+async function loadThree(){
+  const sources=[
+    'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js',
+    'https://unpkg.com/three@0.180.0/build/three.module.js',
+    'https://esm.sh/three@0.180.0'
+  ];
+  const failures=[];
+  for(const source of sources){
+    try{THREE=await import(source);return THREE;}
+    catch(error){failures.push(source+': '+(error?.message||error));}
+  }
+  throw new Error('Unable to load the 3D engine from available CDNs. '+failures.join(' | '));
+}
 const canvas=document.querySelector('#world'),loader=document.querySelector('#loader'),hint=document.querySelector('#hint');
 const nav=document.querySelector('#bottom-nav'),panel=document.querySelector('#content-panel'),panelTitle=document.querySelector('#panel-title'),panelCopy=document.querySelector('#panel-copy'),panelKicker=document.querySelector('#panel-kicker');
 const mobile=matchMedia('(max-width:700px)').matches,reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
@@ -60,7 +73,15 @@ function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDel
 function initialize(){try{renderer=new THREE.WebGLRenderer({canvas,antialias:!mobile,powerPreference:'high-performance'});}catch(e){loader.classList.add('done');hint.textContent='3D rendering unavailable';return}
 renderer.setPixelRatio(Math.min(devicePixelRatio||1,mobile?1.3:1.8));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;
 scene=new THREE.Scene();scene.background=new THREE.Color('#292827');scene.fog=new THREE.Fog('#292827',14,28);camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,.1,60);camera.position.set(...views.entrance.position);camera.lookAt(...views.entrance.target);clock=new THREE.Clock();raycaster=new THREE.Raycaster();mouse=new THREE.Vector2();buildRoom();buildLighting();setView('entrance');camPos.set(...views.entrance.position);camTarget.set(...views.entrance.target);targetCurrent.copy(camTarget);hint.textContent='Tap the door to enter';animate();loader.classList.add('done');window.__ROOM_TEMPLATE__={ready:true,renderer:'three',interactions:true};}
-initialize();
+loadThree().then(()=>initialize()).catch(error=>{
+  console.error('3D engine startup failed:',error);
+  loader.classList.remove('done');
+  loader.classList.add('error');
+  loader.innerHTML='<div class="loader-dot"></div><strong>3D EXPERIENCE COULD NOT LOAD</strong><span class="loader-error"></span><button class="retry-button" id="retry">Retry</button>';
+  loader.querySelector('.loader-error').textContent='Check your internet connection and reload. '+(error?.message||'');
+  loader.querySelector('#retry').addEventListener('click',()=>location.reload());
+  document.body.classList.add('startup-error');
+});
 function enterRoom(){isInside=true;setView('desk');camPos.set(0,1.62,2.4);camTarget.set(0,1.55,-2.5);hint.textContent='Tap the door to enter';}
 canvas.addEventListener('pointerdown',e=>{dragging=true;pointerStart={x:e.clientX,y:e.clientY};pointerLast={x:e.clientX,y:e.clientY};canvas.setPointerCapture?.(e.pointerId)});
 canvas.addEventListener('pointermove',e=>{if(!dragging)return;const dx=e.clientX-pointerLast.x,dy=e.clientY-pointerLast.y;lookTo.x=THREE.MathUtils.clamp(lookTo.x-dx/innerWidth*2.5,-1.3,1.3);lookTo.y=THREE.MathUtils.clamp(lookTo.y+dy/innerHeight*1.2,-.6,.6);look.x+=(lookTo.x-look.x)*.35;look.y+=(lookTo.y-look.y)*.35;pointerLast={x:e.clientX,y:e.clientY}});
