@@ -36,7 +36,12 @@ jobs:
           npm install --no-save playwright@1.55.0
           npx playwright install --with-deps chromium
           python3 -m http.server 4173 --bind 127.0.0.1 > "$RUNNER_TEMP/server.log" 2>&1 &
-          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4173/ >/dev/null && break; sleep 1; done
+          attempt=0
+          until curl -fsS http://127.0.0.1:4173/ >/dev/null; do
+            attempt=$((attempt+1))
+            if [ "$attempt" -ge 30 ]; then echo "Local server failed to start"; exit 1; fi
+            sleep 1
+          done
           SITE_URL=http://127.0.0.1:4173 node scripts/runtime_smoke.cjs
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
