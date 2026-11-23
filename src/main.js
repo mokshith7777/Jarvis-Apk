@@ -30,17 +30,26 @@ const rim=new THREE.SpotLight(0x45caff,55,20,Math.PI/5,.55,1.2);rim.position.set
 const redRim=new THREE.PointLight(0xff234f,18,8,2);redRim.position.set(-3,2.4,-2);scene.add(redRim);
 const reactorLight=new THREE.PointLight(0x6deeff,5,4,2);reactorLight.position.set(0,1.55,1.1);scene.add(reactorLight);
 function makeEnvironment(){
-const floor=new THREE.Mesh(new THREE.PlaneGeometry(70,70),new THREE.MeshStandardMaterial({color:0x060a10,metalness:.52,roughness:.35}));floor.rotation.x=-Math.PI/2;floor.position.y=-.12;floor.receiveShadow=true;scene.add(floor);
-const platform=new THREE.Group();platform.position.y=-.02;scene.add(platform);
-const disk=new THREE.Mesh(new THREE.CylinderGeometry(2.15,2.22,.18,96),new THREE.MeshStandardMaterial({color:0x111923,metalness:.9,roughness:.3}));disk.receiveShadow=true;disk.castShadow=true;platform.add(disk);
-for(let i=0;i<3;i++){const tor=new THREE.Mesh(new THREE.TorusGeometry(2.08-i*.12,.012,8,128),new THREE.MeshStandardMaterial({color:i===1?0x286b82:0x36434f,emissive:i===1?0x0b4c73:0x050a0f,emissiveIntensity:1.3,metalness:.8,roughness:.22}));tor.rotation.x=Math.PI/2;tor.position.y=.1+i*.003;platform.add(tor)}
-for(let i=0;i<36;i++){const a=i*Math.PI*2/36;const mark=new THREE.Mesh(new THREE.BoxGeometry(.12,.012,.28),new THREE.MeshStandardMaterial({color:0x274253,metalness:.8,roughness:.2}));mark.position.set(Math.cos(a)*1.92,.105,Math.sin(a)*1.92);mark.rotation.y=-a;platform.add(mark)}
-const hangar=new THREE.Group();scene.add(hangar);
-for(let i=0;i<8;i++){const a=i*Math.PI/4,r=8.2;const col=new THREE.Mesh(new THREE.BoxGeometry(.42,12,.45),new THREE.MeshStandardMaterial({color:0x0a111b,metalness:.72,roughness:.38}));col.position.set(Math.cos(a)*r,5.8,Math.sin(a)*r);col.lookAt(0,5.8,0);hangar.add(col);const strip=new THREE.Mesh(new THREE.BoxGeometry(.05,7,.05),new THREE.MeshBasicMaterial({color:0x173b4b}));strip.position.set(Math.cos(a)*r,4.2,Math.sin(a)*r);strip.lookAt(0,4.2,0);hangar.add(strip)}
-for(let i=0;i<5;i++){const beam=new THREE.Mesh(new THREE.BoxGeometry(18,.2,.28),new THREE.MeshStandardMaterial({color:0x111a24,metalness:.8,roughness:.3}));beam.position.y=7.8+i*.55;beam.position.z=-2-i*2.2;scene.add(beam)}
-const ringLights=[];for(let i=0;i<4;i++){const rr=new THREE.Mesh(new THREE.TorusGeometry(3.6+i*.5,.018,8,160),new THREE.MeshBasicMaterial({color:i%2?0x17465a:0x4b1e32,transparent:true,opacity:.55}));rr.rotation.x=Math.PI/2;rr.position.y=6.8-i*.35;scene.add(rr);ringLights.push(rr)}
-const hazeMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,uniforms:{uTime:{value:0},uColorA:{value:new THREE.Color(0x041e30)},uColorB:{value:new THREE.Color(0x230719)}},vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',fragmentShader:'varying vec2 vUv;uniform float uTime;uniform vec3 uColorA;uniform vec3 uColorB;float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0);return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}void main(){vec2 p=vUv*3.0;float n=noise(p+uTime*.04)+noise(p*2.1-uTime*.02)*.5;float fog=smoothstep(.25,.8,n)*smoothstep(0.0,.45,vUv.y)*(1.0-smoothstep(.65,1.0,vUv.y));vec3 c=mix(uColorA,uColorB,smoothstep(.1,.9,vUv.x));gl_FragColor=vec4(c,fog*.17);}'});
-const haze=new THREE.Mesh(new THREE.PlaneGeometry(42,18),hazeMat);haze.position.set(0,4,-8);scene.add(haze);return {platform,ringLights,hazeMat};
+ const mountainWorld=new THREE.Group();scene.add(mountainWorld);
+ const cloudWorld=new THREE.Group();scene.add(cloudWorld);
+ const hazeMat={uniforms:{uTime:{value:0}}},ringLights=[];
+ const terrainSeed=(x,z)=>Math.sin(x*.21+z*.07)*.58+Math.sin(x*.083-z*.16)*1.05+Math.cos(z*.19+x*.045)*.52+Math.sin(x*.48+z*.3)*.18;
+ function ridge(layer,width,depth,baseY,peak,seed,color){
+  const nx=mobile?72:128,nz=mobile?28:46,positions=[],colors=[],indices=[],c=new THREE.Color(color);
+  for(let iz=0;iz<=nz;iz++){const v=iz/nz,z=-depth/2+v*depth;for(let ix=0;ix<=nx;ix++){const u=ix/nx,x=-width/2+u*width,envelope=Math.pow(Math.max(0,Math.sin(u*Math.PI)),.65),n=terrainSeed(x+seed,z+seed*4),peaks=Math.pow(Math.abs(Math.sin((x+seed)*.105+z*.028)),1.45),y=baseY+envelope*(peak*(.34+peaks*.62+n*.14))+Math.sin(z*.22+seed)*.28;positions.push(x,y,z);const shade=THREE.MathUtils.clamp(.66+n*.16+envelope*.18,0,1);colors.push(c.r*shade,c.g*shade,c.b*shade);}}
+  for(let iz=0;iz<nz;iz++)for(let ix=0;ix<nx;ix++){const a=iz*(nx+1)+ix,d=a+nx+1;indices.push(a,d,a+1,a+1,d,d+1);}
+  const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));geo.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));geo.setIndex(indices);geo.computeVertexNormals();
+  const mesh=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({vertexColors:true,roughness:1,metalness:0,side:THREE.DoubleSide}));mesh.position.z=layer;mesh.receiveShadow=!mobile;mountainWorld.add(mesh);
+ }
+ ridge(-92,155,44,-6.5,12,-3,0x536f7c);ridge(-68,132,38,-7.4,9,8,0x365b60);ridge(-46,108,32,-8,7,14,0x244b46);ridge(-30,92,27,-8.2,5.8,23,0x173a32);
+ const treeCount=mobile?300:720,treeGeo=new THREE.ConeGeometry(.22,1,5),trunkGeo=new THREE.CylinderGeometry(.035,.05,.32,5),treeMat=new THREE.MeshStandardMaterial({color:0x183b2d,roughness:1}),trunkMat=new THREE.MeshStandardMaterial({color:0x49372a,roughness:1}),trees=new THREE.InstancedMesh(treeGeo,treeMat,treeCount),trunks=new THREE.InstancedMesh(trunkGeo,trunkMat,treeCount),dummy=new THREE.Object3D();let placed=0;
+ for(let i=0;i<treeCount;i++){const x=(Math.random()-.5)*92,z=-22-Math.random()*13,y=-7.4+Math.max(0,Math.sin(x*.08+z*.03))*3.4+terrainSeed(x,z)*1.5;if(y>-3.4)continue;const sc=.55+Math.random()*1.5;dummy.position.set(x,y+sc*.48,z);dummy.rotation.y=Math.random()*6.28;dummy.scale.set(sc*.7,sc,sc*.7);dummy.updateMatrix();trees.setMatrixAt(placed,dummy.matrix);dummy.position.set(x,y+sc*.08,z);dummy.scale.set(sc*.12,sc*.32,sc*.12);dummy.updateMatrix();trunks.setMatrixAt(placed,dummy.matrix);placed++;}
+ trees.count=placed;trunks.count=placed;mountainWorld.add(trees,trunks);
+ const cloudMat=new THREE.MeshStandardMaterial({color:0xc9d8df,transparent:true,opacity:.16,roughness:1,depthWrite:false}),cloudMatLit=new THREE.MeshStandardMaterial({color:0xeaf5fb,transparent:true,opacity:.22,roughness:1,depthWrite:false});
+ for(let bank=0;bank<3;bank++){const g=new THREE.Group();g.position.set((bank-1)*24,1.5+bank*1.4,-24-bank*15);cloudWorld.add(g);for(let i=0;i<16;i++){const cloud=new THREE.Mesh(new THREE.SphereGeometry(1,12,8),i%4===0?cloudMatLit:cloudMat);cloud.position.set((Math.random()-.5)*32,(Math.random()-.5)*4,(Math.random()-.5)*18);cloud.scale.set(2.4+Math.random()*4,1+Math.random()*1.8,2.5+Math.random()*4);g.add(cloud);}}
+ const sky=new THREE.Mesh(new THREE.SphereGeometry(120,32,20),new THREE.MeshBasicMaterial({color:0x7899a6,side:THREE.BackSide}));scene.add(sky);
+ const floor=new THREE.Mesh(new THREE.PlaneGeometry(70,70),new THREE.MeshStandardMaterial({color:0x07120f,roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-.12;floor.receiveShadow=true;scene.add(floor);
+ return {platform:new THREE.Group(),ringLights,hazeMat,mountainWorld,cloudWorld};
 }
 const env=makeEnvironment();
 const dustCount=mobile?700:1500,dustPositions=new Float32Array(dustCount*3),dustSizes=new Float32Array(dustCount);
@@ -113,7 +122,7 @@ function applyCinematic(p){
  key.intensity=1.15+intro*3.1-approach*1.35+reactorReveal*.4;
  rim.intensity=15+intro*40+suitFracture*24+reactorExplode*20;
  ambient.intensity=.35+intro*.7-reactorReveal*.25;
- env.hazeMat.uniforms.uTime.value=motionTime;
+ env.hazeMat.uniforms.uTime.value=motionTime;\n env.mountainWorld.position.x=-p*13;env.mountainWorld.position.y=Math.sin(p*Math.PI*2)*.7;env.mountainWorld.rotation.y=p*.035;env.cloudWorld.position.x=-p*20;env.cloudWorld.position.y=Math.sin(p*4)*.4;env.cloudWorld.rotation.y=p*.055;env.cloudWorld.children.forEach((bank,i)=>{bank.position.x+=Math.sin(motionTime*.045+i)*.018;bank.position.y+=Math.sin(motionTime*.08+i*1.7)*.012;});
  dust.rotation.y=p*.08;dust.position.z=-flight*1.4;
  dust.material.opacity=.42+reactorExplode*.18;
  env.ringLights.forEach((r,i)=>{r.rotation.z=p*(i%2?-.3:.25);r.material.opacity=.4+reactorExplode*.25});
