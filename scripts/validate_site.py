@@ -259,6 +259,11 @@ if SMOKE.is_file():
     check('function waitForScrollReset(page,label)' in SMOKE_TEXT and 'window.scrollY<5' in SMOKE_TEXT and "cs.visibility==='hidden'" in SMOKE_TEXT, 'Browser smoke must verify reveal reversibility and scroll reset helper')
     check('function waitForScrollReset(page,label)' in SMOKE_TEXT and 'window.__JARVIS_RUNTIME__?.scrollTarget<.02' in SMOKE_TEXT and 'window.__JARVIS_RUNTIME__?.scrollProgress<.02' in SMOKE_TEXT and 're-enter visibly after scrolling down again' in SMOKE_TEXT, 'Browser smoke must verify native scroll target and camera progress reset near zero and reveals re-enter after reverse scrolling')
     check('async function scrollToElementInstant(locator,label)' in SMOKE_TEXT and "scrollIntoView({block:'center',inline:'nearest',behavior:'instant'})" in SMOKE_TEXT and "scrollToElementInstant(desktop.locator('#story'),'story section')" in SMOKE_TEXT and SMOKE_TEXT.count("scrollToElementInstant(firstReveal,'first feature reveal')")==2 and 'scrollIntoViewIfNeeded' not in SMOKE_TEXT, 'Browser smoke must use instant DOM scrolling to avoid waiting for animated element stability')
+    desktop_capture=SMOKE_TEXT.find("await captureVisualEvidence(desktop,'DESKTOP')")
+    mobile_capture=SMOKE_TEXT.find("await captureVisualEvidence(mobile,'MOBILE')")
+    desktop_interaction=SMOKE_TEXT.find("assert.equal(new URL(desktop.url()).hash,'#pricing'")
+    mobile_interaction=SMOKE_TEXT.find("mobile tap sandbox interaction should work")
+    check(desktop_capture>desktop_interaction and mobile_capture>mobile_interaction and "await waitForScrollReset(desktop,'desktop screenshot hero reset')" in SMOKE_TEXT and "await waitForScrollReset(mobile,'mobile screenshot hero reset')" in SMOKE_TEXT, "Visual screenshot capture must run only after desktop/mobile functional interactions and restore both hero scroll positions")
 check("Browser smoke for staged Pages artifact" in WORKFLOW and "runtime_smoke.cjs" in WORKFLOW, "Staged browser runtime smoke is not a CI gate")
 check("Browser smoke for live Pages deployment" in WORKFLOW, "Live browser runtime smoke is not a CI gate")
 
