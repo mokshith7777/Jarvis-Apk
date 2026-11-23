@@ -1,40 +1,20 @@
-# JARVIS PRO Storefront
+# JARVIS PRO · Interactive Room Storefront
 
-The active GitHub Pages site is the full JARVIS PRO product storefront, restored from the previous site content and rebuilt around the supplied Iron Man 2020 suit image.
+Fresh room-first storefront. The persistent Three.js environment is the experience; page chapters guide the camera and product story.
 
-## Cinematic entry
-- The hero currently uses an externally hosted Iron Man 2020 suit image. Exact matching against the user's original reference set has not been verified.
-- Scroll choreography zooms toward the chest area and transitions to a layered Arc Reactor graphic. A layered, animated SVG mountain-valley backdrop now sits behind the transparent WebGL scene; the foreground terrain/armor is still procedural. This is not a cinematic video or photoreal armor replacement.
-- No video/training-video asset or autoplay media is used.
-- Scroll reveal respects reduced-motion preferences.
+## Features
+- Persistent Three.js command-room scene with scroll-linked camera progression.
+- Interactive room hotspots and product object.
+- Responsive chapter navigation and adaptive renderer quality.
+- Reduced-motion support and WebGL fallback.
+- Accurate experimental-product messaging; checkout is not yet connected.
 
-## Visual acceptance status
+## Preview
+`python3 -m http.server 4173` then visit `http://127.0.0.1:4173`.
 
-- The abstract background grid overlay is disabled. The animated vector valley backdrop adds cloud/fog drift and scroll-linked parallax, with reduced-motion behavior; scroll reveals retain one GSAP owner.
-- The requested realistic full-page nature video / photoreal environment is still not integrated. The SVG backdrop is an illustrative improvement, not final visual acceptance; no external video or reference-matched GLB is merged.
-- The exact five armor/Arc Reactor reference images are not present in the accessible repository or Library files at audit time. Reattach them before claiming exact fidelity.
-- Checkout/APK delivery remains presentation-only; no live payment or download fulfillment is active.
+## Validate
+`python3 scripts/validate_site.py`
+`node --check src/room.js`
+`node --check scripts/runtime_smoke.cjs`
 
-## Restored storefront content
-- Product hero and product purpose
-- Feature cards: Voice + Chat, AI Provider Choice, Local Tooling, Android Workflows, History + Settings, Connected Services
-- Interactive demo scenarios
-- Provider connection sandbox
-- Ecosystem/integrations overview
-- Android setup walkthrough and device-specific steps
-- Product/launch pricing presentation and purchase status disclaimer
-- FAQ and footer information
-
-The checkout and APK delivery are still presentation-only and are clearly described as inactive; do not treat this page as a live payment or delivery system.
-
-## Source image
-Armor image attribution is shown on the site: ultraraw26 via HDQWalls. The source page is linked from the footer.
-
-## Files
-- `index.html`: full storefront, cinematic scroll reveal, restored content and interactions.
-- `archive/storefront-v1.html`: preserved original storefront snapshot.
-- `scripts/validate_site.py`: static integrity and content checks.
-- `.github/workflows/pages.yml`: validation, Pages artifact upload, deploy and live SHA verification.
-
-## Deploy
-GitHub Pages is deployed by `.github/workflows/pages.yml`. The workflow runs actionlint and site checks, parses inline JavaScript, validates HTML/CSS formatting, uploads the site artifact, deploys, and requires HTTP 200 plus an exact SHA-256 match of the live page to the checked-out `index.html`.
+Pushes to `main` run validation and browser smoke before Pages deployment.

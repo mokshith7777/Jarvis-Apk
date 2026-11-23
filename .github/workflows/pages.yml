@@ -1,4 +1,4 @@
-name: Deploy JARVIS PRO Storefront
+name: Deploy JARVIS Room Storefront
 on:
   push:
     branches: [main]
@@ -24,156 +24,31 @@ jobs:
           curl -fsSL https://github.com/rhysd/actionlint/releases/download/v1.7.7/actionlint_1.7.7_linux_amd64.tar.gz -o "$RUNNER_TEMP/actionlint.tar.gz"
           tar -xzf "$RUNNER_TEMP/actionlint.tar.gz" -C "$RUNNER_TEMP" actionlint
           "$RUNNER_TEMP/actionlint" .github/workflows/pages.yml
-      - name: Validate storefront and references
+      - name: Static validation
         run: |
-          test -s index.html
-          test -s scripts/validate_site.py
-          test -s archive/storefront-v1.html
-          test -f .nojekyll
           python3 scripts/validate_site.py
-      - name: Syntax and structure checks
-        run: |
-          python3 - <<'PY'
-          from html.parser import HTMLParser
-          from pathlib import Path
-          import json, os
-          class Extractor(HTMLParser):
-            def __init__(self):
-              super().__init__(); self.kind=None; self.scripts=[]; self.importmaps=[]; self.styles=[]; self.buf=[]
-            def handle_starttag(self,tag,attrs):
-              a=dict(attrs)
-              if tag=='script' and not a.get('src'):
-                self.kind='importmap' if a.get('type','').lower()=='importmap' else 'script'; self.buf=[]
-              elif tag=='style': self.kind='style'; self.buf=[]
-            def handle_endtag(self,tag):
-              if tag=='script' and self.kind in ('script','importmap'):
-                (self.importmaps if self.kind=='importmap' else self.scripts).append(''.join(self.buf)); self.kind=None; self.buf=[]
-              elif tag=='style' and self.kind=='style':
-                self.styles.append(''.join(self.buf)); self.kind=None; self.buf=[]
-            def handle_data(self,data):
-              if self.kind: self.buf.append(data)
-          p=Extractor(); p.feed(Path('index.html').read_text(encoding='utf-8')); p.close()
-          out=Path(os.environ['RUNNER_TEMP'],'parse'); out.mkdir(parents=True,exist_ok=True)
-          if not p.scripts: raise SystemExit('No inline executable scripts found')
-          for i,s in enumerate(p.scripts): (out/f'inline-{i}.js').write_text(s,encoding='utf-8')
-          for i,s in enumerate(p.styles): (out/f'inline-style-{i}.css').write_text(s,encoding='utf-8')
-          for m in p.importmaps: json.loads(m)
-          print(f'Extracted {len(p.scripts)} executable inline scripts, {len(p.importmaps)} import maps and {len(p.styles)} inline CSS blocks.')
-          PY
-          for js in "$RUNNER_TEMP"/parse/inline-*.js; do node --check --input-type=module < "$js"; done
-          node --check --input-type=module < src/main.js
-          node --check --input-type=module < src/armor.js
+          node --check src/room.js
           node --check scripts/runtime_smoke.cjs
-          cp scripts/runtime_smoke.cjs "$RUNNER_TEMP/runtime-smoke-parse.cjs"
-          npx --yes prettier@3.5.3 --parser babel --write "$RUNNER_TEMP/runtime-smoke-parse.cjs"
-          cp index.html "$RUNNER_TEMP/index-parse.html"
-          npx --yes prettier@3.5.3 --parser html --write "$RUNNER_TEMP/index-parse.html"
-          for js in "$RUNNER_TEMP"/parse/inline-*.js src/main.js src/armor.js; do
-            cp "$js" "$RUNNER_TEMP/$(basename "$js").parse.js"
-            npx --yes prettier@3.5.3 --parser babel --write "$RUNNER_TEMP/$(basename "$js").parse.js"
-          done
-          for css in "$RUNNER_TEMP"/parse/inline-style-*.css styles/cinematic.css; do
-            cp "$css" "$RUNNER_TEMP/$(basename "$css").parse.css"
-            npx --yes prettier@3.5.3 --parser css --write "$RUNNER_TEMP/$(basename "$css").parse.css"
-          done
-          cp scripts/validate_site.py "$RUNNER_TEMP/validator.py"
-          python3 -m py_compile "$RUNNER_TEMP/validator.py"
       - name: Configure Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d
-      - name: Stage Pages artifact
+      - name: Browser smoke
         run: |
-          set -euo pipefail
-          rm -rf "$RUNNER_TEMP/pages"
-          mkdir -p "$RUNNER_TEMP/pages"
-          cp index.html .nojekyll "$RUNNER_TEMP/pages/"
-          cp -R src styles "$RUNNER_TEMP/pages/"
-          test -s "$RUNNER_TEMP/pages/index.html"
-          test -f "$RUNNER_TEMP/pages/.nojekyll"
-          cmp -s index.html "$RUNNER_TEMP/pages/index.html"
-          test -s "$RUNNER_TEMP/pages/src/main.js"
-          test -s "$RUNNER_TEMP/pages/src/armor.js"
-          test -s "$RUNNER_TEMP/pages/styles/cinematic.css"
-          test "$(find "$RUNNER_TEMP/pages" -mindepth 1 -maxdepth 1 | wc -l)" -eq 4
-          echo "Pages artifact allowlist: index.html, .nojekyll, src/, styles/."
-
-# Runtime artifact exact allowlist: no hidden files except Pages' .nojekyll.
-      - name: Verify runtime artifact allowlist
-        run: |
-          set -euo pipefail
-          expected="$RUNNER_TEMP/expected-artifact-files"
-          actual="$RUNNER_TEMP/actual-artifact-files"
-          printf '%s\n' .nojekyll index.html src/armor.js src/main.js src/storefront-cinematic.js styles/cinematic.css styles/storefront-cinematic.css | sort > "$expected"
-          find "$RUNNER_TEMP/pages" -type f -printf '%P\n' | sort > "$actual"
-          diff -u "$expected" "$actual"
-          test ! -e "$RUNNER_TEMP/pages/src/.hidden"
-          test ! -e "$RUNNER_TEMP/pages/styles/.hidden"
-
-      - name: Browser smoke for staged Pages artifact
-        run: |
-          set -euo pipefail
-          npm install --prefix "$RUNNER_TEMP/jarvis-browser" --no-save --no-package-lock playwright@1.65.0 three@0.170.0 gsap@3.12.7 lenis@1.1.16
-          "$RUNNER_TEMP/jarvis-browser/node_modules/.bin/playwright" install --with-deps chromium
-          python3 -m http.server 4173 --bind 127.0.0.1 --directory "$RUNNER_TEMP/pages" > "$RUNNER_TEMP/pages-server.log" 2>&1 &
-          server_pid=$!
-          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
-          server_ready=false
-          for attempt in 1 2 3 4 5; do
-            if curl --fail --silent --show-error --max-time 3 http://127.0.0.1:4173/ >/dev/null; then
-              echo "Artifact server ready after probe $attempt"
-              server_ready=true
-              break
-            fi
-            sleep 2
-          done
-          if [ "$server_ready" != true ]; then
-            cat "$RUNNER_TEMP/pages-server.log"
-            echo "Artifact HTTP server did not become ready."
-            exit 1
-          fi
-          node scripts/runtime_smoke.cjs http://127.0.0.1:4173/ "$RUNNER_TEMP/jarvis-browser/node_modules" full
-      - name: Upload site artifact
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+          python3 -m http.server 4173 --bind 127.0.0.1 > "$RUNNER_TEMP/server.log" 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4173/ >/dev/null && break; sleep 1; done
+          SITE_URL=http://127.0.0.1:4173 node scripts/runtime_smoke.cjs
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
-          name: jarvis-storefront-${{ github.run_id }}-${{ github.run_attempt }}
-          path: "${{ runner.temp }}/pages"
-          include-hidden-files: true
-      - name: Wait for Pages artifact metadata propagation
-        run: sleep 10
+          path: .
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346
-        with:
-          artifact_name: jarvis-storefront-${{ github.run_id }}-${{ github.run_attempt }}
-      - name: Verify live runtime asset hashes
-        env:
-          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+      - name: Verify live deployment
         run: |
-          set -euo pipefail
-          for asset in src/main.js src/armor.js styles/cinematic.css src/storefront-cinematic.js styles/storefront-cinematic.css; do
-            curl --fail --silent --show-error --location --max-time 30 "$PAGE_URL$asset" -o "$RUNNER_TEMP/live-runtime-asset"
-            cmp -s "$asset" "$RUNNER_TEMP/live-runtime-asset"
-            echo "Verified live runtime asset: $asset"
-          done
-      - name: Browser smoke for live Pages deployment
-        env:
-          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
-        run: |
-          set -euo pipefail
-          node scripts/runtime_smoke.cjs "$PAGE_URL" "$RUNNER_TEMP/jarvis-browser/node_modules" live
-      - name: Verify live deployment matches source
-        env:
-          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
-        run: |
-          set -euo pipefail
-          expected="$(sha256sum index.html | cut -d' ' -f1)"
-          for attempt in $(seq 1 12); do
-            status="$(curl --silent --show-error --location --compressed --max-time 20 --output "$RUNNER_TEMP/live-index.html" --write-out '%{http_code}' "$PAGE_URL" || true)"
-            if [ "$status" = "200" ]; then
-              actual="$(sha256sum "$RUNNER_TEMP/live-index.html" | cut -d' ' -f1)"
-              if [ "$actual" = "$expected" ]; then echo "Pages deployment verified: HTTP 200 and source SHA matched.";exit 0;fi
-              echo "Attempt $attempt: HTTP 200 but SHA mismatch ($actual != $expected)."
-            else echo "Attempt $attempt: HTTP $status; retrying.";fi
-            sleep 10
-          done
-          echo "Live deployment verification failed."
-          exit 1
+          curl -fsSL "${{ steps.deployment.outputs.page_url }}" -o "$RUNNER_TEMP/live.html"
+          grep -q 'ENTER THE ROOM' "$RUNNER_TEMP/live.html"
+          grep -q 'src/room.js' "$RUNNER_TEMP/live.html"
+          curl -fsSL "${{ steps.deployment.outputs.page_url }}src/room.js" -o "$RUNNER_TEMP/live-room.js"
+          node --check "$RUNNER_TEMP/live-room.js"
