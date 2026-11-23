@@ -3,38 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#05070b">
-<meta name="description" content="Enter the JARVIS PRO command room. Explore an experimental Android AI companion built around voice, configurable AI services and optional integrations.">
-<title>JARVIS PRO · Enter the Room</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#02040a">
+<meta name="description" content="An immersive JARVIS room experience.">
+<title>JARVIS · Immersive Room</title>
 <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./styles/room.css">
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"}}</script>
 </head>
 <body>
-<div id="room-loader" aria-live="polite"><div class="loader-core"></div><span>JARVIS ENVIRONMENT · INITIALIZING</span><small id="loader-status">BUILDING SPATIAL INTERFACE</small></div>
-<canvas id="room-world" aria-label="Interactive JARVIS command room"></canvas>
-<div id="webgl-fallback" hidden><div class="fallback-glow"></div><p>3D ENVIRONMENT UNAVAILABLE</p><small>Use the navigation below to explore the JARVIS PRO product.</small></div>
-<div class="grain" aria-hidden="true"></div>
-<header class="topbar"><a class="brand" href="#entry" aria-label="JARVIS PRO home"><span class="brand-reactor">J</span><span>JARVIS <i>PRO</i></span></a>
-<nav class="topnav" aria-label="Main navigation"><a href="#features">CAPABILITIES</a><a href="#setup">INSTALLATION</a><a href="#pricing">PRODUCT</a></nav>
-<button id="enter-room" class="enter-button" type="button"><span>ENTER THE ROOM</span><b>↗</b></button></header>
-<div class="scene-hud" aria-hidden="true"><div><span class="hud-dot"></span><span id="scene-status">ENVIRONMENT STANDBY</span></div><div id="scene-coordinates">ROOM / 00</div></div>
-<div class="chapter-hud" aria-label="Room navigation"><button data-jump="#entry" aria-label="Entry" class="chapter-dot active"></button><button data-jump="#features" aria-label="Capabilities" class="chapter-dot"></button><button data-jump="#setup" aria-label="Installation" class="chapter-dot"></button><button data-jump="#pricing" aria-label="Product" class="chapter-dot"></button><button data-jump="#faq" aria-label="FAQ" class="chapter-dot"></button></div>
-<main>
-<section id="entry" class="chapter hero-chapter" data-scene="entry"><div class="chapter-copy hero-copy"><div class="eyebrow"><span>01</span> PERSONAL AI SYSTEM · ANDROID</div>
-<h1>ENTER THE<br><em>JARVIS</em><br>ROOM.</h1><p class="lead">A configurable AI companion. Voice, connected services, and optional tools. One interface, built around your setup.</p>
-<div class="cta-row"><a class="primary-cta" href="#features">EXPLORE THE SYSTEM <span>↓</span></a><a class="quiet-cta" href="#pricing">PRODUCT / ₹19</a></div><div class="microcopy">EXPERIMENTAL SOFTWARE · CAPABILITIES DEPEND ON CONFIGURATION</div></div><div class="hero-caption"><span>ROOM 01 / INITIALIZATION</span><span>SCROLL TO EXPLORE</span></div></section>
-<section id="features" class="chapter feature-chapter" data-scene="desk"><div class="chapter-copy"><div class="eyebrow"><span>02</span> THE COMMAND DESK</div><h2>ONE INTERFACE.<br><em>YOUR CONFIGURATION.</em></h2><p class="lead">JARVIS is designed as a hub for the AI services and tools you choose to connect. Nothing is magically pre-connected.</p>
-<div class="feature-list"><article class="feature-item"><b>01 / VOICE + CHAT</b><p>Text conversation, voice input and spoken responses where supported.</p></article><article class="feature-item"><b>02 / PROVIDER CHOICE</b><p>Configure supported hosted AI providers or compatible endpoints.</p></article><article class="feature-item"><b>03 / LOCAL OPTIONS</b><p>Optional local endpoints and advanced companion-worker integrations.</p></article><article class="feature-item"><b>04 / ANDROID CONTROL</b><p>Optional workflows depend on permissions, device and configured services.</p></article></div></div><div class="side-label">INTERACTIVE SCREENS · SELECT A FEATURE</div></section>
-<section id="setup" class="chapter setup-chapter" data-scene="console"><div class="chapter-copy"><div class="eyebrow"><span>03</span> SYSTEM CONFIGURATION</div><h2>CONNECT.<br><em>CONFIGURE.</em><br>CONTROL.</h2><p class="lead">Choose your provider and understand each permission before you grant it. The device remains yours to control.</p>
-<div class="setup-steps"><div><span>01</span> Verify the release and device compatibility.</div><div><span>02</span> Install from the official distribution source.</div><div><span>03</span> Configure a provider or compatible endpoint.</div><div><span>04</span> Enable only the integrations you actually need.</div></div><a class="text-link" href="https://support.google.com/android/answer/12623953" target="_blank" rel="noopener noreferrer">ANDROID SECURITY GUIDE ↗</a></div></section>
-<section id="pricing" class="chapter product-chapter" data-scene="product"><div class="chapter-copy product-copy"><div class="eyebrow"><span>04</span> THE PRODUCT BAY</div><h2>BRING YOUR<br><em>AI CORE</em><br>ONLINE.</h2><p class="lead">JARVIS PRO · Android AI companion APK</p><div class="price-block"><div class="price">₹19 <small>INR</small><s>₹49</s></div><p>Displayed introductory offer. Standard listed price: ₹49.</p></div><div class="product-includes"><span>CHAT + VOICE</span><span>CONFIGURABLE AI</span><span>OPTIONAL INTEGRATIONS</span></div><a class="primary-cta" href="#checkout">GET JARVIS PRO <span>↗</span></a><div id="checkout" class="checkout-note"><b>Checkout is not connected yet.</b> This button currently navigates to the product bay. Payment verification and APK delivery must be connected before real sales.</div></div><div class="product-visual-caption">PRODUCT BAY / 04 · JARVIS PRO</div></section>
-<section id="faq" class="chapter faq-chapter" data-scene="exit"><div class="chapter-copy faq-copy"><div class="eyebrow"><span>05</span> SYSTEM NOTES</div><h2>BEFORE YOU<br><em>DEPLOY.</em></h2><div class="faq-list">
-<details><summary>Does JARVIS work fully offline?</summary><p>Not necessarily. Offline operation depends on the configured model and features. Hosted providers and online services require connectivity.</p></details><details><summary>Do I need an API key?</summary><p>Some hosted providers require keys and may charge according to their own pricing. Requirements depend on the provider or endpoint.</p></details><details><summary>Is Termux required?</summary><p>Termux companion functionality is optional and intended for advanced configurations.</p></details><details><summary>Are integrations ready out of the box?</summary><p>Optional integrations require compatible services and their own configuration, credentials and permissions.</p></details><details><summary>Is this a production-ready release?</summary><p>The currently documented public build is experimental. Verify signing, compatibility, security and release readiness before relying on it.</p></details></div><div class="final-actions"><a href="#entry">RETURN TO ROOM ↑</a><a href="https://github.com/mokshith7777/Jarvis-Apk" target="_blank" rel="noopener noreferrer">SOURCE / RELEASES ↗</a></div></div></section>
-</main>
-<div id="interaction-hint" aria-live="polite">DRAG TO LOOK · SCROLL TO MOVE</div>
-<div id="object-panel" class="object-panel" hidden><button id="panel-close" aria-label="Close panel">×</button><span id="panel-kicker">ROOM INTERACTION</span><h3 id="panel-title"></h3><p id="panel-text"></p><a id="panel-link" href="#features">EXPLORE ↗</a></div>
+<div id="loader"><div class="loader-ring"><i></i></div><span>INITIALIZING</span></div>
+<canvas id="world" aria-label="Interactive cinematic JARVIS room"></canvas>
+<div class="vignette"></div><div class="grain"></div>
+<div class="hud">
+  <div class="mark" aria-label="JARVIS"><span>J</span></div>
+  <div class="status"><i></i><span id="state">SYSTEM ONLINE</span></div>
+  <button id="enter" aria-label="Enter room"><span class="enter-label">ENTER</span><b>↗</b></button>
+</div>
+<div class="edge-label left">J A R V I S <span> / </span> SPATIAL INTERFACE</div>
+<div class="edge-label right" id="room-index">01 — 04</div>
+<div class="scroll-orbit" aria-hidden="true"><span></span></div>
+<div id="fallback" hidden></div>
 <script type="module" src="./src/room.js"></script>
 </body></html>
