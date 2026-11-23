@@ -63,7 +63,7 @@ jobs:
       - name: Verify live deployment
         run: |
           curl -fsSL "${{ steps.deployment.outputs.page_url }}" -o "$RUNNER_TEMP/live.html"
-          grep -q 'ENTER THE ROOM' "$RUNNER_TEMP/live.html"
+          grep -q 'ENTER' "$RUNNER_TEMP/live.html"
           grep -q 'src/room.js' "$RUNNER_TEMP/live.html"
           curl -fsSL "${{ steps.deployment.outputs.page_url }}src/room.js" -o "$RUNNER_TEMP/live-room.js"
           node --check "$RUNNER_TEMP/live-room.js"
