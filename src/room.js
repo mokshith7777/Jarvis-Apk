@@ -19,7 +19,7 @@ box(9,3.5,.18,wall,0,1.75,-5.5);box(.18,3.5,10,sideWall,-4.5,1.75,-.5);box(.18,3
 box(9,.12,10,ceiling,0,3.5,-.5);
 for(let s of [-1,1]){box(.14,.18,10,white,s*4.42,3.4,-.5);box(.14,.18,10,woodDark,s*4.42,.1,-.5)}
 // Entrance wall split around door opening; door starts closed
-box(9,3.5,.18,white,0,1.75,4.55);box(1.6,3.5,.18,white,-3.7,1.75,4.55);box(1.6,3.5,.18,white,3.7,1.75,4.55);box(2.9,.5,.18,white,0,3.25,4.55);
+box(1.6,3.5,.18,white,-3.7,1.75,4.55);box(1.6,3.5,.18,white,3.7,1.75,4.55);box(2.9,.5,.18,white,0,3.25,4.55);
 doorPivot=new THREE.Group();doorPivot.position.set(-1.45,0,4.46);add(doorPivot);door=box(2.9,2.95,.12,mat('#d5d0c8'),1.45,1.48,0);doorPivot.add(door);door.position.set(1.45,1.48,0);door.userData.interactive=true;door.userData.title='Entrance';
 const frame=box(3.05,3.08,.11,white,0,1.52,4.4);frame.visible=false;
 doorHandle=new THREE.Group();doorHandle.position.set(2.62,1.42,.1);doorPivot.add(doorHandle);sphere(.055,metal,0,0,0);line([0,0,0],[.13,0,0],.025,metal);
