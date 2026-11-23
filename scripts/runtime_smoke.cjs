@@ -31,8 +31,18 @@ async function installPinnedDependencyRoute(page){
 const browser=await chromium.launch({headless:true,args:browserArgs});
 async function revealBeforeInteraction(page,locator,label){
  await locator.evaluate(e=>e.scrollIntoView({block:'center',behavior:'instant'}));
- const reveal=await locator.evaluateHandle(e=>e.closest('.reveal')||e);
- await page.waitForFunction(el=>{const cs=getComputedStyle(el);return cs.visibility==='visible'&&Number(cs.opacity)>.95},reveal,{timeout:10000}).catch(async error=>{const details=await reveal.evaluate(el=>({tag:el.tagName,className:el.className,visibility:getComputedStyle(el).visibility,opacity:getComputedStyle(el).opacity,rect:el.getBoundingClientRect().toJSON()}));throw new Error(label+' reveal did not become visible: '+JSON.stringify(details)+'; '+error.message)});
+ const state=await locator.evaluate(el=>new Promise(resolve=>{
+  const target=el.closest('.reveal')||el,deadline=performance.now()+10000;
+  function inspect(){
+   const revealStyle=getComputedStyle(target),elementStyle=getComputedStyle(el),revealRect=target.getBoundingClientRect(),elementRect=el.getBoundingClientRect();
+   const details={tag:target.tagName,className:target.className,visibility:revealStyle.visibility,opacity:revealStyle.opacity,elementVisibility:elementStyle.visibility,elementOpacity:elementStyle.opacity,revealRect:revealRect.toJSON(),elementRect:elementRect.toJSON()};
+   if(revealStyle.visibility==='visible'&&Number(revealStyle.opacity)>.95&&elementStyle.visibility==='visible'&&elementRect.width>0&&elementRect.height>0){resolve({ready:true,details});return;}
+   if(performance.now()>=deadline){resolve({ready:false,details});return;}
+   requestAnimationFrame(inspect);
+  }
+  inspect();
+ }));
+ if(!state.ready)throw new Error(label+' reveal did not become visible: '+JSON.stringify(state.details));
 }
 async function openAndVerify(page,label){
  const pageErrors=[],failedModules=[],localDependencyFailures=await installPinnedDependencyRoute(page)||[];
