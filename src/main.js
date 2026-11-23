@@ -122,7 +122,8 @@ function applyCinematic(p){
  key.intensity=1.15+intro*3.1-approach*1.35+reactorReveal*.4;
  rim.intensity=15+intro*40+suitFracture*24+reactorExplode*20;
  ambient.intensity=.35+intro*.7-reactorReveal*.25;
- env.hazeMat.uniforms.uTime.value=motionTime;\n env.mountainWorld.position.x=-p*13;env.mountainWorld.position.y=Math.sin(p*Math.PI*2)*.7;env.mountainWorld.rotation.y=p*.035;env.cloudWorld.position.x=-p*20;env.cloudWorld.position.y=Math.sin(p*4)*.4;env.cloudWorld.rotation.y=p*.055;env.cloudWorld.children.forEach((bank,i)=>{bank.position.x=(i-1)*24+Math.sin(motionTime*.045+i)*.28;bank.position.y=1.5+i*1.4+Math.sin(motionTime*.08+i*1.7)*.08;});
+ env.hazeMat.uniforms.uTime.value=motionTime;
+ env.mountainWorld.position.x=-p*13;env.mountainWorld.position.y=Math.sin(p*Math.PI*2)*.7;env.mountainWorld.rotation.y=p*.035;env.cloudWorld.position.x=-p*20;env.cloudWorld.position.y=Math.sin(p*4)*.4;env.cloudWorld.rotation.y=p*.055;env.cloudWorld.children.forEach((bank,i)=>{bank.position.x=(i-1)*24+Math.sin(motionTime*.045+i)*.28;bank.position.y=1.5+i*1.4+Math.sin(motionTime*.08+i*1.7)*.08;});
  dust.rotation.y=p*.08;dust.position.z=-flight*1.4;
  dust.material.opacity=.42+reactorExplode*.18;
  env.ringLights.forEach((r,i)=>{r.rotation.z=p*(i%2?-.3:.25);r.material.opacity=.4+reactorExplode*.25});
