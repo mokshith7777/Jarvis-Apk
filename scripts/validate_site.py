@@ -186,6 +186,10 @@ for impmap in audit.importmaps:
         check(False, "Invalid import map JSON: " + str(exc))
 
 check('id="armor-image"' in HTML and "iron-man-2020-suit-xf-1440x2560.jpg" in HTML, "Current externally hosted armor image markup/source missing")
+check('id="nature-photo"' in HTML and "images.unsplash.com/photo-1774897831544-f9bb889b537c" in HTML, "Photographic nature backdrop source missing")
+check("Marek Piwnicki / Unsplash" in HTML, "Nature photo attribution missing")
+check(".hero.cinematic-hero .stage.armor-stage{display:grid!important}" in CSS, "Armor reference stage must be visible")
+check("sound-toggle[aria-pressed=true]" in CSS, "Sound toggle must have a visible enabled state")
 check("armor-image" in HTML and "reactor-transition" in HTML, "Scroll zoom / reactor transition markup missing")
 check("requestAnimationFrame(render)" in HTML and "armor-scroll" in HTML, "Scroll-driven animation code missing")
 check("prefers-reduced-motion" in HTML, "Reduced motion handling missing")
@@ -208,6 +212,7 @@ ARMOR = (ROOT / "src/armor.js").read_text(encoding="utf-8")
 CSS = (ROOT / "styles/cinematic.css").read_text(encoding="utf-8")
 check("mountainWorld" in MAIN and "ridge(" in MAIN and "env.mountainWorld.position.x=-p*18" in MAIN, "Mountain environment code marker missing")
 check("document.documentElement.style.setProperty('--mountain-scroll',p.toFixed(3))" in MAIN, "Nature backdrop scroll parallax is not synchronized to cinematic progress")
+check("armor.visible=false" in MAIN and "armorReveal" in MAIN, "Procedural armor should start hidden and crossfade during the fracture chapter")
 check("cinematic-techfield" not in CSS and "background-canvas" not in CSS and "web-lattice" not in CSS, "Legacy background selectors remain in the active stylesheet")
 check("function syncScrollTarget(){state.target=THREE.MathUtils.clamp(window.scrollY/Math.max(1,document.documentElement.scrollHeight-innerHeight),0,1)}" in MAIN, "Cinematic target must derive from native document scroll")
 check("window.addEventListener('scroll',syncScrollTarget,{passive:true})" in MAIN and "lenis.on('scroll',()=>{syncScrollTarget();ScrollTrigger.update()})" in MAIN, "Native and Lenis scroll events must synchronize cinematic progress")
@@ -224,7 +229,7 @@ check("fallback.hidden=false" in MAIN and "renderer.domElement" in MAIN, "Three.
 check("requestAnimationFrame(render)" in MAIN, "Three.js render loop missing")
 check("for(let i=0;i<10;i++" in ARMOR and "copper-winding-" in ARMOR, "Ten-coil reactor detail missing")
 check("prefers-reduced-motion" in CSS, "Source cinematic CSS lacks reduced-motion handling")
-check('#nature-backdrop' in CSS and 'natureCloudDrift' in CSS and '--mountain-scroll' in CSS, "Nature backdrop lacks responsive parallax/ambient motion styling")
+check('#nature-backdrop' in CSS and 'natureCloudDrift' in CSS and '--mountain-scroll' in CSS and '#nature-photo' in CSS, "Nature backdrop lacks photo, responsive parallax and ambient motion styling")
 check("@media" in CSS, "Source cinematic CSS lacks responsive breakpoints")
 check("import './armor.js'" not in MAIN and "from './armor.js'" in MAIN, "Local armor module import missing")
 
@@ -249,7 +254,7 @@ if SMOKE.is_file():
     SMOKE_TEXT = SMOKE.read_text(encoding="utf-8")
     check("WEBGL_lose_context" in SMOKE_TEXT and "contextRestorations" in SMOKE_TEXT and "framesAtLoss" in SMOKE_TEXT and "?.frames>frames" in SMOKE_TEXT, "Browser smoke must verify WebGL context recovery and resumed rendering frames")
     check("demo-tab" in SMOKE_TEXT and "devicefamily" in SMOKE_TEXT and "setup-reset" in SMOKE_TEXT, "Browser smoke misses core interactions")
-    check("#nature-backdrop" in SMOKE_TEXT and "nature cloud animation must stop for reduced motion" in SMOKE_TEXT, "Browser smoke must verify nature backdrop and reduced-motion behavior")
+    check("#nature-backdrop" in SMOKE_TEXT and "nature cloud animation must stop for reduced motion" in SMOKE_TEXT and "nature photo must load" in SMOKE_TEXT and "armor image must load" in SMOKE_TEXT and "mobile hero copy must not overlap armor stage" in SMOKE_TEXT, "Browser smoke must verify nature photo, armor reference and mobile/reduced-motion behavior")
     check('async function revealBeforeInteraction(page,locator,label)' in SMOKE_TEXT and 'revealBeforeInteraction(desktop,demo' in SMOKE_TEXT and 'revealBeforeInteraction(desktop,faq' in SMOKE_TEXT and 'revealBeforeInteraction(desktop,expand' in SMOKE_TEXT and 'revealBeforeInteraction(desktop,hosted' in SMOKE_TEXT and 'revealBeforeInteraction(desktop,deviceFamily' in SMOKE_TEXT and 'revealBeforeInteraction(desktop,checklist' in SMOKE_TEXT and 'revealBeforeInteraction(mobile,localChip' in SMOKE_TEXT, 'Browser smoke must wait for cinematic reveal visibility before interacting with desktop and mobile controls')
     check('function waitForScrollReset(page,label)' in SMOKE_TEXT and 'window.scrollY<5' in SMOKE_TEXT and "cs.visibility==='hidden'" in SMOKE_TEXT, 'Browser smoke must verify reveal reversibility and scroll reset helper')
     check('function waitForScrollReset(page,label)' in SMOKE_TEXT and 'window.__JARVIS_RUNTIME__?.scrollTarget<.02' in SMOKE_TEXT and 'window.__JARVIS_RUNTIME__?.scrollProgress<.02' in SMOKE_TEXT and 're-enter visibly after scrolling down again' in SMOKE_TEXT, 'Browser smoke must verify native scroll target and camera progress reset near zero and reveals re-enter after reverse scrolling')
@@ -258,7 +263,7 @@ check("Browser smoke for live Pages deployment" in WORKFLOW, "Live browser runti
 
 # This is a warning, not a release-blocking test: cinematic realism requires human visual approval.
 if not re.search(r"<video\b|\.(?:mp4|webm|mov)(?:[?#]|$)", HTML, re.I):
-    print("VISUAL ACCEPTANCE PENDING: layered animated vector nature backdrop and procedural armor are not a cinematic video or photoreal suit; exact reference matching still requires human review.")
+    print("VISUAL ACCEPTANCE PENDING: photographic nature backdrop and armor reference are in place, but cinematic video, exact reference fidelity and human visual acceptance remain outstanding.")
 
 if errors:
     print("SITE AUDIT FAILED")
