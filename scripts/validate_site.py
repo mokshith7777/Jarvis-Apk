@@ -194,7 +194,7 @@ check("cinematic-world" in HTML and "styles/cinematic.css" in HTML, "Mountain ba
 check('id="cinematic-world"' in HTML, "Primary mountain scene canvas is missing")
 check("cinematic-techfield" not in HTML and "background-canvas" not in HTML and "scene-canvas" not in HTML and "jarvis-world" not in HTML, "Legacy abstract background markup or scripts remain")
 check("Procedural WebGL background plane" not in HTML and "Cinematic 3D ambient scene" not in HTML, "Legacy background renderer scripts remain")
-check("mountainWorld" in MAIN if "MAIN" in globals() else "mountainWorld" in HTML, "Mountain environment code marker missing")
+
 check('referrerpolicy="no-referrer"' in HTML, "Armor image referrer policy missing")
 check("Questions, answered." in HTML and "Bring JARVIS online." in HTML, "FAQ or setup guide content missing")
 coil_block = HTML.split('data-part="coils">', 1)[1].split("</div>", 1)[0] if 'data-part="coils">' in HTML else ""
@@ -205,6 +205,8 @@ check("Questions, answered." in HTML and "Bring JARVIS online." in HTML, "FAQ or
 MAIN = (ROOT / "src/main.js").read_text(encoding="utf-8")
 ARMOR = (ROOT / "src/armor.js").read_text(encoding="utf-8")
 CSS = (ROOT / "styles/cinematic.css").read_text(encoding="utf-8")
+check("mountainWorld" in MAIN and "ridge(" in MAIN and "env.mountainWorld.position.x=-p*18" in MAIN, "Mountain environment code marker missing")
+check("cinematic-techfield" not in CSS and "background-canvas" not in CSS and "web-lattice" not in CSS, "Legacy background selectors remain in the active stylesheet")
 check("scrollTrigger:{start:0,end:()=>Math.max(1,ScrollTrigger.maxScroll(window))" in MAIN, "Cinematic progress must track the full document scroll")
 check("lerp:reduceMotion?1:mobile?.14:.12" in MAIN, "Lenis scroll interpolation must be tuned for responsive smoothness")
 check("1-Math.exp(-24*delta)" in MAIN, "Cinematic camera progress must use frame-rate-independent damping")
