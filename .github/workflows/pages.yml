@@ -102,7 +102,7 @@ jobs:
           set -euo pipefail
           expected="$RUNNER_TEMP/expected-artifact-files"
           actual="$RUNNER_TEMP/actual-artifact-files"
-          printf '%s\n' .nojekyll index.html src/armor.js src/main.js styles/cinematic.css | sort > "$expected"
+          printf '%s\n' .nojekyll index.html src/armor.js src/main.js src/storefront-cinematic.js styles/cinematic.css styles/storefront-cinematic.css | sort > "$expected"
           find "$RUNNER_TEMP/pages" -type f -printf '%P\n' | sort > "$actual"
           diff -u "$expected" "$actual"
           test ! -e "$RUNNER_TEMP/pages/src/.hidden"
@@ -149,7 +149,7 @@ jobs:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
         run: |
           set -euo pipefail
-          for asset in src/main.js src/armor.js styles/cinematic.css; do
+          for asset in src/main.js src/armor.js styles/cinematic.css src/storefront-cinematic.js styles/storefront-cinematic.css; do
             curl --fail --silent --show-error --location --max-time 30 "$PAGE_URL$asset" -o "$RUNNER_TEMP/live-runtime-asset"
             cmp -s "$asset" "$RUNNER_TEMP/live-runtime-asset"
             echo "Verified live runtime asset: $asset"
