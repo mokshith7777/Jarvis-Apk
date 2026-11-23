@@ -131,7 +131,7 @@ function applyCinematic(p){
  if(ph!==state.phase){state.phase=ph;chapterNum.textContent=String(ph+1).padStart(2,'0');chapterName.textContent=chapters[ph].label;hudPhase.textContent=chapters[ph].phase}
  progressFill.style.width=(p*100).toFixed(2)+'%';if(sceneCopy)sceneCopy.style.opacity=1-smooth(.16,.34,p);
 }
-const lenis=new Lenis({smoothWheel:!reduceMotion,smoothTouch:false,lerp:reduceMotion?1:mobile?.14:.12,gestureOrientation:'vertical',wheelMultiplier:1.0,prevent:node=>node?.closest?.('[data-native-scroll]')});lenis.on('scroll',()=>ScrollTrigger.update());gsap.ticker.add(t=>lenis.raf(t*1000));gsap.ticker.lagSmoothing(0);
+const lenis=new Lenis({smoothWheel:false,smoothTouch:false,lerp:1,gestureOrientation:'vertical',wheelMultiplier:1.0,prevent:node=>node?.closest?.('[data-native-scroll]')});lenis.on('scroll',()=>ScrollTrigger.update());gsap.ticker.add(t=>lenis.raf(t*1000));gsap.ticker.lagSmoothing(0);
 // Drive the cinematic journey from the entire document, not just the short hero.
 // This keeps camera/armor/reactor chapters aligned with actual page scroll.
 gsap.to(state,{target:1,ease:'none',scrollTrigger:{start:0,end:()=>Math.max(1,ScrollTrigger.maxScroll(window)),invalidateOnRefresh:true,scrub:reduceMotion?false:.25,onUpdate:self=>{state.target=self.progress}}});
