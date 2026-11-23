@@ -1,0 +1,13 @@
+// Cinematic commerce motion layer: content is retained, presentation and interaction only.
+(()=>{const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const all=[...document.querySelectorAll('h1,h2,h3,.sectionhead p,.storybeat p,.copyblock p,.feature,.pricecard,.included,.demo,.visualbox,.drop-lab,.setup-step,.faqitem,.actions,.eyebrow')];
+all.forEach((el,i)=>{if(el.closest('.nav,.footer'))return;el.classList.add('store-reveal');el.style.transitionDelay=Math.min((i%5)*70,280)+'ms'});
+const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('is-visible');io.unobserve(e.target)}}),{threshold:.12,rootMargin:'0px 0px -5% 0px'});all.forEach(el=>io.observe(el));
+if(!reduced){document.querySelectorAll('h1,h2,.storybeat h2,.sectionhead h2').forEach(el=>{if(el.dataset.wordMotion)return;el.dataset.wordMotion='1';const txt=el.innerHTML;const plain=el.textContent.trim();if(!plain||el.querySelector('span'))return;el.innerHTML=plain.split(/\s+/).map((w,i)=>'<span class="store-word"><span style="transition-delay:'+Math.min(i*45,360)+'ms">'+w+'</span></span>').join(' ');});}
+const streak=document.createElement('div');streak.className='store-streak';document.body.append(streak);
+let lastChapter=-1,scrollBusy=false;const sections=[...document.querySelectorAll('main section[id],main .hero')];
+function onScroll(){const max=Math.max(1,document.documentElement.scrollHeight-innerHeight),p=scrollY/max;document.documentElement.style.setProperty('--store-scroll',p.toFixed(4));const idx=sections.reduce((best,s,i)=>{const y=s.getBoundingClientRect().top;if(y<innerHeight*.55)return i;return best},0);if(idx!==lastChapter){lastChapter=idx;if(!reduced){streak.classList.add('active');setTimeout(()=>streak.classList.remove('active'),1150)}document.querySelectorAll('.chapterrail a').forEach((a,i)=>a.classList.toggle('active',i===idx));}scrollBusy=false}
+addEventListener('scroll',()=>{if(!scrollBusy){scrollBusy=true;requestAnimationFrame(onScroll)}},{passive:true});onScroll();
+document.querySelectorAll('.feature,.pricecard,.visualbox').forEach(el=>{el.addEventListener('pointermove',e=>{if(reduced||matchMedia('(pointer:coarse)').matches)return;const r=el.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;el.style.transform='perspective(900px) rotateX('+(-y*3)+'deg) rotateY('+(x*4)+'deg) translateY(-2px)'});el.addEventListener('pointerleave',()=>el.style.transform='')});
+document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{const target=document.querySelector(a.getAttribute('href'));if(target){e.preventDefault();target.scrollIntoView({behavior:reduced?'auto':'smooth',block:'start'})}}));
+})();

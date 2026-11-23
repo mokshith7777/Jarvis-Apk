@@ -125,7 +125,7 @@ body{background:#020307!important;color:#f3f7fb}
 </script>
 <link rel="stylesheet" href="./styles/cinematic.css">
 
-</head>
+<link rel="stylesheet" href="./styles/storefront-cinematic.css"></head>
 <body>
 
 <div id="runtime-progress" aria-hidden="true"><div id="progress-fill"></div></div>
@@ -327,4 +327,4 @@ document.querySelectorAll('.feature .expand').forEach(button=>{
 document.querySelectorAll('.demo-tab').forEach(tab=>tab.addEventListener('click',()=>{const scenario=demoScenarios[tab.dataset.demo];if(!scenario)return;document.querySelectorAll('.demo-tab').forEach(item=>{const active=item===tab;item.classList.toggle('active',active);item.setAttribute('aria-pressed',String(active))});const screen=document.getElementById('demoscreen');if(screen)screen.innerHTML='<div class="screenlabel">'+scenario.label+'</div><h3>'+scenario.title+'</h3><p>'+scenario.body+'</p>'+scenario.extra;}));
 </script>
 <script type="module" src="./src/main.js"></script>
-</body></html>
+<script src="./src/storefront-cinematic.js"></script></body></html>
