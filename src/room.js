@@ -8,7 +8,7 @@ const stops=[
 {p:[0,1.72,8.5],t:[0,1.6,-3.1]},
 {p:[0,1.72,3.8],t:[0,1.5,-3.5]},
 {p:[0,1.72,1.8],t:[0,1.65,-4.8]},
-{p:[2.35,1.62,-1],t:[-.1,1.45,-4.5]},
+{p:[3.5,1.65,.8],t:[3.8,1.45,-.2]},
 {p:[0,1.65,-3.5],t:[0,1.45,-5.3]}
 ];
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),smooth=v=>v*v*(3-2*v);
@@ -77,7 +77,10 @@ function init(){try{renderer=new THREE.WebGLRenderer({canvas,antialias:!mobile,p
 renderer.setPixelRatio(Math.min(devicePixelRatio||1,mobile?1.25:1.65));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;renderer.shadowMap.enabled=!mobile;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 scene=new THREE.Scene();scene.background=new THREE.Color('#05070b');scene.fog=new THREE.FogExp2('#05070b',.028);camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,.1,100);camera.position.set(...stops[0].p);clock=new THREE.Clock();raycaster=new THREE.Raycaster();mouse=new THREE.Vector2();try{buildRoom();loader.classList.add('hidden');window.__JARVIS_ROOM__={ready:true,renderer:'three',mobile,reducedMotion:reduced};animate();}
 catch(e){console.error('Room renderer initialization failed',e);fallback.hidden=false;document.body.classList.add('fallback');loader.classList.add('hidden');window.__JARVIS_ROOM__={ready:false,renderer:'fallback',error:String(e)};}}
-window.addEventListener('pointermove',e=>{if(mobile)return;lookTX=(e.clientX/innerWidth-.5)*.32;lookTY=(.5-e.clientY/innerHeight)*.14;});
-canvas.addEventListener('pointerdown',e=>{mouse.x=e.clientX/innerWidth*2-1;mouse.y=-(e.clientY/innerHeight)*2+1;raycaster.setFromCamera(mouse,camera);const hit=raycaster.intersectObjects(hotspots,true)[0];if(hit){let o=hit.object;while(o&&!o.userData.hotspot)o=o.parent;if(o&&o.userData.hotspot)show(o.userData.hotspot);}});
+let pointerActive=false,pointerMoved=false,pointerOrigin={x:0,y:0};
+window.addEventListener('pointermove',e=>{if(pointerActive){const dx=e.clientX-pointerOrigin.x,dy=e.clientY-pointerOrigin.y;if(Math.abs(dx)+Math.abs(dy)>8)pointerMoved=true;lookTX=clamp(dx/innerWidth*.55,-.32,.32);lookTY=clamp(-dy/innerHeight*.3,-.16,.16);}else if(!mobile){lookTX=(e.clientX/innerWidth-.5)*.32;lookTY=(.5-e.clientY/innerHeight)*.14;}});
+canvas.addEventListener('pointerdown',e=>{pointerActive=true;pointerMoved=false;pointerOrigin={x:e.clientX,y:e.clientY};if(!mobile)canvas.setPointerCapture?.(e.pointerId);});
+canvas.addEventListener('pointerup',e=>{if(!pointerActive)return;pointerActive=false;if(pointerMoved)return;mouse.x=e.clientX/innerWidth*2-1;mouse.y=-(e.clientY/innerHeight)*2+1;raycaster.setFromCamera(mouse,camera);const hit=raycaster.intersectObjects(hotspots,true)[0];if(hit){let o=hit.object;while(o&&!o.userData.hotspot)o=o.parent;if(o&&o.userData.hotspot)show(o.userData.hotspot);}});
+canvas.addEventListener('pointercancel',()=>{pointerActive=false;});
 window.addEventListener('resize',()=>{if(!renderer)return;camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio||1,mobile?1.25:1.65));});
 init();
