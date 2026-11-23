@@ -6,7 +6,8 @@ root=Path(__file__).resolve().parents[1]
 html=(root/'index.html').read_text()
 errors=[]
 class Audit(HTMLParser):
- def __init__(self):super().__init__();self.ids=[];self.scripts=[];self.links=[]
+ def __init__(self):
+  super().__init__();self.ids=[];self.scripts=[];self.links=[]
  def handle_starttag(self,t,a):
   d=dict(a)
   if d.get('id'):self.ids.append(d['id'])
@@ -16,9 +17,11 @@ p=Audit();p.feed(html)
 if len(set(p.ids))!=len(p.ids):errors.append('duplicate IDs')
 for f in p.scripts+p.links:
  if f.startswith('./') and not (root/f[2:]).exists():errors.append('missing asset '+f)
-for x in ['world','loader','enter','state','room-index']:
+for x in ['world','loader','bottom-nav','open-site','content-panel','panel-close','light-mode']:
  if x not in p.ids:errors.append('required element missing: '+x)
 if 'three@0.180.0' not in html:errors.append('Three.js import map missing')
 if not (root/'favicon.svg').is_file():errors.append('favicon missing')
-if errors:print('FAILED\n'+'\n'.join(errors));sys.exit(1)
+for required in ['buildRoom','buildDesk','buildPiano','buildShelf','buildLighting','setView','enterRoom']:
+ if required not in (root/'src/room.js').read_text():errors.append('runtime function missing: '+required)
+if errors:print('FAILED\\n'+'\\n'.join(errors));sys.exit(1)
 print('Immersive room validation passed.')
