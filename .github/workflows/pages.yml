@@ -34,7 +34,9 @@ jobs:
       - name: Browser smoke
         run: |
           npm install --no-save playwright@1.55.0
-          npx playwright install chromium
+          if ! command -v google-chrome >/dev/null 2>&1; then
+            timeout 180s npx playwright install chromium
+          fi
           python3 -m http.server 4173 --bind 127.0.0.1 > "$RUNNER_TEMP/server.log" 2>&1 &
           attempt=0
           until curl -fsS http://127.0.0.1:4173/ >/dev/null; do
