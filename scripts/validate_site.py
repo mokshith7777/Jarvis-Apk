@@ -19,7 +19,7 @@ for f in p.scripts+p.links:
  if f.startswith('./') and not (root/f[2:]).exists():errors.append('missing asset '+f)
 for x in ['world','loader','bottom-nav','open-site','content-panel','panel-close','light-mode']:
  if x not in p.ids:errors.append('required element missing: '+x)
-if 'three@0.180.0' not in html:errors.append('Three.js import map missing')
+if 'loadThree' not in (root/'src/room.js').read_text():errors.append('resilient Three.js loader missing')
 if not (root/'favicon.svg').is_file():errors.append('favicon missing')
 for required in ['buildRoom','buildDesk','buildPiano','buildShelf','buildLighting','setView','enterRoom']:
  if required not in (root/'src/room.js').read_text():errors.append('runtime function missing: '+required)
