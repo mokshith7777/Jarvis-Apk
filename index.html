@@ -3,27 +3,37 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#02040a">
-<meta name="description" content="An immersive JARVIS room experience.">
-<title>JARVIS · Immersive Room</title>
+<meta name="theme-color" content="#161616">
+<meta name="description" content="An immersive interactive 3D room experience.">
+<title>Immersive Room</title>
 <link rel="icon" href="./favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./styles/room.css">
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"}}</script>
 </head>
 <body>
-<div id="loader"><div class="loader-ring"><i></i></div><span>INITIALIZING</span></div>
-<canvas id="world" aria-label="Interactive cinematic JARVIS room"></canvas>
-<div class="vignette"></div><div class="grain"></div>
-<div class="hud">
-  <div class="mark" aria-label="JARVIS"><span>J</span></div>
-  <div class="status"><i></i><span id="state">SYSTEM ONLINE</span></div>
-  <button id="enter" aria-label="Enter room"><span class="enter-label">ENTER</span><b>↗</b></button>
+<div id="loader"><div class="loader-dot"></div><span>ENTERING</span></div>
+<canvas id="world" aria-label="Interactive 3D room. Drag to look around and tap objects."></canvas>
+<div class="screen-shade"></div>
+<div class="ui">
+  <button class="moon" id="light-mode" aria-label="Toggle lighting"><span>◐</span></button>
+  <div class="hint" id="hint">Drag to look around</div>
+  <div class="bottom-nav" id="bottom-nav">
+    <button class="location active" data-view="desk">+ Desk</button>
+    <button class="location" data-view="entrance">Entrance</button>
+    <button class="location" data-view="shelf">Shelf</button>
+    <button class="location" data-view="piano">Piano</button>
+    <button class="open-site" id="open-site">Open site ↗</button>
+  </div>
+  <div class="object-label" id="object-label" hidden></div>
+  <div class="content-panel" id="content-panel" hidden>
+    <button class="panel-close" id="panel-close" aria-label="Close">×</button>
+    <div class="panel-kicker" id="panel-kicker">INTERACTIVE OBJECT</div>
+    <div class="panel-title" id="panel-title">Screen</div>
+    <div class="panel-copy" id="panel-copy">This is a content placeholder. Your concept will be added here later.</div>
+  </div>
 </div>
-<div class="edge-label left">J A R V I S <span> / </span> SPATIAL INTERFACE</div>
-<div class="edge-label right" id="room-index">01 — 04</div>
-<div class="scroll-orbit" aria-hidden="true"><span></span></div>
-<div id="fallback" hidden></div>
 <script type="module" src="./src/room.js"></script>
-</body></html>
+</body>
+</html>
