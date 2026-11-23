@@ -43,7 +43,7 @@ jobs:
           curl -fsS http://127.0.0.1:4173/ | grep -q 'ENTER THE ROOM'
           curl -fsS http://127.0.0.1:4173/favicon.svg | grep -q '<svg'
           curl -fsS http://127.0.0.1:4173/styles/room.css >/dev/null
-          curl -fsS http://127.0.0.1:4173/src/room.js | grep -q 'function buildRoom'
+          curl -fsS http://127.0.0.1:4173/src/room.js | grep -q 'function buildArchitecture'
           echo "HTTP smoke passed: HTML, favicon, CSS, and room runtime served successfully."
       - name: Stage clean website artifact
         run: |
