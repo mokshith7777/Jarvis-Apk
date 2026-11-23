@@ -11,10 +11,7 @@ concurrency:
   group: pages
   cancel-in-progress: true
 jobs:
-  validate-and-deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  validate-and-upload:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
@@ -44,7 +41,7 @@ jobs:
           grep -q 'unpkg.com/three' src/room.js
           grep -q 'esm.sh/three' src/room.js
           grep -q 'function buildDesk' src/room.js
-          echo "Static smoke passed: immersive room assets and interaction framework are present."
+          echo "Static smoke passed: studio assets and interactions are present."
       - name: Stage website artifact
         run: |
           rm -rf _site
@@ -82,6 +79,17 @@ jobs:
         uses: actions/upload-pages-artifact@0ca16172ca884f0a37117fed41734f29784cc980
         with:
           path: _site
+  deploy:
+    needs: validate-and-upload
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    steps:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346
