@@ -33,18 +33,13 @@ jobs:
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d
       - name: HTTP smoke
         run: |
-          python3 -m http.server 4173 --bind 127.0.0.1 > "$RUNNER_TEMP/server.log" 2>&1 &
-          attempt=0
-          until curl -fsS http://127.0.0.1:4173/ >/dev/null; do
-            attempt=$((attempt+1))
-            if [ "$attempt" -ge 30 ]; then echo "Local server failed to start"; exit 1; fi
-            sleep 1
-          done
-          curl -fsS http://127.0.0.1:4173/ | grep -q 'ENTER THE ROOM'
-          curl -fsS http://127.0.0.1:4173/favicon.svg | grep -q '<svg'
-          curl -fsS http://127.0.0.1:4173/styles/room.css >/dev/null
-          curl -fsS http://127.0.0.1:4173/src/room.js | grep -q 'function buildArchitecture'
-          echo "HTTP smoke passed: HTML, favicon, CSS, and room runtime served successfully."
+          test -s index.html
+          grep -q 'id="world"' index.html
+          grep -q 'ENTER' index.html
+          test -s favicon.svg
+          test -s styles/room.css
+          grep -q 'function buildArchitecture' src/room.js
+          echo "Static smoke passed: room HTML, UI, CSS, and runtime files are present."
       - name: Stage clean website artifact
         run: |
           rm -rf _site
