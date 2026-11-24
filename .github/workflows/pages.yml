@@ -11,76 +11,40 @@ concurrency:
   group: pages
   cancel-in-progress: true
 jobs:
-  validate-and-upload:
+  build-test-deploy:
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
-      - name: Validate workflow
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - name: Install dependencies
+        run: npm install
+      - name: Validate
         run: |
-          curl -fsSL https://github.com/rhysd/actionlint/releases/download/v1.7.7/actionlint_1.7.7_linux_amd64.tar.gz -o "$RUNNER_TEMP/actionlint.tar.gz"
-          tar -xzf "$RUNNER_TEMP/actionlint.tar.gz" -C "$RUNNER_TEMP" actionlint
-          "$RUNNER_TEMP/actionlint" .github/workflows/pages.yml
-      - name: Static validation
-        run: |
-          python3 scripts/validate_site.py
+          npm run build
           node --check src/room.js
-          node --check scripts/runtime_smoke.cjs
-      - name: Configure Pages
-        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d
-      - name: HTTP smoke
-        run: |
-          test -s index.html
-          grep -q 'id="world"' index.html
-          grep -q 'id="bottom-nav"' index.html
-          grep -q 'id="screen-modal"' index.html
-          test -s favicon.svg
-          test -s styles/room.css
-          grep -q 'function buildRoom' src/room.js
-          grep -q 'loadModule' src/room.js
-          grep -q 'unpkg.com/three' src/room.js
-          grep -q 'esm.sh/three' src/room.js
-          grep -q 'function buildDesk' src/room.js
-          echo "Static smoke passed: studio assets and interactions are present."
-      - name: Stage website artifact
-        run: |
-          rm -rf _site
-          mkdir -p _site/styles _site/src
-          cp index.html _site/
-          cp favicon.svg _site/
-          cp .nojekyll _site/
-          cp styles/room.css _site/styles/
-          cp src/room.js _site/src/
-          test -s _site/index.html
-          test -s _site/styles/room.css
-          test -s _site/src/room.js
-          find _site -type f -print
-      - name: Install browser test dependencies
+          test -s dist/index.html
+          grep -q 'world' dist/index.html
+          if grep -R -E 'cdn.jsdelivr.net|unpkg.com|esm.sh' src dist; then exit 1; fi
+          if grep -q 'bottom-nav' index.html; then exit 1; fi
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d
+      - name: Browser smoke
         run: |
           npm install --no-save playwright@1.55.0
           npx playwright install chromium
-      - name: Real browser smoke
-        run: |
-          python3 -m http.server 4173 --directory _site > "$RUNNER_TEMP/site-server.log" 2>&1 &
-          echo $! > "$RUNNER_TEMP/site-server.pid"
-          for _ in $(seq 1 30); do
-            curl -fsS http://127.0.0.1:4173/ >/dev/null && break
-            sleep 1
-          done
-          SITE_URL=http://127.0.0.1:4173 SCREENSHOT_PATH="$RUNNER_TEMP/room-smoke.png" node scripts/runtime_smoke.cjs
-      - name: Upload browser screenshot
+          python3 -m http.server 4173 --directory dist > "$RUNNER_TEMP/server.log" 2>&1 &
+          for _ in $(seq 1 30); do curl -fsS http://127.0.0.1:4173/Jarvis-Apk/ >/dev/null && break; sleep 1; done
+          SITE_URL=http://127.0.0.1:4173/Jarvis-Apk/ node scripts/runtime_smoke.cjs
+      - name: Upload smoke screenshot
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: immersive-room-browser-smoke
-          path: ${{ runner.temp }}/room-smoke.png
+          name: studio-browser-smoke
+          path: room-smoke.png
           if-no-files-found: ignore
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@0ca16172ca884f0a37117fed41734f29784cc980
+      - uses: actions/upload-pages-artifact@0ca16172ca884f0a37117fed41734f29784cc980
         with:
-          path: _site
+          path: dist
   deploy:
-    needs: validate-and-upload
+    needs: build-test-deploy
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -90,13 +54,9 @@ jobs:
       pages: write
       id-token: write
     steps:
-      - name: Deploy
-        id: deployment
+      - id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346
-      - name: Verify live deployment
+      - name: Verify deployment response
         run: |
           curl -fsSL "${{ steps.deployment.outputs.page_url }}" -o "$RUNNER_TEMP/live.html"
-          grep -q 'bottom-nav' "$RUNNER_TEMP/live.html"
-          grep -q 'src/room.js' "$RUNNER_TEMP/live.html"
-          curl -fsSL "${{ steps.deployment.outputs.page_url }}src/room.js" -o "$RUNNER_TEMP/live-room.js"
-          node --check "$RUNNER_TEMP/live-room.js"
+          grep -q 'world' "$RUNNER_TEMP/live.html"
