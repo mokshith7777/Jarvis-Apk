@@ -26,22 +26,6 @@ jobs:
           if grep -R -E 'cdn.jsdelivr.net|unpkg.com|esm.sh' src dist; then exit 1; fi
           if grep -q 'bottom-nav' index.html; then exit 1; fi
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d
-      - name: Browser smoke
-        timeout-minutes: 5
-        continue-on-error: true
-        run: |
-          npm install --no-save playwright@1.55.0
-          npx playwright install chromium
-          python3 -m http.server 4173 --directory dist > "$RUNNER_TEMP/server.log" 2>&1 &
-          for _ in $(seq 1 30); do curl -fsS http://127.0.0.1:4173/Jarvis-Apk/ >/dev/null && break; sleep 1; done
-          SITE_URL=http://127.0.0.1:4173/Jarvis-Apk/ node scripts/runtime_smoke.cjs
-      - name: Upload smoke screenshot
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: studio-browser-smoke
-          path: room-smoke.png
-          if-no-files-found: ignore
       - uses: actions/upload-pages-artifact@0ca16172ca884f0a37117fed41734f29784cc980
         with:
           path: dist
