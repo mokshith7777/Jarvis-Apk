@@ -18,6 +18,8 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Validate
+        env:
+          GITHUB_PAGES: 'true'
         run: |
           npm run build
           node --check src/room.js
